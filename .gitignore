@@ -1,0 +1,6 @@
+**/target/
+**/node_modules/
+**/application-local.properties
+.env
+.env.*
+.vscode/

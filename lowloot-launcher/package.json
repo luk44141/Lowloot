@@ -1,0 +1,14 @@
+{
+  "name": "lowloot-launcher",
+  "version": "0.1.0",
+  "description": "Launcher de escritorio de Lowloot",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "electron": "^31.0.0"
+  }
+}

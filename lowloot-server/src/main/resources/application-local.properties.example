@@ -1,0 +1,5 @@
+# Copy this file to application-local.properties for local-only overrides.
+# Do not commit the copied file; use a dedicated PostgreSQL user instead of postgres.
+spring.datasource.url=jdbc:postgresql://localhost:5432/lowloot
+spring.datasource.username=lowloot_app
+spring.datasource.password=change-me
