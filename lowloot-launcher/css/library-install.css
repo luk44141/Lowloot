@@ -1,0 +1,182 @@
+/* library-install.css — modal de instalación dentro de Lowloot (disco, carpeta,
+   espacio, versión, contenido opcional, acceso directo, progreso simulado). */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 6, 6, 0.6);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s var(--ease);
+  z-index: 50;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal {
+  width: 440px;
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 26px 26px 24px;
+  position: relative;
+  transform: scale(0.96) translateY(8px);
+  transition: transform 0.22s var(--ease);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45);
+}
+
+.modal-overlay.open .modal {
+  transform: scale(1) translateY(0);
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease);
+  z-index: 2;
+}
+
+.modal-close:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.install-modal-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 22px;
+  padding-right: 24px;
+}
+
+.install-field {
+  margin-bottom: 18px;
+}
+
+.install-field label,
+.install-field-label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+  margin-bottom: 8px;
+}
+
+.install-field select,
+.install-field input[type='text'] {
+  width: 100%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 12.5px;
+  padding: 9px 11px;
+}
+
+.install-field select:focus,
+.install-field input[type='text']:focus {
+  outline: none;
+  border-color: var(--text-secondary);
+}
+
+.install-space-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+
+.install-space-warning {
+  color: var(--text-primary) !important;
+}
+
+.install-warning {
+  font-size: 12px;
+  color: var(--text-primary);
+  background: var(--accent-dim);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  margin: 0 0 18px;
+}
+
+.install-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  padding: 6px 0;
+  cursor: default;
+}
+
+.install-checkbox input {
+  accent-color: var(--text-primary);
+}
+
+.install-shortcut {
+  margin-top: 4px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.install-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+/* ---------- Progreso simulado ---------- */
+
+.install-progress-track {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.install-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent-bright);
+  border-radius: 999px;
+  transition: width 0.2s ease-out;
+}
+
+.install-progress-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0;
+}

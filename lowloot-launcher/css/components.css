@@ -1,0 +1,391 @@
+/* components.css — piezas reutilizables: botones, tarjetas de juego/pack, filas de resultado, precios */
+
+.gradient-featured {
+  background: linear-gradient(155deg, #2a2a2a 0%, #161616 45%, #0e0e0e 100%);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #111111;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: default;
+  transition: background 0.15s var(--ease), transform 0.12s var(--ease);
+}
+
+.btn-primary:hover {
+  background: var(--accent-bright);
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+/* Recomendados */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  width: 100%;
+}
+
+.game-card {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  cursor: default;
+  transition: transform 0.2s var(--ease), border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  opacity: 0;
+  animation: cardIn 0.4s var(--ease) forwards;
+}
+
+.card-grid .game-card:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.card-grid .game-card:nth-child(2) {
+  animation-delay: 0.12s;
+}
+.card-grid .game-card:nth-child(3) {
+  animation-delay: 0.19s;
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Al pasar el mouse la tarjeta crece un poco y "flota" por encima de las
+   vecinas (z-index), para que el video de preview se note más — sin tocar
+   el layout del grid, porque transform no reserva espacio extra. */
+.game-card:hover {
+  transform: translateY(-4px) scale(1.045);
+  border-color: #333333;
+  box-shadow: 0 22px 42px rgba(0, 0, 0, 0.4);
+  z-index: 3;
+}
+
+.game-card-media {
+  position: relative;
+  overflow: hidden;
+}
+
+.game-image {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  display: block;
+}
+
+/* Video de preview (hover tipo Steam), superpuesto a la portada. Arranca
+   invisible/pausado; app.js (initHoverPreviews) lo reproduce y le agrega
+   la clase .preview-playing a la tarjeta al pasar el mouse. */
+.game-card-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s var(--ease);
+}
+
+.game-card.preview-playing .game-card-video {
+  opacity: 1;
+}
+
+.discount-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: var(--accent-bright);
+  color: #111111;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 5px;
+  letter-spacing: 0.02em;
+  z-index: 1;
+}
+
+.gradient-a {
+  background: linear-gradient(155deg, #262626 0%, #131313 100%);
+}
+
+.gradient-b {
+  background: linear-gradient(155deg, #2e2e2e 0%, #161616 100%);
+}
+
+.gradient-c {
+  background: linear-gradient(155deg, #202020 0%, #101010 100%);
+}
+
+.gradient-d {
+  background: linear-gradient(155deg, #343434 0%, #191919 100%);
+}
+
+.gradient-e {
+  background: linear-gradient(155deg, #232323 0%, #0f0f0f 100%);
+}
+
+.gradient-f {
+  background: linear-gradient(155deg, #2a2a2a 0%, #171717 100%);
+}
+
+.game-info {
+  padding: 13px 15px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.game-name {
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.game-genre {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.game-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+
+.game-rating {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.game-price {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.game-price.price-free {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.price-old {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-decoration: line-through;
+  margin-right: 6px;
+}
+
+.price-new {
+  font-size: 12px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.empty-state {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 18px;
+  display: none;
+}
+
+.empty-state.visible {
+  display: block;
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+/* ---------- Tarjetas de pack ---------- */
+
+.pack-card {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  cursor: default;
+  transition: transform 0.2s var(--ease), border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.pack-card:hover {
+  transform: translateY(-3px);
+  border-color: #333333;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28);
+}
+
+.pack-card-media {
+  position: relative;
+  display: flex;
+  aspect-ratio: 16 / 9;
+}
+
+.pack-thumb {
+  flex: 1;
+}
+
+.pack-thumb-secondary {
+  filter: brightness(0.85);
+}
+
+.pack-count-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.55);
+  color: var(--text-primary);
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.pack-savings {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.result-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: default;
+  transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.result-row:hover {
+  background: var(--bg-elevated);
+  border-color: #333333;
+}
+
+.result-thumb {
+  width: 84px;
+  height: 48px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.result-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.result-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.result-genre {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.result-rating {
+  font-size: 12px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  width: 56px;
+}
+
+.result-price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  width: 150px;
+  justify-content: flex-end;
+}
+
+.result-price .discount-badge {
+  position: static;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  padding: 6px 4px;
+  margin-bottom: 26px;
+  cursor: default;
+  transition: color 0.15s var(--ease), transform 0.15s var(--ease);
+}
+
+.back-btn:hover {
+  color: var(--text-primary);
+  transform: translateX(-2px);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: default;
+  transition: border-color 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.btn-secondary:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+.btn-secondary.wishlisted {
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
+.chip-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+.chip {
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  padding: 7px 12px;
+  border-radius: 999px;
+}

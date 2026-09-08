@@ -9,7 +9,18 @@
     href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/home.css" />
+  <link rel="stylesheet" href="css/store.css" />
+  <link rel="stylesheet" href="css/detail.css" />
+  <link rel="stylesheet" href="css/wishlist.css" />
+  <link rel="stylesheet" href="css/cart.css" />
+  <link rel="stylesheet" href="css/library.css" />
+  <link rel="stylesheet" href="css/library-detail.css" />
+  <link rel="stylesheet" href="css/library-install.css" />
+  <link rel="stylesheet" href="css/library-community.css" />
 </head>
 <body>
   <div class="app">
@@ -78,6 +89,11 @@
             <span class="nav-indicator"></span>
             <span class="nav-label">WISHLIST</span>
           </li>
+          <li class="nav-item" data-view="carrito">
+            <span class="nav-indicator"></span>
+            <span class="nav-label">CARRITO</span>
+            <span class="nav-badge" id="cart-nav-badge" hidden></span>
+          </li>
           <li class="nav-item" data-view="amigos">
             <span class="nav-indicator"></span>
             <span class="nav-label">AMIGOS</span>
@@ -142,12 +158,22 @@
           <div id="wishlist-content"></div>
         </section>
 
-        <!-- Vistas placeholder -->
-        <section class="view placeholder-view" data-view="biblioteca">
-          <h2 class="section-title">BIBLIOTECA</h2>
-          <p class="placeholder-text">Esta sección todavía no está disponible.</p>
+        <!-- Vista: Carrito -->
+        <section class="view store-view" data-view="carrito">
+          <div id="cart-content"></div>
         </section>
 
+        <!-- Vista: Biblioteca -->
+        <section class="view store-view" data-view="biblioteca">
+          <div id="library-content"></div>
+        </section>
+
+        <!-- Vista: ficha de juego de Biblioteca -->
+        <section class="view game-view" data-view="library-game">
+          <div id="library-game-content"></div>
+        </section>
+
+        <!-- Vistas placeholder -->
         <section class="view placeholder-view" data-view="amigos">
           <h2 class="section-title">AMIGOS</h2>
           <p class="placeholder-text">Esta sección todavía no está disponible.</p>
@@ -171,10 +197,35 @@
     </div>
   </div>
 
+  <!-- Modal de instalación (Biblioteca) -->
+  <div class="modal-overlay" id="install-modal-overlay">
+    <div class="modal install-modal" role="dialog" aria-modal="true">
+      <button type="button" class="modal-close" id="install-modal-close" aria-label="Cerrar">&times;</button>
+      <div id="install-modal-content"></div>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
-  <script src="data.js" defer></script>
-  <script src="app.js" defer></script>
+  <script src="js/api-client.js" defer></script>
+  <script src="js/game-store.js" defer></script>
+  <script src="js/library-data.js" defer></script>
+  <script src="js/helpers.js" defer></script>
+  <script src="js/state.js" defer></script>
+  <script src="js/navigation.js" defer></script>
+  <script src="js/topbar.js" defer></script>
+  <script src="js/components.js" defer></script>
+  <script src="js/home.js" defer></script>
+  <script src="js/store.js" defer></script>
+  <script src="js/game-detail.js" defer></script>
+  <script src="js/pack-detail.js" defer></script>
+  <script src="js/wishlist.js" defer></script>
+  <script src="js/cart.js" defer></script>
+  <script src="js/library.js" defer></script>
+  <script src="js/library-community.js" defer></script>
+  <script src="js/library-detail.js" defer></script>
+  <script src="js/library-install.js" defer></script>
+  <script src="js/app.js" defer></script>
 </body>
 </html>

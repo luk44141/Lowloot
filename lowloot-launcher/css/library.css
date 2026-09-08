@@ -1,0 +1,457 @@
+/* library.css — vista principal de Biblioteca: encabezado, controles, carpetas
+   y los 3 modos de visualización (lista, cuadrícula, carátulas). */
+
+/* ---------- Encabezado y controles ---------- */
+
+.lib-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.lib-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.lib-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 7px 11px;
+  width: 220px;
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.lib-search:focus-within {
+  border-color: var(--text-secondary);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+.lib-search svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.lib-search input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 12.5px;
+  width: 100%;
+}
+
+.lib-search input::placeholder {
+  color: var(--text-muted);
+}
+
+.lib-view-toggle {
+  display: flex;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  gap: 2px;
+}
+
+.lib-view-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: default;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.lib-view-btn:hover {
+  color: var(--text-primary);
+}
+
+.lib-view-btn.active {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* ---------- Barra de filtros y orden ---------- */
+
+.lib-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.lib-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lib-filter-chip {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 7px 13px;
+  border-radius: 999px;
+  cursor: default;
+  transition: background 0.15s var(--ease), border-color 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.lib-filter-chip:hover {
+  color: var(--text-primary);
+}
+
+.lib-filter-chip.active {
+  background: var(--accent-dim);
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+.lib-sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.lib-sort select {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+}
+
+/* ---------- Carpetas ---------- */
+
+.lib-folders {
+  margin-bottom: 36px;
+}
+
+.lib-folders-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 14px;
+}
+
+.lib-folders-track {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.lib-folder-card {
+  flex: 0 0 168px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0;
+  overflow: hidden;
+  cursor: default;
+  text-align: left;
+  transition: transform 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+
+.lib-folder-card:hover {
+  transform: translateY(-3px);
+  border-color: #333333;
+}
+
+.lib-folder-cover {
+  display: flex;
+  aspect-ratio: 16 / 9;
+}
+
+.lib-folder-cover-img {
+  flex: 1;
+}
+
+.lib-folder-name {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-primary);
+  padding: 10px 12px 2px;
+}
+
+.lib-folder-count {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 0 12px 12px;
+}
+
+.lib-folder-heading {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 20px;
+}
+
+/* ---------- Contenedor de juegos + transición entre modos ---------- */
+
+.lib-games {
+  transition: opacity 0.18s var(--ease), transform 0.18s var(--ease);
+}
+
+.lib-games.lib-games-fading {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+/* ---------- Estado / acciones compartidas ---------- */
+
+.lib-pill {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 4px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.lib-pill-installed {
+  background: var(--accent-dim);
+  color: var(--text-primary);
+}
+
+.lib-pill-not-installed {
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+}
+
+.lib-pill-update {
+  background: var(--accent-bright);
+  color: #111111;
+}
+
+.lib-action-btn {
+  white-space: nowrap;
+}
+
+.lib-action-btn-small {
+  padding: 7px 12px;
+  font-size: 11px;
+}
+
+.lib-action-group {
+  display: flex;
+  gap: 8px;
+}
+
+.lib-update-dot {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-bright);
+  box-shadow: 0 0 6px var(--accent-bright);
+}
+
+.lib-stat-label {
+  display: block;
+  font-size: 10.5px;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+}
+
+.lib-stat-value {
+  display: block;
+  font-size: 12.5px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* ---------- Modo Lista ---------- */
+
+.lib-games-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lib-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  cursor: default;
+  transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.lib-row:hover {
+  background: var(--bg-elevated);
+  border-color: #333333;
+}
+
+.lib-row-cover {
+  width: 96px;
+  height: 54px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.lib-row-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.lib-row-name {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.lib-row-sub {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.lib-row-status {
+  flex-shrink: 0;
+  width: 172px;
+}
+
+.lib-row-stat {
+  flex-shrink: 0;
+  width: 120px;
+}
+
+.lib-row-action {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* ---------- Modo Cuadrícula ---------- */
+
+.lib-games-cuadricula {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 22px;
+}
+
+.lib-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: default;
+  transition: transform 0.2s var(--ease), border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.lib-card:hover {
+  transform: translateY(-3px);
+  border-color: #333333;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28);
+}
+
+.lib-card-cover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.lib-card-info {
+  padding: 12px 14px 4px;
+}
+
+.lib-card-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.lib-card-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.lib-card-action {
+  padding: 12px 14px 14px;
+}
+
+.lib-card-action .btn-primary {
+  width: 100%;
+}
+
+/* ---------- Modo Carátulas ---------- */
+
+.lib-games-caratulas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 20px;
+}
+
+.lib-cover {
+  cursor: default;
+  text-align: left;
+}
+
+.lib-cover-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 8px;
+  transition: transform 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+
+.lib-cover:hover .lib-cover-image {
+  transform: translateY(-3px);
+  border-color: #333333;
+}
+
+.lib-cover-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.55);
+  color: var(--text-primary);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.lib-cover-name {
+  display: block;
+  font-size: 12.5px;
+  color: var(--text-primary);
+  line-height: 1.35;
+}

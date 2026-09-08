@@ -1,0 +1,109 @@
+/* cart.css — vista de Carrito: filas con control de cantidad y resumen de compra */
+
+.cart-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.cart-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.cart-row:hover {
+  background: var(--bg-elevated);
+  border-color: #333333;
+}
+
+.cart-row .result-thumb {
+  width: 140px;
+  height: 80px;
+  border-radius: var(--radius-sm);
+}
+
+.cart-row .result-name {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.cart-row .result-genre {
+  font-size: 12.5px;
+}
+
+.cart-qty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.cart-qty-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.cart-qty-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--text-secondary);
+}
+
+.cart-qty-value {
+  min-width: 18px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.cart-row .result-price {
+  width: 130px;
+  justify-content: flex-end;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cart-remove-btn {
+  flex-shrink: 0;
+  padding: 8px 14px;
+}
+
+.cart-summary {
+  margin-top: 26px;
+  padding: 20px 22px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  max-width: 360px;
+}
+
+.cart-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding-bottom: 16px;
+}
+
+.cart-checkout-btn {
+  width: 100%;
+}

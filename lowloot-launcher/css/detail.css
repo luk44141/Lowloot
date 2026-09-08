@@ -1,0 +1,458 @@
+/* detail.css — página de detalle de juego y de pack (incluye reseñas y desarrolladora) */
+
+/* ---------- Página de detalle (juego / pack) ---------- */
+
+.game-view {
+  max-width: 1040px;
+}
+
+.detail-gallery {
+  margin-bottom: 28px;
+}
+
+/* Hero más grande y destacado (antes 320px máx.), con overflow controlado
+   para que el video/imagen no se recorte contra el borde del contenedor. */
+.detail-hero {
+  width: 100%;
+  aspect-ratio: 16 / 8;
+  max-height: 520px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  overflow: hidden;
+  position: relative;
+  background: #050505;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45);
+}
+
+.detail-preview-image,
+.detail-preview-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: #050505;
+}
+
+.hero-play-icon {
+  font-size: 22px;
+  color: var(--text-primary);
+  opacity: 0.85;
+}
+
+.hero-play-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.gallery-thumbs {
+  display: flex;
+  gap: 10px;
+}
+
+.gallery-thumb {
+  width: 84px;
+  height: 48px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  cursor: default;
+  padding: 0;
+  transition: border-color 0.15s var(--ease);
+}
+
+.gallery-thumb.active {
+  border-color: var(--accent-bright);
+}
+
+/* Miniatura del video dentro de la galería, para poder volver a él después
+   de mirar las screenshots. */
+.gallery-thumb-video {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gallery-thumb-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.detail-header {
+  margin-bottom: 8px;
+}
+
+.game-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.detail-name {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  margin: 0 0 10px;
+}
+
+.detail-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.detail-developer {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.owned-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+  background: var(--accent-dim);
+  padding: 5px 10px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+}
+
+.detail-price-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.detail-price {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.detail-price-row .price-old {
+  font-size: 13px;
+}
+
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  row-gap: 12px;
+  padding-bottom: 32px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.detail-section {
+  margin-bottom: 40px;
+}
+
+.detail-section-inline {
+  display: flex;
+  gap: 60px;
+}
+
+.detail-desc {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  max-width: 640px;
+  margin: 0;
+}
+
+.info-card-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.info-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  min-width: 200px;
+  flex: 1 1 220px;
+}
+
+.info-card h5 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.info-card p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0 0 10px;
+}
+
+.info-card-price {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.simple-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.requirements-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 24px;
+}
+
+.requirements-col h5 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 12px;
+}
+
+.req-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.req-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12.5px;
+  border-bottom: 1px solid var(--border-soft);
+  padding-bottom: 9px;
+}
+
+.req-list li span:first-child {
+  color: var(--text-muted);
+}
+
+.req-list li span:last-child {
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+/* ---------- Reseñas ---------- */
+
+.reviews-summary {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.reviews-average {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 120px;
+}
+
+.reviews-average-number {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.rating-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 220px;
+  max-width: 320px;
+}
+
+.rating-bar-row {
+  display: grid;
+  grid-template-columns: 26px 1fr 22px;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.rating-bar-track {
+  height: 5px;
+  background: var(--bg-elevated);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.rating-bar-fill {
+  height: 100%;
+  background: var(--text-secondary);
+}
+
+.reviews-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.reviews-controls select {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-size: 12px;
+  padding: 7px 9px;
+  border-radius: var(--radius-sm);
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.review-item {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.review-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2c2c2c, #161616);
+  border: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.review-header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.review-user {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.review-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.review-text {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ---------- Página de pack ---------- */
+
+.pack-games-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pack-game-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: default;
+  transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.pack-game-row:hover {
+  background: var(--bg-elevated);
+  border-color: #333333;
+}
+
+.pack-summary {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 20px 22px;
+  max-width: 360px;
+}
+
+.pack-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 8px 0;
+}
+
+.pack-summary-savings {
+  color: var(--text-primary);
+  font-weight: 600;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+  margin: 4px 0 14px;
+}
+
+.pack-summary .btn-primary {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* ---------- Desarrolladora (detalle de juego) ---------- */
+
+.developer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.developer-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+}

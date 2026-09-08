@@ -4,3 +4,10 @@
 .env
 .env.*
 .vscode/
+
+# Ignorar los juegos instalados
+lowlootgames/*/*/
+
+# Mantener los assets
+!lowlootgames/*/assets/
+!lowlootgames/*/assets/**

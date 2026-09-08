@@ -1,0 +1,55 @@
+/* wishlist.css — vista de Wishlist */
+
+/* ---------- Wishlist ---------- */
+
+.wishlist-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.wishlist-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.wishlist-row:hover {
+  background: var(--bg-elevated);
+  border-color: #333333;
+}
+
+.wishlist-row .result-thumb {
+  width: 140px;
+  height: 80px;
+  border-radius: var(--radius-sm);
+}
+
+.wishlist-row .result-name {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.wishlist-row .result-genre {
+  font-size: 12.5px;
+}
+
+.wishlist-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  width: 190px;
+}
+
+.wishlist-remove-btn {
+  flex-shrink: 0;
+  padding: 8px 14px;
+}
