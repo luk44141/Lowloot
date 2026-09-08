@@ -106,6 +106,29 @@
   opacity: 1;
 }
 
+/* Mientras el preview de video está sonando/reproduciéndose, esa tarjeta
+   pasa a ser "lo primario en la pantalla": se eleva más que el hover normal
+   y el resto de las tarjetas del mismo grupo se atenúan y desenfocan un
+   poco, para que el video se note y se lea bien. */
+.game-card.preview-playing {
+  transform: translateY(-8px) scale(1.09);
+  box-shadow: 0 34px 64px rgba(0, 0, 0, 0.55);
+  z-index: 5;
+}
+
+.store-row-track:has(.preview-playing) .game-card:not(.preview-playing),
+.card-grid:has(.preview-playing) .game-card:not(.preview-playing) {
+  filter: blur(2.5px) brightness(0.6) saturate(0.85);
+  transform: scale(0.98);
+  transition: filter 0.25s var(--ease), transform 0.25s var(--ease);
+}
+
+.featured-card.preview-playing .featured-media {
+  transform: translateY(-6px) scale(1.06);
+  box-shadow: 0 34px 70px rgba(0, 0, 0, 0.55);
+  z-index: 5;
+}
+
 .discount-badge {
   position: absolute;
   top: 10px;
@@ -222,12 +245,14 @@
   border: 1px solid var(--border-subtle);
   cursor: default;
   transition: transform 0.2s var(--ease), border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  opacity: 0;
+  animation: cardIn 0.4s var(--ease) forwards;
 }
 
 .pack-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-5px) scale(1.03);
   border-color: #333333;
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 20px 38px rgba(0, 0, 0, 0.35);
 }
 
 .pack-card-media {
@@ -270,12 +295,15 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   cursor: default;
-  transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
+  transition: background 0.18s var(--ease), border-color 0.18s var(--ease), transform 0.18s var(--ease);
+  opacity: 0;
+  animation: cardIn 0.3s var(--ease) forwards;
 }
 
 .result-row:hover {
   background: var(--bg-elevated);
   border-color: #333333;
+  transform: translateX(3px);
 }
 
 .result-thumb {

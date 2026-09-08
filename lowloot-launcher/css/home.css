@@ -4,6 +4,7 @@
 
 .featured {
   margin-bottom: 120px;
+  position: relative;
 }
 
 .featured-card {
@@ -12,6 +13,11 @@
   gap: 44px;
   align-items: flex-start;
   cursor: default;
+  position: relative;
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  background: radial-gradient(ellipse at 15% 20%, rgba(255, 255, 255, 0.05), transparent 60%);
+  animation: cardIn 0.5s var(--ease) both;
 }
 
 .featured-media {
@@ -46,6 +52,8 @@
   padding-top: 10px;
   flex: 1 1 320px;
   max-width: 480px;
+  animation: cardIn 0.5s var(--ease) both;
+  animation-delay: 0.08s;
 }
 
 .featured-name {
@@ -238,10 +246,34 @@
 /* ---------- Más jugado ahora ---------- */
 
 .top-played-count {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   font-size: 12px;
   color: var(--text-muted);
   margin-bottom: 18px;
+}
+
+.top-played-count::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #6ee78a;
+  box-shadow: 0 0 0 rgba(110, 231, 138, 0.6);
+  animation: livePulse 1.8s var(--ease) infinite;
+}
+
+@keyframes livePulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(110, 231, 138, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(110, 231, 138, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(110, 231, 138, 0);
+  }
 }
 
 /* ---------- En tendencia: tarjetas más chicas que en el resto de la app ---------- */

@@ -36,70 +36,38 @@ const LibraryData = (() => {
     return new Date(Date.now() - days * DAY_MS).toISOString();
   }
 
-  function generateAchievements(game, installed, playtimeHours, addedDate) {
+  // Estas tres funciones generaban contenido de EJEMPLO fijo para todos los
+  // juegos (siempre los mismos 3 logros con el mismo texto, el mismo post
+  // de comunidad, el mismo historial de "actualización disponible"). Eso no
+  // es dato simulado útil, es relleno de maqueta — así que ahora se devuelve
+  // vacío/real y las secciones ya muestran su estado vacío normal ("Este
+  // juego todavía no tiene logros", "Todavía no hay actividad de la
+  // comunidad...", etc.), igual que ya se hace en el resto de la app cuando
+  // no hay backend real para algo (ver notifications en state.js).
+
+  function generateAchievements() {
+    return [];
+  }
+
+  function generateDevUpdates(game, _updateAvailable, addedDate) {
     return [
       {
-        id: 'a1',
-        name: 'Primeros pasos',
-        description: `Iniciá ${game.name} por primera vez.`,
-        unlocked: installed,
-        unlockedDate: installed ? addedDate : null,
-      },
-      {
-        id: 'a2',
-        name: 'En marcha',
-        description: `Acumulá horas de juego en ${game.name}.`,
-        unlocked: playtimeHours > 20,
-        unlockedDate: playtimeHours > 20 ? addedDate : null,
-      },
-      {
-        id: 'a3',
-        name: 'Explorador',
-        description: 'Descubrí contenido oculto.',
-        unlocked: false,
-        unlockedDate: null,
+        version: '1.0.0',
+        date: game.releaseDate || addedDate,
+        title: 'Lanzamiento',
+        description: `Primera versión pública de ${game.name}.`,
+        changes: ['Lanzamiento inicial'],
       },
     ];
   }
 
-  function generateDevUpdates(game, updateAvailable, addedDate) {
-    const base = {
-      version: '1.0.0',
-      date: game.releaseDate || addedDate,
-      title: 'Lanzamiento',
-      description: `Primera versión pública de ${game.name}.`,
-      changes: ['Lanzamiento inicial'],
-    };
-    if (!updateAvailable) return [base];
-    return [
-      {
-        version: '1.1.0',
-        date: isoDateDaysAgo(3),
-        title: 'Actualización disponible',
-        description: 'Hay una nueva versión esperando para instalarse.',
-        changes: ['Mejoras generales', 'Corrección de errores'],
-      },
-      base,
-    ];
-  }
-
-  function generateCommunityPosts(game, addedDate) {
-    return [
-      {
-        id: `${game.id}-p1`,
-        user: 'jugador_anonimo',
-        date: addedDate,
-        title: `¿Alguien más está jugando ${game.name}?`,
-        content: 'Recién lo empecé, ¿algún consejo para arrancar bien?',
-        likes: 3,
-        comments: [],
-      },
-    ];
+  function generateCommunityPosts() {
+    return [];
   }
 
   function generateLibraryEntry(game, index) {
     const installed = index % 2 === 0;
-    const updateAvailable = installed && index % 3 === 0;
+    const updateAvailable = false; // sin backend de updates real todavía
     const playtimeHours = installed ? Math.round((index + 1) * 6.5 * 10) / 10 : 0;
     const addedDate = isoDateDaysAgo((index + 3) * 5);
     const lastPlayed = installed && playtimeHours > 0 ? isoDateTimeDaysAgo((index + 1) * 2) : null;
@@ -108,7 +76,7 @@ const LibraryData = (() => {
       gameId: game.id,
       installed,
       installedVersion: installed ? '1.0.0' : null,
-      latestVersion: updateAvailable ? '1.1.0' : '1.0.0',
+      latestVersion: '1.0.0',
       updateAvailable,
       installSizeGB: 8 + (index % 5) * 4,
       playtimeHours,
@@ -117,9 +85,9 @@ const LibraryData = (() => {
       favorite: index % 4 === 0,
       folder: game.genre || null,
       dlcOwned: [], // sin fuente real todavía: /games no trae DLC comprado por el usuario
-      achievements: generateAchievements(game, installed, playtimeHours, addedDate),
+      achievements: generateAchievements(),
       devUpdates: generateDevUpdates(game, updateAvailable, addedDate),
-      communityPosts: generateCommunityPosts(game, addedDate),
+      communityPosts: generateCommunityPosts(),
     };
   }
 

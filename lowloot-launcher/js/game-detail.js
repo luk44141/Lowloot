@@ -5,6 +5,13 @@
 // al salir de la ficha (activateView llama a stopGallerySlideshow si existe).
 let galleryAutoTimer = null;
 
+// Cuando el video del hero termina, la ficha pasa sola a mostrar las
+// screenshots (deslizándose) y, al completar una vuelta completa a la
+// galería, vuelve sola al video (también deslizándose). Este flag indica
+// que ese "viaje de ida y vuelta" automático está en curso; se cancela apenas
+// el usuario toca una miniatura a mano, para no interrumpirlo mientras mira.
+let heroAutoReturnToVideo = false;
+
 async function openGameDetail(id) {
   const game = await LowlootData.getGameById(id);
 
@@ -34,7 +41,6 @@ function heroVideoHtml(game) {
       controls
       autoplay
       muted
-      loop
       playsinline
       preload="metadata"
       poster="${game.coverImageUrl || ''}">
@@ -76,14 +82,34 @@ function setupHeroVideoAudio() {
 }
 
 function stopGallerySlideshow() {
+  heroAutoReturnToVideo = false;
   if (galleryAutoTimer) {
     clearInterval(galleryAutoTimer);
     galleryAutoTimer = null;
   }
 }
 
+// Desliza el contenido actual del hero hacia afuera, ejecuta renderFn
+// (que reemplaza el innerHTML) y deja que vuelva a su lugar deslizándose
+// desde el lado opuesto. direction='back' se usa cuando volvemos del final
+// de la galería hacia el video (se desliza para el otro lado que al ir).
+function transitionHeroSlide(renderFn, direction = 'forward') {
+  const hero = qs('#detail-hero-image');
+  if (!hero) {
+    renderFn();
+    return;
+  }
+  hero.classList.add(direction === 'back' ? 'hero-slide-out-back' : 'hero-slide-out');
+  setTimeout(() => {
+    renderFn();
+    hero.classList.remove('hero-slide-out', 'hero-slide-out-back');
+  }, 220);
+}
+
 // Las screenshots van pasando solas cada ~4.5s. Nunca interrumpe al video:
-// si el hero está mostrando el <video>, este tick no hace nada.
+// si el hero está mostrando el <video>, este tick no hace nada. Si el ciclo
+// llegó a completar una vuelta entera desde que el video terminó
+// (heroAutoReturnToVideo), en vez de repetir la primera foto vuelve al video.
 function startGallerySlideshow(game, galleryImages) {
   stopGallerySlideshow();
   if (galleryImages.length < 2) return;
@@ -101,7 +127,15 @@ function startGallerySlideshow(game, galleryImages) {
     );
     const currentIndex = activeThumb ? Number(activeThumb.dataset.thumb) : -1;
     const nextIndex = (currentIndex + 1) % galleryImages.length;
-    showGalleryImage(game, galleryImages, nextIndex);
+
+    if (nextIndex === 0 && heroAutoReturnToVideo && game.previewVideoUrl) {
+      heroAutoReturnToVideo = false;
+      stopGallerySlideshow();
+      transitionHeroSlide(() => showGalleryVideo(game), 'back');
+      return;
+    }
+
+    transitionHeroSlide(() => showGalleryImage(game, galleryImages, nextIndex));
   }, 4500);
 }
 
@@ -132,6 +166,32 @@ function showGalleryVideo(game) {
   qs('.gallery-thumb-video')?.classList.add('active');
 
   setupHeroVideoAudio();
+  bindHeroVideoEndedHandler(game);
+}
+
+// Al terminar el video una vez (ya no tiene loop), la ficha pasa sola a la
+// galería de fotos deslizándose. Si no hay fotos, simplemente lo repite.
+function bindHeroVideoEndedHandler(game) {
+  const video = qs('#detail-hero-video');
+  if (!video) return;
+
+  video.addEventListener(
+    'ended',
+    () => {
+      const galleryImages = game.images?.length ? game.images : game.coverImageUrl ? [game.coverImageUrl] : [];
+
+      if (!galleryImages.length) {
+        video.currentTime = 0;
+        video.play().catch(() => {});
+        return;
+      }
+
+      heroAutoReturnToVideo = true;
+      transitionHeroSlide(() => showGalleryImage(game, galleryImages, 0));
+      startGallerySlideshow(game, galleryImages);
+    },
+    { once: true }
+  );
 }
 
 function cartActionButtonHtml(game) {
@@ -820,14 +880,22 @@ async function renderGameDetail(game) {
 
   currentDetailReviews = game.reviews;
 
-  if (hasVideo) setupHeroVideoAudio();
+  heroAutoReturnToVideo = false;
+  if (hasVideo) {
+    setupHeroVideoAudio();
+    bindHeroVideoEndedHandler(game);
+  }
 
   qsa('.gallery-thumb').forEach((thumb) => {
     thumb.addEventListener('click', () => {
+      // El usuario está navegando la galería a mano: cancelar cualquier
+      // "vuelta automática al video" que hubiera quedado pendiente.
+      heroAutoReturnToVideo = false;
+
       if (thumb.dataset.thumb === 'video') {
-        showGalleryVideo(game);
+        transitionHeroSlide(() => showGalleryVideo(game), 'back');
       } else {
-        showGalleryImage(game, galleryImages, Number(thumb.dataset.thumb));
+        transitionHeroSlide(() => showGalleryImage(game, galleryImages, Number(thumb.dataset.thumb)));
       }
       startGallerySlideshow(game, galleryImages);
     });

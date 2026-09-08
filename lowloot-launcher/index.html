@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="css/library-detail.css" />
   <link rel="stylesheet" href="css/library-install.css" />
   <link rel="stylesheet" href="css/library-community.css" />
+  <link rel="stylesheet" href="css/login.css" />
 </head>
 <body>
   <div class="app">
@@ -57,15 +58,14 @@
           </div>
         </div>
 
-        <div class="profile" id="profile-trigger">
-          <div class="avatar"></div>
-          <span class="profile-name">Luk</span>
-
-          <div class="profile-menu" id="profile-menu">
-            <button type="button" class="profile-menu-item" data-toast="Perfil próximamente">Ver perfil</button>
-            <button type="button" class="profile-menu-item" data-toast="Próximamente">Cerrar sesión</button>
-          </div>
-        </div>
+        <button type="button" class="login-btn" id="login-trigger">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+            <polyline points="10 17 15 12 10 7"></polyline>
+            <line x1="15" y1="12" x2="3" y2="12"></line>
+          </svg>
+          INICIAR SESIÓN
+        </button>
       </div>
     </header>
 
@@ -202,6 +202,40 @@
     <div class="modal install-modal" role="dialog" aria-modal="true">
       <button type="button" class="modal-close" id="install-modal-close" aria-label="Cerrar">&times;</button>
       <div id="install-modal-content"></div>
+    </div>
+  </div>
+
+  <!-- Modal de inicio de sesión -->
+  <div class="modal-overlay" id="login-modal-overlay">
+    <div class="modal login-modal" role="dialog" aria-modal="true">
+      <button type="button" class="modal-close" id="login-modal-close" aria-label="Cerrar">&times;</button>
+
+      <div class="login-modal-header">
+        <span class="login-modal-mark">LOWLOOT</span>
+        <h3 class="install-modal-title">Iniciar sesión</h3>
+        <p class="login-modal-sub">Ingresá tu cuenta para acceder a tu biblioteca, wishlist y carrito.</p>
+      </div>
+
+      <form id="login-form" class="login-form">
+        <div class="install-field">
+          <label for="login-email">Correo electrónico</label>
+          <input type="email" id="login-email" placeholder="vos@ejemplo.com" autocomplete="email" required />
+        </div>
+
+        <div class="install-field">
+          <label for="login-password">Contraseña</label>
+          <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required />
+        </div>
+
+        <div class="login-form-row">
+          <label class="install-checkbox"><input type="checkbox" id="login-remember" /> Recordarme</label>
+          <button type="button" class="login-forgot" data-toast="Recuperación de contraseña próximamente">¿Olvidaste tu contraseña?</button>
+        </div>
+
+        <button type="submit" class="btn-primary login-submit">INICIAR SESIÓN</button>
+
+        <p class="login-modal-footer">¿No tenés cuenta? <button type="button" class="login-link" data-toast="Registro próximamente">Creá una</button></p>
+      </form>
     </div>
   </div>
 

@@ -300,7 +300,7 @@ function initHoverPreviews() {
 
 document.addEventListener('DOMContentLoaded', async () => {
   initSidebarNavigation();
-  initProfileMenu();
+  initLoginButton();
   initNotifications();
   initSearch();
   initLibraryControls();

@@ -16,18 +16,27 @@
   padding: 16px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
+  background: var(--bg-panel);
+  transition: background 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  animation: cardIn 0.32s var(--ease) both;
 }
 
 .wishlist-row:hover {
   background: var(--bg-elevated);
   border-color: #333333;
+  transform: translateX(4px) scale(1.005);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3);
 }
 
 .wishlist-row .result-thumb {
   width: 140px;
   height: 80px;
   border-radius: var(--radius-sm);
+  transition: transform 0.2s var(--ease);
+}
+
+.wishlist-row:hover .result-thumb {
+  transform: scale(1.04);
 }
 
 .wishlist-row .result-name {
@@ -42,14 +51,21 @@
 .wishlist-meta {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   font-size: 11px;
   color: var(--text-muted);
   flex-shrink: 0;
   width: 190px;
+  padding-left: 14px;
+  border-left: 1px solid var(--border-soft);
 }
 
 .wishlist-remove-btn {
   flex-shrink: 0;
   padding: 8px 14px;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease), transform 0.12s var(--ease);
+}
+
+.wishlist-remove-btn:hover {
+  transform: scale(1.04);
 }

@@ -69,79 +69,6 @@
   color: var(--text-muted);
 }
 
-.profile {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 5px 8px 5px 6px;
-  border-radius: var(--radius-sm);
-  cursor: default;
-  transition: background 0.15s var(--ease);
-}
-
-.profile:hover {
-  background: var(--bg-hover);
-}
-
-.avatar {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #2c2c2c, #161616);
-  border: 1px solid var(--border-subtle);
-  flex-shrink: 0;
-}
-
-.profile-name {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.profile-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  min-width: 150px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  opacity: 0;
-  transform: translateY(-6px);
-  pointer-events: none;
-  transition: opacity 0.16s var(--ease), transform 0.16s var(--ease);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
-  z-index: 20;
-}
-
-.profile-menu.open {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.profile-menu-item {
-  background: transparent;
-  border: none;
-  text-align: left;
-  color: var(--text-secondary);
-  font-size: 12px;
-  padding: 8px 10px;
-  border-radius: 5px;
-  cursor: default;
-  transition: background 0.15s var(--ease), color 0.15s var(--ease);
-}
-
-.profile-menu-item:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-}
-
 /* ---------- Layout general ---------- */
 
 .body {
@@ -229,6 +156,26 @@
   align-items: center;
   justify-content: center;
   line-height: 1;
+  animation: badgePop 0.22s var(--ease);
+}
+
+/* El atributo [hidden] tiene que ganarle a "display:flex" de arriba: si no,
+   el badge queda visible como un círculo vacío aunque no haya nada que
+   contar (bug reportado: "círculo blanco" en carrito/notificaciones). */
+.nav-badge[hidden],
+.notif-badge[hidden] {
+  display: none !important;
+}
+
+@keyframes badgePop {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .nav-separator {
@@ -435,6 +382,7 @@
   align-items: center;
   justify-content: center;
   line-height: 1;
+  animation: badgePop 0.22s var(--ease);
 }
 
 .notif-menu {

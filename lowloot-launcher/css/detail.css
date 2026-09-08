@@ -39,6 +39,30 @@
   background: #050505;
 }
 
+/* El video sí llena todo el marco sin franjas negras (a diferencia de las
+   screenshots, que se mantienen en "contain" porque muchas son pósters
+   verticales y recortarlas se ve mal). */
+.detail-preview-video {
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Contenedor que recibe la animación de "deslizamiento" al pasar de video a
+   fotos y viceversa (ver game-detail.js: transitionHeroSlide). */
+#detail-hero-image {
+  transition: transform 0.28s var(--ease), opacity 0.28s var(--ease);
+}
+
+#detail-hero-image.hero-slide-out {
+  transform: translateX(-26px);
+  opacity: 0;
+}
+
+#detail-hero-image.hero-slide-out-back {
+  transform: translateX(26px);
+  opacity: 0;
+}
+
 .hero-play-icon {
   font-size: 22px;
   color: var(--text-primary);

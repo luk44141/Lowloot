@@ -1,30 +1,50 @@
 // topbar.js — menú de perfil, notificaciones y buscador con sugerencias.
 // Depende de helpers.js, state.js y navigation.js (el buscador navega a Tienda).
 
-/* ---------- Menú de perfil ---------- */
+/* ---------- Botón de inicio de sesión ---------- */
+// Reemplaza al viejo menú de perfil: todavía no hay sesión de usuario real,
+// así que en vez de mostrar una cuenta "de mentira" siempre logueada, se
+// muestra un botón de acceso que abre el modal de login (login.css/html).
+// La conexión real de este formulario con el backend queda para el próximo
+// paso, junto con el carrito ligado a la cuenta.
 
-function initProfileMenu() {
-  const trigger = document.getElementById('profile-trigger');
-  const menu = document.getElementById('profile-menu');
+function openLoginModal() {
+  qs('#login-modal-overlay')?.classList.add('open');
+  qs('#login-email')?.focus();
+}
 
-  trigger.addEventListener('click', (event) => {
+function closeLoginModal() {
+  qs('#login-modal-overlay')?.classList.remove('open');
+}
+
+function initLoginButton() {
+  const trigger = document.getElementById('login-trigger');
+  const overlay = document.getElementById('login-modal-overlay');
+  const form = document.getElementById('login-form');
+
+  trigger?.addEventListener('click', (event) => {
     event.stopPropagation();
-    qs('#notif-menu')?.classList.remove('open');
-    menu.classList.toggle('open');
+    openLoginModal();
   });
 
-  menu.querySelectorAll('.profile-menu-item').forEach((item) => {
-    item.addEventListener('click', (event) => {
-      event.stopPropagation();
-      showToast(item.dataset.toast || 'Próximamente');
-      menu.classList.remove('open');
-    });
+  document.getElementById('login-modal-close')?.addEventListener('click', closeLoginModal);
+
+  overlay?.addEventListener('click', (event) => {
+    if (event.target === overlay) closeLoginModal();
+  });
+
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    showToast('El inicio de sesión todavía no está conectado con el backend');
   });
 
   document.addEventListener('click', (event) => {
-    if (!event.target.closest('#profile-trigger')) menu.classList.remove('open');
     if (!event.target.closest('.search')) hideSuggestions();
     if (!event.target.closest('#notifications-trigger')) qs('#notif-menu')?.classList.remove('open');
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeLoginModal();
   });
 }
 
@@ -75,7 +95,6 @@ function initNotifications() {
 
   trigger.addEventListener('click', (event) => {
     event.stopPropagation();
-    qs('#profile-menu')?.classList.remove('open');
     menu.classList.toggle('open');
   });
 
