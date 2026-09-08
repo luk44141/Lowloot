@@ -1,3 +1,4 @@
+#Basico
 **/target/
 **/node_modules/
 **/application-local.properties
@@ -11,3 +12,7 @@ lowlootgames/*/*/
 # Mantener los assets
 !lowlootgames/*/assets/
 !lowlootgames/*/assets/**
+
+# Archivos temporales
+backend.pid
+**/backend.pid
