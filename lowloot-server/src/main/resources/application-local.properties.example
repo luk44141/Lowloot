@@ -3,3 +3,7 @@
 spring.datasource.url=jdbc:postgresql://localhost:5432/lowloot
 spring.datasource.username=lowloot_app
 spring.datasource.password=change-me
+
+# Generar un valor propio y largo (por ejemplo: openssl rand -base64 64)
+# y NO commitear el archivo application-local.properties real.
+lowloot.jwt.secret=reemplazar-por-un-secreto-largo-y-aleatorio-de-al-menos-64-bytes

@@ -223,6 +223,13 @@ async function renderGameDetail(game) {
       game.id
     );
 
+  // /games es catálogo público: no sabe (ni debe saber) qué juegos son de
+  // cada usuario. La pertenencia real sale de /library/me (user_games),
+  // no de un campo hardcodeado en game-store.js.
+  game.owned = currentUser
+    ? Boolean(await LibraryData.getLibraryEntry(game.id))
+    : false;
+
   const discounted =
     game.discount > 0
       ? Math.round(
@@ -231,7 +238,7 @@ async function renderGameDetail(game) {
         )
       : game.price;
 
-  const isWishlisted = wishlist.has(game.id);
+  const isWishlisted = wishlist.has(String(game.id));
 
   const galleryImages = game.images?.length
     ? game.images
@@ -290,7 +297,7 @@ async function renderGameDetail(game) {
       <button
         type="button"
         class="btn-primary"
-        data-buy-toggle="Los pagos y descargas todavía no están disponibles">
+        data-purchase-game="${game.id}">
         OBTENER
       </button>
     `;
@@ -299,7 +306,7 @@ async function renderGameDetail(game) {
       <button
         type="button"
         class="btn-primary"
-        data-buy-toggle="Los pagos todavía no están disponibles">
+        data-purchase-game="${game.id}">
         COMPRAR · ${formatPrice(discounted)}
       </button>
     `;
@@ -670,8 +677,12 @@ async function renderGameDetail(game) {
 
       <div class="detail-actions">
         ${actionButton}
-        ${cartActionButtonHtml(game)}
+        ${game.owned ? '' : cartActionButtonHtml(game)}
 
+        ${
+          game.owned
+            ? ''
+            : `
         <button
           type="button"
           class="btn-secondary ${
@@ -692,6 +703,8 @@ async function renderGameDetail(game) {
           }
 
         </button>
+        `
+        }
       </div>
 
     </div>
@@ -977,44 +990,43 @@ function applyReviewFilters() {
   }
 }
 
-function toggleWishlist(btn) {
-  const id =
-    btn.dataset.wishlistToggle;
+async function toggleWishlist(btn) {
+  const id = btn.dataset.wishlistToggle;
+  if (!requireLogin('Iniciá sesión para usar tu wishlist')) return;
 
-  const added =
-    !wishlist.has(id);
+  const added = !wishlist.has(String(id));
 
-  if (added) {
-    wishlist.set(
-      id,
-      new Date()
-        .toISOString()
-        .slice(0, 10)
-    );
-  } else {
-    wishlist.delete(id);
+  // Optimista: se refleja en el botón al toque, y se revierte si el
+  // servidor rechaza el cambio (sesión vencida, juego inexistente, etc.).
+  btn.disabled = true;
+  try {
+    if (added) {
+      await LowlootAPI.addToWishlist(id);
+      wishlist.set(String(id), new Date().toISOString());
+    } else {
+      await LowlootAPI.removeFromWishlist(id);
+      wishlist.delete(String(id));
+    }
+  } catch (err) {
+    showToast(err.message || 'No se pudo actualizar tu wishlist');
+    btn.disabled = false;
+    return;
   }
+  btn.disabled = false;
 
-  btn.classList.toggle(
-    'wishlisted',
-    added
-  );
+  btn.classList.toggle('wishlisted', added);
 
   btn.innerHTML = `
     <span class="wishlist-icon">
       ${added ? '♥' : '♡'}
     </span>
 
-    ${
-      added
-        ? 'En tu wishlist'
-        : 'Agregar a wishlist'
-    }
+    ${added ? 'En tu wishlist' : 'Agregar a wishlist'}
   `;
 
-  showToast(
-    added
-      ? 'Agregado a tu wishlist'
-      : 'Quitado de tu wishlist'
-  );
+  showToast(added ? 'Agregado a tu wishlist' : 'Quitado de tu wishlist');
+
+  if (qs('.view[data-view="wishlist"]')?.classList.contains('active') && typeof renderWishlistView === 'function') {
+    renderWishlistView();
+  }
 }

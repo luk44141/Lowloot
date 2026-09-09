@@ -74,7 +74,7 @@ function renderCommunitySection(game) {
 
 function toggleCommunityLike(btn) {
   const postId = btn.dataset.communityLike;
-  const game = libraryCache?.find((g) => g.gameId === currentLibraryGameId);
+  const game = libraryCache?.find((g) => String(g.gameId) === String(currentLibraryGameId));
   const post = game?.communityPosts.find((p) => p.id === postId);
   if (!post) return;
 
@@ -110,7 +110,7 @@ function submitCommunityComment(postId) {
   communityUserComments.get(postId).push({ user: 'Luk', date: null, text });
   input.value = '';
 
-  const game = libraryCache?.find((g) => g.gameId === currentLibraryGameId);
+  const game = libraryCache?.find((g) => String(g.gameId) === String(currentLibraryGameId));
   const post = game?.communityPosts.find((p) => p.id === postId);
   if (post) {
     const listEl = document.querySelector(`#comments-${postId} .community-comments-list`);

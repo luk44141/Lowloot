@@ -1,15 +1,14 @@
 // topbar.js — menú de perfil, notificaciones y buscador con sugerencias.
 // Depende de helpers.js, state.js y navigation.js (el buscador navega a Tienda).
 
-/* ---------- Botón de inicio de sesión ---------- */
-// Reemplaza al viejo menú de perfil: todavía no hay sesión de usuario real,
-// así que en vez de mostrar una cuenta "de mentira" siempre logueada, se
-// muestra un botón de acceso que abre el modal de login (login.css/html).
-// La conexión real de este formulario con el backend queda para el próximo
-// paso, junto con el carrito ligado a la cuenta.
+/* ---------- Botón de inicio de sesión / chip de usuario ---------- */
+// Sin sesión: se ve el botón "INICIAR SESIÓN" que abre el modal (login.js
+// maneja el submit real). Con sesión: se ve el saldo + nombre de usuario,
+// con un menú para cerrar sesión y (si el rol es ADMIN) ir al panel admin.
 
-function openLoginModal() {
+function openLoginModal(view) {
   qs('#login-modal-overlay')?.classList.add('open');
+  if (typeof setLoginView === 'function') setLoginView(view || 'login');
   qs('#login-email')?.focus();
 }
 
@@ -17,14 +16,42 @@ function closeLoginModal() {
   qs('#login-modal-overlay')?.classList.remove('open');
 }
 
+function renderTopbarSession() {
+  const loginBtn = document.getElementById('login-trigger');
+  const chip = document.getElementById('user-chip');
+  if (!loginBtn || !chip) return;
+
+  if (!currentUser) {
+    loginBtn.hidden = false;
+    chip.hidden = true;
+    qs('#user-menu')?.classList.remove('open');
+    return;
+  }
+
+  loginBtn.hidden = true;
+  chip.hidden = false;
+
+  qs('#user-chip-balance').textContent = formatPrice(Number(currentUser.balance) || 0);
+  qs('#user-chip-name').textContent = currentUser.username;
+  qs('#user-menu-name').textContent = currentUser.username;
+  qs('#user-menu-email').textContent = currentUser.email;
+
+  const adminItem = document.getElementById('user-menu-admin');
+  if (adminItem) adminItem.hidden = !isAdmin();
+  const adminNav = document.getElementById('admin-nav-list');
+  if (adminNav) adminNav.hidden = !isAdmin();
+}
+
 function initLoginButton() {
   const trigger = document.getElementById('login-trigger');
   const overlay = document.getElementById('login-modal-overlay');
-  const form = document.getElementById('login-form');
+  const chip = document.getElementById('user-chip');
+  const chipTrigger = document.getElementById('user-chip-trigger');
+  const userMenu = document.getElementById('user-menu');
 
   trigger?.addEventListener('click', (event) => {
     event.stopPropagation();
-    openLoginModal();
+    openLoginModal('login');
   });
 
   document.getElementById('login-modal-close')?.addEventListener('click', closeLoginModal);
@@ -33,19 +60,35 @@ function initLoginButton() {
     if (event.target === overlay) closeLoginModal();
   });
 
-  form?.addEventListener('submit', (event) => {
-    event.preventDefault();
-    showToast('El inicio de sesión todavía no está conectado con el backend');
+  chipTrigger?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    userMenu?.classList.toggle('open');
+  });
+
+  document.getElementById('user-menu-logout')?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    userMenu?.classList.remove('open');
+    logout();
+  });
+
+  document.getElementById('user-menu-admin')?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    userMenu?.classList.remove('open');
+    activateView('admin');
+    if (typeof renderAdminView === 'function') renderAdminView();
   });
 
   document.addEventListener('click', (event) => {
     if (!event.target.closest('.search')) hideSuggestions();
     if (!event.target.closest('#notifications-trigger')) qs('#notif-menu')?.classList.remove('open');
+    if (!event.target.closest('#user-chip')) userMenu?.classList.remove('open');
   });
 
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') closeLoginModal();
   });
+
+  renderTopbarSession();
 }
 
 /* ---------- Notificaciones ---------- */

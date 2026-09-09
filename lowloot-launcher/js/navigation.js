@@ -43,6 +43,7 @@ function initSidebarNavigation() {
       if (item.dataset.view === 'wishlist') renderWishlistView();
       if (item.dataset.view === 'biblioteca') renderLibraryHome();
       if (item.dataset.view === 'carrito') renderCartView();
+      if (item.dataset.view === 'admin') renderAdminView();
     });
   });
 }

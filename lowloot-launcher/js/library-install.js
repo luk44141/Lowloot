@@ -6,7 +6,7 @@
 
 async function openInstallModal(gameId) {
   const allGames = await loadLibraryGames();
-  const game = allGames.find((g) => g.gameId === gameId);
+  const game = allGames.find((g) => String(g.gameId) === String(gameId));
   if (!game) return;
 
   installModalGameId = gameId;
@@ -25,7 +25,8 @@ function renderInstallModal(game, drives, selectedDriveId) {
   const content = qs('#install-modal-content');
   if (!content) return;
 
-  const notEnoughSpace = drive.freeGB < game.installSizeGB;
+  const hasSizeInfo = typeof game.installSizeGB === 'number';
+  const notEnoughSpace = hasSizeInfo && drive.freeGB < game.installSizeGB;
 
   content.innerHTML = `
     <h3 class="install-modal-title">Instalar ${game.name}</h3>
@@ -43,7 +44,7 @@ function renderInstallModal(game, drives, selectedDriveId) {
     </div>
 
     <div class="install-space-row">
-      <div><span class="lib-stat-label">Espacio necesario</span><span class="lib-stat-value">${game.installSizeGB} GB</span></div>
+      <div><span class="lib-stat-label">Espacio necesario</span><span class="lib-stat-value">${hasSizeInfo ? `${game.installSizeGB} GB` : '—'}</span></div>
       <div><span class="lib-stat-label">Espacio disponible</span><span class="lib-stat-value ${notEnoughSpace ? 'install-space-warning' : ''}">${drive.freeGB} GB</span></div>
       <div><span class="lib-stat-label">Versión a instalar</span><span class="lib-stat-value">${game.latestVersion}</span></div>
     </div>
@@ -69,7 +70,7 @@ function renderInstallModal(game, drives, selectedDriveId) {
 
 function handleInstallDriveChange(selectEl) {
   const gameId = installModalGameId;
-  const game = libraryCache?.find((g) => g.gameId === gameId);
+  const game = libraryCache?.find((g) => String(g.gameId) === String(gameId));
   if (!game) return;
 
   LibraryData.getDrives().then((drives) => {
@@ -79,7 +80,7 @@ function handleInstallDriveChange(selectEl) {
 
 function confirmInstall(gameId) {
   const content = qs('#install-modal-content');
-  const game = libraryCache?.find((g) => g.gameId === gameId);
+  const game = libraryCache?.find((g) => String(g.gameId) === String(gameId));
   if (!game || !content) return;
 
   content.innerHTML = `
@@ -112,8 +113,19 @@ function confirmInstall(gameId) {
   }, 220);
 }
 
-function finishInstall(gameId) {
-  const index = libraryCache?.findIndex((g) => g.gameId === gameId);
+async function finishInstall(gameId) {
+  try {
+    // No hay instalación real: esto solo persiste que el juego quedó
+    // "instalado" para este usuario, tal como se pidió (modal "En
+    // proceso" + guardar el estado si ya existe la estructura para ello).
+    await LowlootAPI.installGame(gameId);
+  } catch (err) {
+    closeInstallModal();
+    showToast(err.message || 'No se pudo guardar la instalación');
+    return;
+  }
+
+  const index = libraryCache?.findIndex((g) => String(g.gameId) === String(gameId));
   if (index > -1) {
     libraryCache[index].installed = true;
     libraryCache[index].installedVersion = libraryCache[index].latestVersion;
@@ -122,13 +134,13 @@ function finishInstall(gameId) {
 
   setTimeout(() => {
     closeInstallModal();
-    showToast('Instalación completa (simulada)');
+    showToast('Instalación completa');
 
     if (qs('.view[data-view="biblioteca"]')?.classList.contains('active')) {
       refreshLibraryGamesList();
     }
     if (currentLibraryGameId === gameId && qs('.view[data-view="library-game"]')?.classList.contains('active')) {
-      const updatedGame = libraryCache.find((g) => g.gameId === gameId);
+      const updatedGame = libraryCache.find((g) => String(g.gameId) === String(gameId));
       if (updatedGame) renderLibraryGameDetail(updatedGame);
     }
   }, 700);

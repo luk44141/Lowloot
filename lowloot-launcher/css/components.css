@@ -123,6 +123,20 @@
   transition: filter 0.25s var(--ease), transform 0.25s var(--ease);
 }
 
+/* El resto del launcher (barra superior y lateral) también se atenúa un
+   poco mientras el preview está en foco, no solo las tarjetas vecinas, para
+   reforzar la sensación de "primer plano" del juego seleccionado. */
+.topbar,
+.sidebar {
+  transition: filter 0.3s var(--ease), opacity 0.3s var(--ease);
+}
+
+body.preview-focus-active .topbar,
+body.preview-focus-active .sidebar {
+  filter: blur(2px) brightness(0.65);
+  opacity: 0.85;
+}
+
 .featured-card.preview-playing .featured-media {
   transform: translateY(-6px) scale(1.06);
   box-shadow: 0 34px 70px rgba(0, 0, 0, 0.55);

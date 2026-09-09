@@ -3,7 +3,12 @@
 
 let lastMainView = 'inicio';
 
-// Wishlist: Map<gameId, fechaAgregadoISO (YYYY-MM-DD)>
+// Sesión real contra el backend: null si no hay usuario logueado, o
+// { id, username, email, role, balance } si lo hay. La maneja session.js.
+let currentUser = null;
+
+// Wishlist: Map<gameId, fechaAgregadoISO>. Se llena desde el backend real
+// (ver session.js: refreshWishlistCache) en vez de vivir solo en memoria.
 const wishlist = new Map();
 
 // Carrito: Map<gameId, cantidad>

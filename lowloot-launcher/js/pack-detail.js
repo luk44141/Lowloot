@@ -16,7 +16,7 @@ async function openPackDetail(id) {
 
 async function renderPackDetail(pack) {
   const allGames = await LowlootData.getAllGames();
-  const games = pack.gameIds.map((id) => allGames.find((g) => g.id === id)).filter(Boolean);
+  const games = pack.gameIds.map((id) => allGames.find((g) => String(g.id) === String(id))).filter(Boolean);
   const { individualTotal, savings, pct } = packSavings(pack, games);
 
   const gamesHtml = games

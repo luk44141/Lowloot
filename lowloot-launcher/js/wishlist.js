@@ -17,7 +17,7 @@ async function renderWishlistView() {
 
   const allGames = await LowlootData.getAllGames();
   const entries = [...wishlist.entries()]
-    .map(([id, addedDate]) => ({ game: allGames.find((g) => g.id === id), addedDate }))
+    .map(([id, addedDate]) => ({ game: allGames.find((g) => String(g.id) === String(id)), addedDate }))
     .filter((e) => e.game)
     .sort((a, b) => new Date(b.addedDate) - new Date(a.addedDate));
 
@@ -31,7 +31,7 @@ async function renderWishlistView() {
         <span class="result-genre">${game.genre}</span>
       </div>
       <div class="wishlist-meta">
-        <span>Agregado el ${formatDate(addedDate)}</span>
+        <span>Agregado el ${formatDate(String(addedDate).slice(0, 10))}</span>
         <span>Lanzamiento: ${formatDate(game.releaseDate)}</span>
       </div>
       <div class="result-price">${discountBadge(game)}${priceMarkup(game)}</div>

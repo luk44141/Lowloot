@@ -21,7 +21,7 @@ async function renderPacksRow(packs) {
   const allGames = await LowlootData.getAllGames();
   const cards = packs
     .map((pack) => {
-      const games = pack.gameIds.map((id) => allGames.find((g) => g.id === id)).filter(Boolean);
+      const games = pack.gameIds.map((id) => allGames.find((g) => String(g.id) === String(id))).filter(Boolean);
       return renderPackCard(pack, games);
     })
     .join('');

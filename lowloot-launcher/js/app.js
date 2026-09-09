@@ -15,9 +15,14 @@ function initDelegatedHandlers() {
 
     const wishlistRemoveBtn = event.target.closest('[data-wishlist-remove]');
     if (wishlistRemoveBtn) {
-      wishlist.delete(wishlistRemoveBtn.dataset.wishlistRemove);
-      renderWishlistView();
-      showToast('Quitado de tu wishlist');
+      const id = wishlistRemoveBtn.dataset.wishlistRemove;
+      LowlootAPI.removeFromWishlist(id)
+        .then(() => {
+          wishlist.delete(String(id));
+          renderWishlistView();
+          showToast('Quitado de tu wishlist');
+        })
+        .catch((err) => showToast(err.message || 'No se pudo quitar de tu wishlist'));
       return;
     }
 
@@ -56,6 +61,18 @@ function initDelegatedHandlers() {
     const buyBtn = event.target.closest('[data-buy-toggle]');
     if (buyBtn) {
       showToast(buyBtn.dataset.buyToggle);
+      return;
+    }
+
+    const purchaseBtn = event.target.closest('[data-purchase-game]');
+    if (purchaseBtn) {
+      purchaseGame(purchaseBtn.dataset.purchaseGame);
+      return;
+    }
+
+    const checkoutBtn = event.target.closest('[data-cart-checkout]');
+    if (checkoutBtn) {
+      checkoutCart();
       return;
     }
 
@@ -277,6 +294,9 @@ function initHoverPreviews() {
 
     video.play().catch(() => {});
     card.classList.add('preview-playing');
+    // El resto del launcher (topbar, sidebar) pasa a segundo plano mientras
+    // dura el foco de la tarjeta, no solo sus tarjetas vecinas.
+    document.body.classList.add('preview-focus-active');
   });
 
   document.body.addEventListener('mouseout', (event) => {
@@ -293,6 +313,9 @@ function initHoverPreviews() {
       // Idem arriba.
     }
     card.classList.remove('preview-playing');
+    if (!qs('.preview-playing')) {
+      document.body.classList.remove('preview-focus-active');
+    }
   });
 }
 
@@ -301,11 +324,14 @@ function initHoverPreviews() {
 document.addEventListener('DOMContentLoaded', async () => {
   initSidebarNavigation();
   initLoginButton();
+  initAuthForms();
   initNotifications();
   initSearch();
   initLibraryControls();
+  initAdminControls();
   initDelegatedHandlers();
   initHoverPreviews();
+  await initSession();
   renderCartBadge();
   await renderHome();
 });

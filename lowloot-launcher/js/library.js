@@ -6,6 +6,14 @@
 
 let libraryCache = null;
 
+// Se llama tras comprar, instalar un juego, o iniciar/cerrar sesión, para
+// que la Biblioteca vuelva a pedir /library/me en vez de mostrar datos
+// obsoletos (por ejemplo, un juego recién comprado que todavía no aparece).
+function invalidateLibraryCache() {
+  libraryCache = null;
+  if (typeof LibraryData !== 'undefined') LibraryData.invalidate();
+}
+
 async function loadLibraryGames() {
   if (libraryCache) return libraryCache;
   const entries = await LibraryData.getLibrary();
@@ -20,7 +28,8 @@ async function loadLibraryGames() {
 }
 
 function isLibraryFavorite(game) {
-  return libraryFavoriteOverrides.has(game.gameId) ? libraryFavoriteOverrides.get(game.gameId) : game.favorite;
+  const key = String(game.gameId);
+  return libraryFavoriteOverrides.has(key) ? libraryFavoriteOverrides.get(key) : game.favorite;
 }
 
 /* ---------- Formato específico de Biblioteca ---------- */

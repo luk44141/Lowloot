@@ -7,7 +7,7 @@
 
 async function openLibraryGameDetail(gameId) {
   const allGames = await loadLibraryGames();
-  const game = allGames.find((g) => g.gameId === gameId);
+  const game = allGames.find((g) => String(g.gameId) === String(gameId));
   if (!game) return;
 
   currentLibraryGameId = gameId;
@@ -243,7 +243,7 @@ function toggleLibraryFavorite(btn) {
   const gameId = btn.dataset.libFavoriteToggle;
   const current = libraryFavoriteOverrides.has(gameId)
     ? libraryFavoriteOverrides.get(gameId)
-    : libraryCache?.find((g) => g.gameId === gameId)?.favorite;
+    : libraryCache?.find((g) => String(g.gameId) === String(gameId))?.favorite;
   const next = !current;
 
   libraryFavoriteOverrides.set(gameId, next);

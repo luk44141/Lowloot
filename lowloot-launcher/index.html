@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="css/library-install.css" />
   <link rel="stylesheet" href="css/library-community.css" />
   <link rel="stylesheet" href="css/login.css" />
+  <link rel="stylesheet" href="css/admin.css" />
 </head>
 <body>
   <div class="app">
@@ -66,6 +67,22 @@
           </svg>
           INICIAR SESIÓN
         </button>
+
+        <div class="user-chip" id="user-chip" hidden>
+          <button type="button" class="user-chip-trigger" id="user-chip-trigger">
+            <span class="user-chip-balance" id="user-chip-balance">$0</span>
+            <span class="user-chip-name" id="user-chip-name"></span>
+          </button>
+
+          <div class="user-menu" id="user-menu">
+            <div class="user-menu-header">
+              <span class="user-menu-name" id="user-menu-name"></span>
+              <span class="user-menu-email" id="user-menu-email"></span>
+            </div>
+            <button type="button" class="user-menu-item" id="user-menu-admin" hidden data-view-target="admin">Panel admin</button>
+            <button type="button" class="user-menu-item" id="user-menu-logout">Cerrar sesión</button>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -105,6 +122,13 @@
           <li class="nav-item" data-view="publicar">
             <span class="nav-indicator"></span>
             <span class="nav-label">PUBLICAR</span>
+          </li>
+        </ul>
+
+        <ul class="nav-list" id="admin-nav-list" hidden>
+          <li class="nav-item" data-view="admin">
+            <span class="nav-indicator"></span>
+            <span class="nav-label">PANEL ADMIN</span>
           </li>
         </ul>
 
@@ -193,6 +217,11 @@
           <h2 class="section-title">AJUSTES</h2>
           <p class="placeholder-text">Esta sección todavía no está disponible.</p>
         </section>
+
+        <!-- Vista: Panel admin (solo visible/funcional si role=ADMIN, validado también en el servidor) -->
+        <section class="view store-view" data-view="admin">
+          <div id="admin-content"></div>
+        </section>
       </main>
     </div>
   </div>
@@ -205,39 +234,104 @@
     </div>
   </div>
 
-  <!-- Modal de inicio de sesión -->
+  <!-- Modal de inicio de sesión / registro / olvidé mi contraseña -->
   <div class="modal-overlay" id="login-modal-overlay">
     <div class="modal login-modal" role="dialog" aria-modal="true">
       <button type="button" class="modal-close" id="login-modal-close" aria-label="Cerrar">&times;</button>
 
-      <div class="login-modal-header">
-        <span class="login-modal-mark">LOWLOOT</span>
-        <h3 class="install-modal-title">Iniciar sesión</h3>
-        <p class="login-modal-sub">Ingresá tu cuenta para acceder a tu biblioteca, wishlist y carrito.</p>
+      <!-- Vista: iniciar sesión -->
+      <div class="login-view" id="login-view-login">
+        <div class="login-modal-header">
+          <span class="login-modal-mark">LOWLOOT</span>
+          <h3 class="install-modal-title">Iniciar sesión</h3>
+          <p class="login-modal-sub">Ingresá tu cuenta para acceder a tu biblioteca, wishlist y carrito.</p>
+        </div>
+
+        <form id="login-form" class="login-form">
+          <p class="login-form-error" id="login-error" hidden></p>
+
+          <div class="install-field">
+            <label for="login-email">Correo electrónico</label>
+            <input type="email" id="login-email" placeholder="vos@ejemplo.com" autocomplete="email" required />
+          </div>
+
+          <div class="install-field">
+            <label for="login-password">Contraseña</label>
+            <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required />
+          </div>
+
+          <div class="login-form-row">
+            <label class="install-checkbox"><input type="checkbox" id="login-remember" checked /> Recordarme</label>
+            <button type="button" class="login-forgot" data-login-view="forgot">¿Olvidaste tu contraseña?</button>
+          </div>
+
+          <button type="submit" class="btn-primary login-submit">INICIAR SESIÓN</button>
+
+          <p class="login-modal-footer">¿No tenés cuenta? <button type="button" class="login-link" data-login-view="register">Creá una</button></p>
+        </form>
       </div>
 
-      <form id="login-form" class="login-form">
-        <div class="install-field">
-          <label for="login-email">Correo electrónico</label>
-          <input type="email" id="login-email" placeholder="vos@ejemplo.com" autocomplete="email" required />
+      <!-- Vista: crear cuenta -->
+      <div class="login-view" id="login-view-register" hidden>
+        <div class="login-modal-header">
+          <span class="login-modal-mark">LOWLOOT</span>
+          <h3 class="install-modal-title">Creá tu cuenta</h3>
+          <p class="login-modal-sub">Se crea siempre como cuenta de usuario estándar.</p>
         </div>
 
-        <div class="install-field">
-          <label for="login-password">Contraseña</label>
-          <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required />
+        <form id="register-form" class="login-form">
+          <p class="login-form-error" id="register-error" hidden></p>
+
+          <div class="install-field">
+            <label for="register-username">Nombre de usuario</label>
+            <input type="text" id="register-username" placeholder="tu_usuario" autocomplete="username" minlength="3" maxlength="50" required />
+          </div>
+
+          <div class="install-field">
+            <label for="register-email">Correo electrónico</label>
+            <input type="email" id="register-email" placeholder="vos@ejemplo.com" autocomplete="email" required />
+          </div>
+
+          <div class="install-field">
+            <label for="register-password">Contraseña</label>
+            <input type="password" id="register-password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" minlength="8" required />
+          </div>
+
+          <button type="submit" class="btn-primary login-submit">CREAR CUENTA</button>
+
+          <p class="login-modal-footer">¿Ya tenés cuenta? <button type="button" class="login-link" data-login-view="login">Iniciá sesión</button></p>
+        </form>
+      </div>
+
+      <!-- Vista: olvidé mi contraseña (versión escolar: cambio directo, sin email real) -->
+      <div class="login-view" id="login-view-forgot" hidden>
+        <div class="login-modal-header">
+          <span class="login-modal-mark">LOWLOOT</span>
+          <h3 class="install-modal-title">Restablecer contraseña</h3>
+          <p class="login-modal-sub">Ingresá tu email y la nueva contraseña para tu cuenta.</p>
         </div>
 
-        <div class="login-form-row">
-          <label class="install-checkbox"><input type="checkbox" id="login-remember" /> Recordarme</label>
-          <button type="button" class="login-forgot" data-toast="Recuperación de contraseña próximamente">¿Olvidaste tu contraseña?</button>
-        </div>
+        <form id="forgot-form" class="login-form">
+          <p class="login-form-error" id="forgot-error" hidden></p>
 
-        <button type="submit" class="btn-primary login-submit">INICIAR SESIÓN</button>
+          <div class="install-field">
+            <label for="forgot-email">Correo electrónico</label>
+            <input type="email" id="forgot-email" placeholder="vos@ejemplo.com" autocomplete="email" required />
+          </div>
 
-        <p class="login-modal-footer">¿No tenés cuenta? <button type="button" class="login-link" data-toast="Registro próximamente">Creá una</button></p>
-      </form>
+          <div class="install-field">
+            <label for="forgot-password">Nueva contraseña</label>
+            <input type="password" id="forgot-password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" minlength="8" required />
+          </div>
+
+          <button type="submit" class="btn-primary login-submit">CAMBIAR CONTRASEÑA</button>
+
+          <p class="login-modal-footer"><button type="button" class="login-link" data-login-view="login">Volver a iniciar sesión</button></p>
+        </form>
+      </div>
     </div>
   </div>
+
 
   <!-- Toast -->
   <div class="toast" id="toast"></div>
@@ -247,8 +341,10 @@
   <script src="js/library-data.js" defer></script>
   <script src="js/helpers.js" defer></script>
   <script src="js/state.js" defer></script>
+  <script src="js/session.js" defer></script>
   <script src="js/navigation.js" defer></script>
   <script src="js/topbar.js" defer></script>
+  <script src="js/login.js" defer></script>
   <script src="js/components.js" defer></script>
   <script src="js/home.js" defer></script>
   <script src="js/store.js" defer></script>
@@ -260,6 +356,7 @@
   <script src="js/library-community.js" defer></script>
   <script src="js/library-detail.js" defer></script>
   <script src="js/library-install.js" defer></script>
+  <script src="js/admin.js" defer></script>
   <script src="js/app.js" defer></script>
 </body>
 </html>
