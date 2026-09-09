@@ -195,7 +195,7 @@ function bindHeroVideoEndedHandler(game) {
 }
 
 function cartActionButtonHtml(game) {
-  const inCart = cart.has(game.id);
+  const inCart = cart.has(String(game.id));
   return `
     <button type="button" class="btn-secondary ${inCart ? 'wishlisted' : ''}" data-cart-toggle="${game.id}">
       <span class="wishlist-icon">${inCart ? '✓' : '🛒'}</span> ${inCart ? 'En el carrito' : 'Agregar al carrito'}

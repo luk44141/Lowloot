@@ -46,18 +46,6 @@ function initDelegatedHandlers() {
       return;
     }
 
-    const cartQtyDecreaseBtn = event.target.closest('[data-cart-qty-decrease]');
-    if (cartQtyDecreaseBtn) {
-      changeCartQty(cartQtyDecreaseBtn.dataset.cartQtyDecrease, -1);
-      return;
-    }
-
-    const cartQtyIncreaseBtn = event.target.closest('[data-cart-qty-increase]');
-    if (cartQtyIncreaseBtn) {
-      changeCartQty(cartQtyIncreaseBtn.dataset.cartQtyIncrease, 1);
-      return;
-    }
-
     const buyBtn = event.target.closest('[data-buy-toggle]');
     if (buyBtn) {
       showToast(buyBtn.dataset.buyToggle);

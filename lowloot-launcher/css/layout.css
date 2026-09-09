@@ -346,6 +346,31 @@
   position: relative;
 }
 
+/* Botón de Panel Admin en la topbar (al lado de notificaciones/saldo).
+   Reutiliza .nav-item para el click delegation genérico de
+   navigation.js, pero acá pisa todo el look de sidebar por el de un
+   icon-btn redondo, igual que notificaciones. Solo visible si sos ADMIN
+   (topbar.js / renderTopbarSession). */
+.admin-nav-trigger {
+  all: unset;
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: default;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.admin-nav-trigger:hover,
+.admin-nav-trigger.active {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
 .icon-btn {
   position: relative;
   width: 34px;

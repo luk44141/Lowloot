@@ -7,6 +7,13 @@
 // con un menú para cerrar sesión y (si el rol es ADMIN) ir al panel admin.
 
 function openLoginModal(view) {
+  // Si había un video sonando de fondo (el hero de una ficha de juego, un
+  // preview de tarjeta que quedó activo), lo pausamos: abrir un modal no
+  // debería dejar audio escuchándose detrás.
+  document.querySelectorAll('video').forEach((video) => {
+    if (!video.paused) video.pause();
+  });
+
   qs('#login-modal-overlay')?.classList.add('open');
   if (typeof setLoginView === 'function') setLoginView(view || 'login');
   qs('#login-email')?.focus();
@@ -19,11 +26,13 @@ function closeLoginModal() {
 function renderTopbarSession() {
   const loginBtn = document.getElementById('login-trigger');
   const chip = document.getElementById('user-chip');
+  const adminTrigger = document.getElementById('admin-nav-trigger');
   if (!loginBtn || !chip) return;
 
   if (!currentUser) {
     loginBtn.hidden = false;
     chip.hidden = true;
+    if (adminTrigger) adminTrigger.hidden = true;
     qs('#user-menu')?.classList.remove('open');
     return;
   }
@@ -36,10 +45,7 @@ function renderTopbarSession() {
   qs('#user-menu-name').textContent = currentUser.username;
   qs('#user-menu-email').textContent = currentUser.email;
 
-  const adminItem = document.getElementById('user-menu-admin');
-  if (adminItem) adminItem.hidden = !isAdmin();
-  const adminNav = document.getElementById('admin-nav-list');
-  if (adminNav) adminNav.hidden = !isAdmin();
+  if (adminTrigger) adminTrigger.hidden = !isAdmin();
 }
 
 function initLoginButton() {
@@ -69,13 +75,6 @@ function initLoginButton() {
     event.stopPropagation();
     userMenu?.classList.remove('open');
     logout();
-  });
-
-  document.getElementById('user-menu-admin')?.addEventListener('click', (event) => {
-    event.stopPropagation();
-    userMenu?.classList.remove('open');
-    activateView('admin');
-    if (typeof renderAdminView === 'function') renderAdminView();
   });
 
   document.addEventListener('click', (event) => {

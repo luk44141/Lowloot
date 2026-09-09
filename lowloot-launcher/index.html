@@ -59,6 +59,12 @@
           </div>
         </div>
 
+        <button type="button" class="nav-item admin-nav-trigger" id="admin-nav-trigger" data-view="admin" hidden aria-label="Panel admin" title="Panel admin">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Z"></path>
+          </svg>
+        </button>
+
         <button type="button" class="login-btn" id="login-trigger">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
@@ -79,7 +85,6 @@
               <span class="user-menu-name" id="user-menu-name"></span>
               <span class="user-menu-email" id="user-menu-email"></span>
             </div>
-            <button type="button" class="user-menu-item" id="user-menu-admin" hidden data-view-target="admin">Panel admin</button>
             <button type="button" class="user-menu-item" id="user-menu-logout">Cerrar sesión</button>
           </div>
         </div>
@@ -122,13 +127,6 @@
           <li class="nav-item" data-view="publicar">
             <span class="nav-indicator"></span>
             <span class="nav-label">PUBLICAR</span>
-          </li>
-        </ul>
-
-        <ul class="nav-list" id="admin-nav-list" hidden>
-          <li class="nav-item" data-view="admin">
-            <span class="nav-indicator"></span>
-            <span class="nav-label">PANEL ADMIN</span>
           </li>
         </ul>
 
@@ -332,6 +330,19 @@
     </div>
   </div>
 
+
+  <!-- Modal de confirmación genérico (reemplaza window.confirm; hoy lo usa
+       la compra desde el carrito / ficha de juego, ver cart.js) -->
+  <div class="modal-overlay" id="confirm-modal-overlay">
+    <div class="modal confirm-modal" role="dialog" aria-modal="true">
+      <h3 class="install-modal-title" id="confirm-modal-title">Confirmar</h3>
+      <p class="confirm-modal-message" id="confirm-modal-message"></p>
+      <div class="confirm-modal-actions">
+        <button type="button" class="btn-secondary" id="confirm-modal-cancel">Cancelar</button>
+        <button type="button" class="btn-primary" id="confirm-modal-accept">Confirmar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Toast -->
   <div class="toast" id="toast"></div>

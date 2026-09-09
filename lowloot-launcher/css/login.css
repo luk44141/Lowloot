@@ -35,35 +35,43 @@
 /* ---------- Modal de login ---------- */
 
 .login-modal {
-  width: 400px;
+  width: 420px;
+  padding: 34px 32px 30px;
+  background: linear-gradient(180deg, var(--bg-panel), var(--bg-elevated));
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
 }
 
 .login-modal-header {
   text-align: center;
-  margin-bottom: 22px;
+  margin-bottom: 26px;
 }
 
 .login-modal-mark {
-  display: block;
+  display: inline-block;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.18em;
-  color: var(--text-muted);
-  margin-bottom: 14px;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  color: #111111;
+  background: var(--accent-bright);
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 18px;
 }
 
 .login-modal .install-modal-title {
-  margin: 0 0 8px;
+  font-size: 21px;
+  margin: 0 0 10px;
   padding-right: 0;
   text-align: center;
 }
 
 .login-modal-sub {
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--text-secondary);
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .login-form {
@@ -117,6 +125,51 @@
   color: var(--accent-bright);
 }
 
+.login-modal .install-field {
+  margin-bottom: 20px;
+}
+
+.login-modal .install-field label {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  margin-bottom: 9px;
+}
+
+/* ---------- Modal de confirmación (checkout, etc.) ---------- */
+
+.confirm-modal {
+  width: 400px;
+  padding: 30px 28px 26px;
+}
+
+.confirm-modal .install-modal-title {
+  font-size: 18px;
+  margin: 0 0 14px;
+  padding-right: 0;
+}
+
+.confirm-modal-message {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 26px;
+}
+
+.confirm-modal-message strong {
+  color: var(--text-primary);
+}
+
+.confirm-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.confirm-modal-actions .btn-secondary,
+.confirm-modal-actions .btn-primary {
+  padding: 10px 20px;
+}
+
 .login-form-error {
   background: rgba(255, 92, 92, 0.12);
   border: 1px solid rgba(255, 92, 92, 0.35);
@@ -135,6 +188,7 @@
 
 .user-chip-trigger {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 10px;
   background: var(--bg-elevated);
@@ -142,6 +196,7 @@
   border-radius: var(--radius-sm);
   padding: 7px 14px;
   cursor: default;
+  white-space: nowrap;
   transition: background 0.15s var(--ease);
 }
 
@@ -149,11 +204,17 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
+/* El saldo va SIEMPRE a la izquierda del nombre (ese es el orden en el
+   markup); el separador vertical deja bien claro que son dos datos
+   distintos en una sola fila, no una etiqueta arriba de la otra. */
 .user-chip-balance {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 12.5px;
   color: var(--accent);
+  padding-right: 10px;
+  border-right: 1px solid var(--border-subtle);
+  white-space: nowrap;
 }
 
 .user-chip-name {

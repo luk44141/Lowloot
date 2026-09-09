@@ -52,17 +52,6 @@ function toggleCartFromDetail(btn) {
   if (qs('.view[data-view="carrito"]')?.classList.contains('active')) renderCartView();
 }
 
-function changeCartQty(gameId, delta) {
-  const current = cart.get(gameId) || 0;
-  const next = current + delta;
-
-  if (next <= 0) cart.delete(gameId);
-  else cart.set(gameId, next);
-
-  renderCartBadge();
-  renderCartView();
-}
-
 function removeFromCart(gameId) {
   cart.delete(gameId);
   renderCartBadge();
@@ -98,11 +87,6 @@ async function renderCartView() {
       <div class="result-info">
         <h4 class="result-name">${game.name}</h4>
         <span class="result-genre">${game.genre}</span>
-      </div>
-      <div class="cart-qty">
-        <button type="button" class="cart-qty-btn" data-cart-qty-decrease="${game.id}" aria-label="Restar">−</button>
-        <span class="cart-qty-value">${qty}</span>
-        <button type="button" class="cart-qty-btn" data-cart-qty-increase="${game.id}" aria-label="Sumar">+</button>
       </div>
       <div class="result-price">${formatPrice(cartLineTotal(game, qty))}</div>
       <button type="button" class="btn-secondary cart-remove-btn" data-cart-remove="${game.id}">Quitar</button>
@@ -140,11 +124,14 @@ async function purchaseGames(gameIds, { fromCart = false } = {}) {
   const balance = Number(currentUser.balance) || 0;
   const names = items.map((g) => g.name).join(', ');
 
-  const confirmed = window.confirm(
-    total > 0
-      ? `Vas a gastar ${formatPrice(total)} de tu saldo (disponible: ${formatPrice(balance)}) en: ${names}. ¿Confirmás la compra?`
-      : `Vas a agregar a tu biblioteca (gratis): ${names}. ¿Confirmás?`
-  );
+  const confirmed = await showConfirmModal({
+    title: total > 0 ? 'Confirmar compra' : 'Agregar a tu biblioteca',
+    message:
+      total > 0
+        ? `Vas a gastar <strong>${formatPrice(total)}</strong> de tu saldo (disponible: <strong>${formatPrice(balance)}</strong>) en:<br>${escapeHtml(names)}.`
+        : `Vas a agregar a tu biblioteca (gratis):<br>${escapeHtml(names)}.`,
+    confirmLabel: total > 0 ? 'Confirmar compra' : 'Agregar',
+  });
   if (!confirmed) return false;
 
   try {

@@ -9,7 +9,11 @@
 
 function setCurrentUser(me) {
   currentUser = {
-    id: me.id,
+    // AuthResponse (login/register) manda el campo como "userId";
+    // MeResponse (/users/me) lo manda como "id". Sin este fallback,
+    // currentUser.id quedaba undefined justo después de loguearte/crear
+    // la cuenta (solo se corregía recién al refrescar con /users/me).
+    id: me.id ?? me.userId,
     username: me.username,
     email: me.email,
     role: me.role,
