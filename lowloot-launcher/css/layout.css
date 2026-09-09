@@ -371,6 +371,10 @@
   color: var(--text-primary);
 }
 
+.admin-nav-trigger[hidden] {
+  display: none !important;
+}
+
 .icon-btn {
   position: relative;
   width: 34px;

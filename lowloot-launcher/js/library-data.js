@@ -36,7 +36,11 @@ const LibraryData = (() => {
       lastPlayed: null,
       addedDate: item.purchasedAt ? String(item.purchasedAt).slice(0, 10) : null,
       favorite: false, // el toggle de favorito vive solo en memoria (libraryFavoriteOverrides)
-      folder: item.genre || null,
+      // Antes se auto-asignaba una "carpeta" por género apenas se compraba
+      // el juego. Las carpetas las tiene que armar el usuario a mano (esa
+      // función todavía no existe), así que por ahora ningún juego entra
+      // en una carpeta solo.
+      folder: null,
       dlcOwned: [], // sin fuente real todavía: user_games no distingue DLC
       achievements: [],
       devUpdates: [],

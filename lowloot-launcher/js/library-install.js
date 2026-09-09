@@ -78,70 +78,18 @@ function handleInstallDriveChange(selectEl) {
   });
 }
 
+// Esto es a propósito: el modal de instalación (disco, carpeta, espacio,
+// progreso) queda completo y disponible para probarlo/mostrarlo, pero ya NO
+// termina "instalando" de verdad el juego (antes marcaba installed=true y
+// habilitaba un botón JUGAR que a su vez tiraba otro toast de "no
+// disponible" — dos capas de simulado engañoso). Confirmar acá avisa
+// honestamente que todavía no hay instalación real.
 function confirmInstall(gameId) {
-  const content = qs('#install-modal-content');
   const game = libraryCache?.find((g) => String(g.gameId) === String(gameId));
-  if (!game || !content) return;
-
-  content.innerHTML = `
-    <h3 class="install-modal-title">Instalando ${game.name}...</h3>
-    <div class="install-progress-track">
-      <div class="install-progress-fill" id="install-progress-fill"></div>
-    </div>
-    <p class="install-progress-label" id="install-progress-label">Preparando archivos...</p>
-  `;
-
-  const fill = qs('#install-progress-fill');
-  const label = qs('#install-progress-label');
-  const steps = ['Preparando archivos...', 'Copiando datos...', 'Verificando integridad...', 'Casi listo...'];
-  let pct = 0;
-
-  const timer = setInterval(() => {
-    pct += 8 + Math.random() * 10;
-
-    if (pct >= 100) {
-      pct = 100;
-      clearInterval(timer);
-      fill.style.width = '100%';
-      label.textContent = '¡Instalación completa!';
-      finishInstall(gameId);
-      return;
-    }
-
-    fill.style.width = `${pct}%`;
-    label.textContent = steps[Math.min(Math.floor(pct / 26), steps.length - 1)];
-  }, 220);
-}
-
-async function finishInstall(gameId) {
-  try {
-    // No hay instalación real: esto solo persiste que el juego quedó
-    // "instalado" para este usuario, tal como se pidió (modal "En
-    // proceso" + guardar el estado si ya existe la estructura para ello).
-    await LowlootAPI.installGame(gameId);
-  } catch (err) {
-    closeInstallModal();
-    showToast(err.message || 'No se pudo guardar la instalación');
-    return;
-  }
-
-  const index = libraryCache?.findIndex((g) => String(g.gameId) === String(gameId));
-  if (index > -1) {
-    libraryCache[index].installed = true;
-    libraryCache[index].installedVersion = libraryCache[index].latestVersion;
-    libraryCache[index].updateAvailable = false;
-  }
-
-  setTimeout(() => {
-    closeInstallModal();
-    showToast('Instalación completa');
-
-    if (qs('.view[data-view="biblioteca"]')?.classList.contains('active')) {
-      refreshLibraryGamesList();
-    }
-    if (currentLibraryGameId === gameId && qs('.view[data-view="library-game"]')?.classList.contains('active')) {
-      const updatedGame = libraryCache.find((g) => String(g.gameId) === String(gameId));
-      if (updatedGame) renderLibraryGameDetail(updatedGame);
-    }
-  }, 700);
+  closeInstallModal();
+  showToast(
+    game
+      ? `La instalación de ${game.name} todavía no está disponible: esta ventana es solo una vista previa de cómo va a funcionar.`
+      : 'La instalación todavía no está disponible: esta ventana es solo una vista previa de cómo va a funcionar.'
+  );
 }

@@ -2,6 +2,11 @@ package com.lowloot.server.admin;
 
 import com.lowloot.server.auth.User;
 import com.lowloot.server.auth.UserRepository;
+import com.lowloot.server.library.LibraryEntryResponse;
+import com.lowloot.server.library.UserGame;
+import com.lowloot.server.library.UserGameRepository;
+import com.lowloot.server.Game;
+import com.lowloot.server.repository.GameRepository;
 import com.lowloot.server.wallet.Transaction;
 import com.lowloot.server.wallet.TransactionRepository;
 import com.lowloot.server.wallet.Wallet;
@@ -9,8 +14,13 @@ import com.lowloot.server.wallet.WalletRepository;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -29,14 +39,20 @@ public class AdminController {
     private final UserRepository userRepository;
     private final WalletRepository walletRepository;
     private final TransactionRepository transactionRepository;
+    private final UserGameRepository userGameRepository;
+    private final GameRepository gameRepository;
 
     public AdminController(
             UserRepository userRepository,
             WalletRepository walletRepository,
-            TransactionRepository transactionRepository) {
+            TransactionRepository transactionRepository,
+            UserGameRepository userGameRepository,
+            GameRepository gameRepository) {
         this.userRepository = userRepository;
         this.walletRepository = walletRepository;
         this.transactionRepository = transactionRepository;
+        this.userGameRepository = userGameRepository;
+        this.gameRepository = gameRepository;
     }
 
     @GetMapping("/users")
@@ -87,5 +103,47 @@ public class AdminController {
                 user.getRole().name(),
                 wallet.getBalance(),
                 user.getCreatedAt());
+    }
+
+    // Biblioteca de un usuario, para que el admin pueda ver qué tiene y
+    // (si hace falta) sacarle algún juego.
+    @GetMapping("/users/{userId}/library")
+    public List<LibraryEntryResponse> userLibrary(@PathVariable Long userId) {
+        List<UserGame> owned = userGameRepository.findByUserId(userId);
+        if (owned.isEmpty()) return List.of();
+
+        Map<Long, Game> gamesById = gameRepository
+                .findAllById(owned.stream().map(UserGame::getGameId).toList())
+                .stream()
+                .collect(Collectors.toMap(Game::getId, Function.identity()));
+
+        return owned.stream()
+                .map(ug -> {
+                    Game game = gamesById.get(ug.getGameId());
+                    if (game == null) return null;
+                    return new LibraryEntryResponse(
+                            game.getId(),
+                            game.getName(),
+                            game.getGenre(),
+                            game.getCoverImageUrl(),
+                            game.getPrice(),
+                            ug.isInstalled(),
+                            ug.getPurchasedAt());
+                })
+                .filter(java.util.Objects::nonNull)
+                .toList();
+    }
+
+    // Saca un juego de la biblioteca de un usuario. No devuelve el saldo
+    // (es una acción de moderación/soporte, no una devolución de plata);
+    // si en algún momento hace falta reembolsar, es un flujo aparte.
+    @Transactional
+    @DeleteMapping("/users/{userId}/library/{gameId}")
+    public ResponseEntity<Void> removeFromLibrary(@PathVariable Long userId, @PathVariable Long gameId) {
+        if (!userGameRepository.existsByUserIdAndGameId(userId, gameId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ese usuario no tiene ese juego en su biblioteca");
+        }
+        userGameRepository.deleteByUserIdAndGameId(userId, gameId);
+        return ResponseEntity.noContent().build();
     }
 }

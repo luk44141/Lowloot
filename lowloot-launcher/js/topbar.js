@@ -26,12 +26,14 @@ function closeLoginModal() {
 function renderTopbarSession() {
   const loginBtn = document.getElementById('login-trigger');
   const chip = document.getElementById('user-chip');
+  const balanceChip = document.getElementById('balance-chip');
   const adminTrigger = document.getElementById('admin-nav-trigger');
   if (!loginBtn || !chip) return;
 
   if (!currentUser) {
     loginBtn.hidden = false;
     chip.hidden = true;
+    if (balanceChip) balanceChip.hidden = true;
     if (adminTrigger) adminTrigger.hidden = true;
     qs('#user-menu')?.classList.remove('open');
     return;
@@ -39,9 +41,11 @@ function renderTopbarSession() {
 
   loginBtn.hidden = true;
   chip.hidden = false;
+  if (balanceChip) balanceChip.hidden = false;
 
   qs('#user-chip-balance').textContent = formatPrice(Number(currentUser.balance) || 0);
   qs('#user-chip-name').textContent = currentUser.username;
+  qs('#user-chip-avatar').textContent = currentUser.username?.[0]?.toUpperCase() || '?';
   qs('#user-menu-name').textContent = currentUser.username;
   qs('#user-menu-email').textContent = currentUser.email;
 

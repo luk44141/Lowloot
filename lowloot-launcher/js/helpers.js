@@ -18,6 +18,15 @@ function formatDate(iso) {
   return d.toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
+// Fecha + hora exacta (para "agregado a la wishlist el ..."), a diferencia
+// de formatDate que solo muestra el día.
+function formatDateTime(isoDateTime) {
+  if (!isoDateTime) return '';
+  const d = new Date(isoDateTime);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleString('es-AR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;

@@ -264,6 +264,75 @@
 .lib-action-group {
   display: flex;
   gap: 8px;
+  align-items: center;
+}
+
+/* Menú de "más opciones" (3 puntitos) al lado de JUGAR: hoy solo tiene
+   Desinstalar. */
+.lib-more-menu {
+  position: relative;
+}
+
+.lib-more-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.lib-more-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.lib-more-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 150px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 6px;
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 0.16s var(--ease), transform 0.16s var(--ease);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  z-index: 20;
+}
+
+.lib-more-dropdown.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.lib-more-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: #ff8a8a;
+  font-size: 12px;
+  padding: 8px 10px;
+  border-radius: 5px;
+  cursor: default;
+  transition: background 0.15s var(--ease);
+}
+
+.lib-more-item:hover {
+  background: rgba(255, 92, 92, 0.12);
 }
 
 .lib-update-dot {

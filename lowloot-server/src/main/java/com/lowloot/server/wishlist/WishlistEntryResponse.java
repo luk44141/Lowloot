@@ -10,5 +10,6 @@ public record WishlistEntryResponse(
         double price,
         double discount,
         String releaseDate,
-        LocalDateTime addedAt) {
+        LocalDateTime addedAt,
+        long wishlistCount) {
 }

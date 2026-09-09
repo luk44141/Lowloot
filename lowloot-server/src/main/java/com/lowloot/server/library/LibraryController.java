@@ -82,4 +82,27 @@ public class LibraryController {
                 userGame.isInstalled(),
                 userGame.getPurchasedAt());
     }
+
+    // Simetrico al de arriba: permite volver a "No instalado" (el usuario
+    // eligio Desinstalar desde el menu de los 3 puntitos en Biblioteca).
+    @PatchMapping("/{gameId}/uninstall")
+    public LibraryEntryResponse markUninstalled(@AuthenticationPrincipal User user, @PathVariable Long gameId) {
+        UserGame userGame = userGameRepository.findByUserIdAndGameId(user.getId(), gameId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ese juego no esta en tu biblioteca"));
+
+        userGame.setInstalled(false);
+        userGameRepository.save(userGame);
+
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Juego no encontrado"));
+
+        return new LibraryEntryResponse(
+                game.getId(),
+                game.getName(),
+                game.getGenre(),
+                game.getCoverImageUrl(),
+                game.getPrice(),
+                userGame.isInstalled(),
+                userGame.getPurchasedAt());
+    }
 }

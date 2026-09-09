@@ -86,6 +86,27 @@ function applyLibraryFilters(games) {
 
 /* ---------- Piezas compartidas entre lista/cuadrícula/carátulas ---------- */
 
+async function uninstallLibraryGame(gameId) {
+  qsa('.lib-more-dropdown.open').forEach((d) => d.classList.remove('open'));
+  try {
+    await LowlootAPI.uninstallGame(gameId);
+  } catch (err) {
+    showToast(err.message || 'No se pudo desinstalar el juego');
+    return;
+  }
+
+  const index = libraryCache?.findIndex((g) => String(g.gameId) === String(gameId));
+  if (index > -1) libraryCache[index].installed = false;
+
+  showToast('Juego desinstalado');
+
+  if (qs('.view[data-view="biblioteca"]')?.classList.contains('active')) refreshLibraryGamesList();
+  if (currentLibraryGameId === gameId && qs('.view[data-view="library-game"]')?.classList.contains('active')) {
+    const updatedGame = libraryCache.find((g) => String(g.gameId) === String(gameId));
+    if (updatedGame) renderLibraryGameDetail(updatedGame);
+  }
+}
+
 function libraryStatusPill(game) {
   if (game.updateAvailable) return `<span class="lib-pill lib-pill-update">ACTUALIZACIÓN DISPONIBLE</span>`;
   if (game.installed) return `<span class="lib-pill lib-pill-installed">Instalado</span>`;
@@ -98,10 +119,18 @@ function libraryActionButtons(game, size) {
     return `<button type="button" class="btn-primary lib-action-btn${small}" data-lib-install="${game.gameId}">INSTALAR</button>`;
   }
   const playBtn = `<button type="button" class="btn-primary lib-action-btn${small}" data-buy-toggle="La ejecución de juegos todavía no está disponible">JUGAR</button>`;
+  const moreMenu = `
+    <div class="lib-more-menu">
+      <button type="button" class="lib-more-btn" data-lib-more="${game.gameId}" aria-label="Más opciones" title="Más opciones">⋮</button>
+      <div class="lib-more-dropdown" data-lib-more-dropdown="${game.gameId}">
+        <button type="button" class="lib-more-item" data-lib-uninstall="${game.gameId}">Desinstalar</button>
+      </div>
+    </div>
+  `;
   if (game.updateAvailable && size !== 'small') {
-    return `<div class="lib-action-group"><button type="button" class="btn-secondary lib-action-btn${small}" data-buy-toggle="Las actualizaciones automáticas todavía no están disponibles">ACTUALIZAR</button>${playBtn}</div>`;
+    return `<div class="lib-action-group"><button type="button" class="btn-secondary lib-action-btn${small}" data-buy-toggle="Las actualizaciones automáticas todavía no están disponibles">ACTUALIZAR</button>${playBtn}${moreMenu}</div>`;
   }
-  return playBtn;
+  return `<div class="lib-action-group">${playBtn}${moreMenu}</div>`;
 }
 
 /* ---------- Modo Lista ---------- */
@@ -223,7 +252,6 @@ async function renderLibraryHome() {
         <div class="lib-view-toggle" role="tablist">
           <button type="button" class="lib-view-btn ${libraryViewMode === 'lista' ? 'active' : ''}" data-lib-view="lista">Lista</button>
           <button type="button" class="lib-view-btn ${libraryViewMode === 'cuadricula' ? 'active' : ''}" data-lib-view="cuadricula">Cuadrícula</button>
-          <button type="button" class="lib-view-btn ${libraryViewMode === 'caratulas' ? 'active' : ''}" data-lib-view="caratulas">Carátulas</button>
         </div>
       </div>
     </div>

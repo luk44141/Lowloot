@@ -85,12 +85,16 @@ const LowlootAPI = (() => {
     }
 
     if (!res.ok) {
-      let message = `${method} ${path} devolvió ${res.status}`;
+      let message = friendlyStatusMessage(res.status);
       try {
         const data = await res.json();
-        if (data && data.message) message = data.message;
+        // Solo usamos el mensaje del backend si es texto pensado para
+        // mostrarse (no una traza ni un mapa de errores de validación).
+        if (data && typeof data.message === 'string' && data.message.length < 200) {
+          message = data.message;
+        }
       } catch (_) {
-        // El body no era JSON (o estaba vacío); nos quedamos con el mensaje genérico.
+        // El body no era JSON (o estaba vacío); nos quedamos con el mensaje amigable genérico.
       }
       const err = new Error(message);
       err.code = 'HTTP_' + res.status;
@@ -100,6 +104,22 @@ const LowlootAPI = (() => {
 
     if (res.status === 204) return null;
     return res.json();
+  }
+
+  // Mensajes genéricos por código de estado para cuando el backend no manda
+  // un "message" propio (por ejemplo, la página de error por defecto de
+  // Spring en un 500, o un 404 de un endpoint que no existe todavía). Antes
+  // esto se mostraba tal cual ("POST /auth/register devolvió 404"), nada
+  // amigable para alguien que no lee HTTP.
+  function friendlyStatusMessage(status) {
+    if (status === 400) return 'Los datos ingresados no son válidos';
+    if (status === 403) return 'No tenés permiso para hacer esto';
+    if (status === 404) return 'No se pudo encontrar lo que buscabas';
+    if (status === 409) return 'Ese dato ya está en uso';
+    if (status === 422) return 'Revisá los datos ingresados';
+    if (status === 429) return 'Demasiados intentos, esperá un momento y volvé a intentar';
+    if (status >= 500) return 'Hubo un problema en el servidor, intentá de nuevo en un rato';
+    return 'Ocurrió un error inesperado';
   }
 
   /* ---------- Catálogo (público) ---------- */
@@ -136,6 +156,10 @@ const LowlootAPI = (() => {
     return request(`/library/${gameId}/install`, { method: 'PATCH', auth: true });
   }
 
+  function uninstallGame(gameId) {
+    return request(`/library/${gameId}/uninstall`, { method: 'PATCH', auth: true });
+  }
+
   /* ---------- Wishlist ---------- */
 
   function getWishlist() {
@@ -170,6 +194,14 @@ const LowlootAPI = (() => {
     });
   }
 
+  function adminGetUserLibrary(userId) {
+    return request(`/admin/users/${userId}/library`, { auth: true });
+  }
+
+  function adminRemoveFromLibrary(userId, gameId) {
+    return request(`/admin/users/${userId}/library/${gameId}`, { method: 'DELETE', auth: true });
+  }
+
   return {
     // sesión
     saveToken,
@@ -187,6 +219,7 @@ const LowlootAPI = (() => {
     // biblioteca
     getLibrary,
     installGame,
+    uninstallGame,
     // wishlist
     getWishlist,
     addToWishlist,
@@ -196,5 +229,7 @@ const LowlootAPI = (() => {
     // admin
     adminGetUsers,
     adminAdjustBalance,
+    adminGetUserLibrary,
+    adminRemoveFromLibrary,
   };
 })();

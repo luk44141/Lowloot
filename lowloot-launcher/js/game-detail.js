@@ -288,8 +288,8 @@ async function renderGameDetail(game) {
       <button
         type="button"
         class="btn-primary"
-        data-buy-toggle="La ejecución del juego todavía no está disponible">
-        JUGAR
+        data-lib-install="${game.id}">
+        INSTALAR
       </button>
     `;
   } else if (game.isFree) {
@@ -995,6 +995,11 @@ async function toggleWishlist(btn) {
   if (!requireLogin('Iniciá sesión para usar tu wishlist')) return;
 
   const added = !wishlist.has(String(id));
+
+  if (added && cart.has(String(id))) {
+    showToast('Ese juego ya está en tu carrito');
+    return;
+  }
 
   // Optimista: se refleja en el botón al toque, y se revierte si el
   // servidor rechaza el cambio (sesión vencida, juego inexistente, etc.).

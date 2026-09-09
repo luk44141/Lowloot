@@ -40,6 +40,14 @@ function toggleCartFromDetail(btn) {
   const id = btn.dataset.cartToggle;
   const added = !cart.has(id);
 
+  // No tiene sentido tenerlo en el carrito Y en la wishlist a la vez: si
+  // lo estás comprando, lo sacamos de "quiero esto" automáticamente.
+  if (added && wishlist.has(String(id))) {
+    wishlist.delete(String(id));
+    LowlootAPI.removeFromWishlist(id).catch(() => {});
+    if (qs('.view[data-view="wishlist"]')?.classList.contains('active')) renderWishlistView();
+  }
+
   if (added) cart.set(id, 1);
   else cart.delete(id);
 
