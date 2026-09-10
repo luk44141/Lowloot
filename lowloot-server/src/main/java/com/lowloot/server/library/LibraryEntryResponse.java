@@ -9,5 +9,6 @@ public record LibraryEntryResponse(
         String coverImageUrl,
         double price,
         boolean installed,
+        boolean favorite,
         LocalDateTime purchasedAt) {
 }

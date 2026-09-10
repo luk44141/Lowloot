@@ -3,6 +3,7 @@ package com.lowloot.server.library;
 import com.lowloot.server.Game;
 import com.lowloot.server.auth.User;
 import com.lowloot.server.repository.GameRepository;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -12,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -45,14 +47,7 @@ public class LibraryController {
                 .map(ug -> {
                     Game game = gamesById.get(ug.getGameId());
                     if (game == null) return null; // juego borrado del catalogo: no se muestra
-                    return new LibraryEntryResponse(
-                            game.getId(),
-                            game.getName(),
-                            game.getGenre(),
-                            game.getCoverImageUrl(),
-                            game.getPrice(),
-                            ug.isInstalled(),
-                            ug.getPurchasedAt());
+                    return toResponse(game, ug);
                 })
                 .filter(java.util.Objects::nonNull)
                 .toList();
@@ -64,38 +59,46 @@ public class LibraryController {
     // llamar aca.
     @PatchMapping("/{gameId}/install")
     public LibraryEntryResponse markInstalled(@AuthenticationPrincipal User user, @PathVariable Long gameId) {
-        UserGame userGame = userGameRepository.findByUserIdAndGameId(user.getId(), gameId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ese juego no esta en tu biblioteca"));
-
+        UserGame userGame = findOwned(user, gameId);
         userGame.setInstalled(true);
         userGameRepository.save(userGame);
-
-        Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Juego no encontrado"));
-
-        return new LibraryEntryResponse(
-                game.getId(),
-                game.getName(),
-                game.getGenre(),
-                game.getCoverImageUrl(),
-                game.getPrice(),
-                userGame.isInstalled(),
-                userGame.getPurchasedAt());
+        return toResponse(gameOrThrow(gameId), userGame);
     }
 
-    // Simetrico al de arriba: permite volver a "No instalado" (el usuario
-    // eligio Desinstalar desde el menu de los 3 puntitos en Biblioteca).
+    // Desinstalar tambien es simulado: solo pone installed=false. No borra
+    // ni toca ningun archivo real (no hay instalacion real todavia).
     @PatchMapping("/{gameId}/uninstall")
     public LibraryEntryResponse markUninstalled(@AuthenticationPrincipal User user, @PathVariable Long gameId) {
-        UserGame userGame = userGameRepository.findByUserIdAndGameId(user.getId(), gameId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ese juego no esta en tu biblioteca"));
-
+        UserGame userGame = findOwned(user, gameId);
         userGame.setInstalled(false);
         userGameRepository.save(userGame);
+        return toResponse(gameOrThrow(gameId), userGame);
+    }
 
-        Game game = gameRepository.findById(gameId)
+    // Favorito real por usuario (persistido en user_games.favorite, ver
+    // V3__user_games_favorite.sql), no un estado simulado en el launcher.
+    @PatchMapping("/{gameId}/favorite")
+    public LibraryEntryResponse setFavorite(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long gameId,
+            @Valid @RequestBody FavoriteRequest request) {
+        UserGame userGame = findOwned(user, gameId);
+        userGame.setFavorite(request.favorite());
+        userGameRepository.save(userGame);
+        return toResponse(gameOrThrow(gameId), userGame);
+    }
+
+    private UserGame findOwned(User user, Long gameId) {
+        return userGameRepository.findByUserIdAndGameId(user.getId(), gameId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ese juego no está en tu biblioteca"));
+    }
+
+    private Game gameOrThrow(Long gameId) {
+        return gameRepository.findById(gameId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Juego no encontrado"));
+    }
 
+    private LibraryEntryResponse toResponse(Game game, UserGame userGame) {
         return new LibraryEntryResponse(
                 game.getId(),
                 game.getName(),
@@ -103,6 +106,7 @@ public class LibraryController {
                 game.getCoverImageUrl(),
                 game.getPrice(),
                 userGame.isInstalled(),
+                userGame.isFavorite(),
                 userGame.getPurchasedAt());
     }
 }

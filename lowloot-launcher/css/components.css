@@ -59,11 +59,11 @@
 @keyframes cardIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    translate: 0 10px;
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    translate: 0 0;
   }
 }
 
@@ -102,30 +102,49 @@
   transition: opacity 0.2s var(--ease);
 }
 
-.game-card.preview-playing .game-card-video {
+/* Sistema único de preview de video (hover tipo Steam), compartido por
+   .game-card (Tienda/Tendencia) y .featured-card (Más jugado ahora): ambas
+   usan el mismo .game-card-video + data-preview-card + .preview-playing
+   (ver app.js: initHoverPreviews). No hay una regla separada por sección,
+   así evitamos tener dos sistemas de preview en paralelo. */
+.preview-playing .game-card-video {
   opacity: 1;
 }
 
 /* Mientras el preview de video está sonando/reproduciéndose, esa tarjeta
-   pasa a ser "lo primario en la pantalla": se eleva más que el hover normal
-   y el resto de las tarjetas del mismo grupo se atenúan y desenfocan un
-   poco, para que el video se note y se lea bien. */
+   pasa a ser "lo primario en la pantalla": se eleva más que el hover normal.
+   El propio elemento marcado [data-preview-card] es el que se agranda: en
+   .game-card es la tarjeta entera, en .featured-card es solo el bloque de
+   imagen (.featured-media), para no correr el texto de al lado. */
 .game-card.preview-playing {
   transform: translateY(-8px) scale(1.09);
   box-shadow: 0 34px 64px rgba(0, 0, 0, 0.55);
   z-index: 5;
 }
 
-.store-row-track:has(.preview-playing) .game-card:not(.preview-playing),
-.card-grid:has(.preview-playing) .game-card:not(.preview-playing) {
+.featured-card.preview-playing .featured-media {
+  transform: translateY(-6px) scale(1.06);
+  box-shadow: 0 34px 70px rgba(0, 0, 0, 0.55);
+  z-index: 5;
+}
+
+/* Mientras hay un preview activo (en cualquier sección), TODAS las demás
+   tarjetas visibles se atenúan y desenfocan -- no solo las de la misma fila
+   o grid -- y la que está en preview se mantiene nítida. */
+body.preview-focus-active .game-card:not(.preview-playing) {
   filter: blur(2.5px) brightness(0.6) saturate(0.85);
   transform: scale(0.98);
   transition: filter 0.25s var(--ease), transform 0.25s var(--ease);
 }
 
+body.preview-focus-active .featured-card:not(.preview-playing) .featured-media {
+  filter: blur(2.5px) brightness(0.6) saturate(0.85);
+  transform: scale(0.98);
+}
+
 /* El resto del launcher (barra superior y lateral) también se atenúa un
-   poco mientras el preview está en foco, no solo las tarjetas vecinas, para
-   reforzar la sensación de "primer plano" del juego seleccionado. */
+   poco mientras el preview está en foco, para reforzar la sensación de
+   "primer plano" del juego seleccionado. */
 .topbar,
 .sidebar {
   transition: filter 0.3s var(--ease), opacity 0.3s var(--ease);
@@ -135,12 +154,6 @@ body.preview-focus-active .topbar,
 body.preview-focus-active .sidebar {
   filter: blur(2px) brightness(0.65);
   opacity: 0.85;
-}
-
-.featured-card.preview-playing .featured-media {
-  transform: translateY(-6px) scale(1.06);
-  box-shadow: 0 34px 70px rgba(0, 0, 0, 0.55);
-  z-index: 5;
 }
 
 .discount-badge {

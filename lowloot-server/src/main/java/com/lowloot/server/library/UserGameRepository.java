@@ -15,9 +15,6 @@ public interface UserGameRepository extends JpaRepository<UserGame, Long> {
 
     boolean existsByUserIdAndGameId(Long userId, Long gameId);
 
-    // Para el panel admin: sacarle un juego a un usuario de su biblioteca.
-    void deleteByUserIdAndGameId(Long userId, Long gameId);
-
     // Para el paso "comprobar que no pertenezcan ya al usuario" de la
     // compra, sin ida y vuelta juego por juego.
     @Query("select ug.gameId from UserGame ug where ug.userId = :userId and ug.gameId in :gameIds")

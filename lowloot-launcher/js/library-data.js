@@ -35,12 +35,8 @@ const LibraryData = (() => {
       playtimeHours: 0, // sin backend de tiempo jugado real todavía
       lastPlayed: null,
       addedDate: item.purchasedAt ? String(item.purchasedAt).slice(0, 10) : null,
-      favorite: false, // el toggle de favorito vive solo en memoria (libraryFavoriteOverrides)
-      // Antes se auto-asignaba una "carpeta" por género apenas se compraba
-      // el juego. Las carpetas las tiene que armar el usuario a mano (esa
-      // función todavía no existe), así que por ahora ningún juego entra
-      // en una carpeta solo.
-      folder: null,
+      favorite: Boolean(item.favorite), // real, persistido en user_games.favorite (V3)
+      folder: item.genre || null,
       dlcOwned: [], // sin fuente real todavía: user_games no distingue DLC
       achievements: [],
       devUpdates: [],
@@ -98,11 +94,21 @@ const LibraryData = (() => {
     return clone(DRIVES);
   }
 
+  // Actualiza el favorito de una entrada ya cargada en memoria (después de
+  // un PATCH exitoso), para que la próxima lectura no tenga que volver a
+  // pedirle /library/me al servidor.
+  function setFavoriteCache(gameId, favorite) {
+    if (!libraryEntries) return;
+    const entry = libraryEntries.find((e) => String(e.gameId) === String(gameId));
+    if (entry) entry.favorite = favorite;
+  }
+
   return {
     getLibrary,
     getLibraryEntry,
     getFolders,
     getDrives,
+    setFavoriteCache,
     invalidate,
   };
 })();

@@ -159,6 +159,9 @@ const LowlootData = (() => {
       recommended:
         Boolean(raw.recommended),
 
+      // /games es el catálogo público: no sabe (ni debe saber) qué juegos
+      // son de cada usuario. game-detail.js recalcula este valor real
+      // consultando /library/me antes de usarlo.
       owned: false,
 
       coverImageUrl,

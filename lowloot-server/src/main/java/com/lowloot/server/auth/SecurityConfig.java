@@ -4,13 +4,16 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -48,9 +51,40 @@ public class SecurityConfig {
                         // aca (server-side), nunca solo ocultando botones.
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
+                // Sin esto, Spring Security usa su manejo por defecto para
+                // pedidos sin sesion valida o sin permiso: normalmente
+                // termina devolviendo un 403 generico (incluso cuando en
+                // realidad el token vencio/falta, que deberia ser 401) y esa
+                // respuesta nunca llega a pasar por GlobalExceptionHandler,
+                // asi que el launcher mostraba "no tenés permisos" para
+                // casos que en realidad eran "iniciá sesión de nuevo".
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(authenticationEntryPoint())
+                        .accessDeniedHandler(accessDeniedHandler()))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    // 401: no hay token, es invalido, o vencio. El frontend (api-client.js)
+    // reacciona específicamente a este status limpiando la sesión local.
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return (request, response, authException) -> writeJsonError(response, 401, "Tenés que iniciar sesión para continuar");
+    }
+
+    // 403: hay sesión válida, pero el rol no alcanza (ej. un USER pegándole
+    // a /admin/**).
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, accessDeniedException) -> writeJsonError(response, 403, "No tenés permisos para hacer esto");
+    }
+
+    private void writeJsonError(jakarta.servlet.http.HttpServletResponse response, int status, String message) throws java.io.IOException {
+        response.setStatus(status);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"status\":" + status + ",\"message\":\"" + message + "\"}");
     }
 
     // CORS permisivo: el launcher de Electron llama a la API desde un

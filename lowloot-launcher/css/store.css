@@ -69,7 +69,12 @@
   display: flex;
   gap: 18px;
   overflow-x: auto;
-  padding-bottom: 6px;
+  /* El padding le da lugar a la tarjeta en preview para agrandarse/elevarse
+     sin que este mismo contenedor se la recorte; el margen negativo la
+     compensa para que la fila ocupe exactamente el mismo espacio visual
+     que antes (no mueve nada del layout de alrededor). */
+  padding: 26px 18px 20px;
+  margin: -26px -18px -14px;
   scrollbar-width: thin;
 }
 

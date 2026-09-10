@@ -88,28 +88,20 @@
 }
 
 .install-field select,
-.install-field input[type='text'],
-.install-field input[type='email'],
-.install-field input[type='password'],
-.install-field input:not([type]) {
+.install-field input[type='text'] {
   width: 100%;
   background: var(--bg-elevated);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
-  font-size: 13.5px;
-  padding: 11px 13px;
-  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+  font-size: 12.5px;
+  padding: 9px 11px;
 }
 
 .install-field select:focus,
-.install-field input[type='text']:focus,
-.install-field input[type='email']:focus,
-.install-field input[type='password']:focus,
-.install-field input:not([type]):focus {
+.install-field input[type='text']:focus {
   outline: none;
-  border-color: var(--accent-bright);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
+  border-color: var(--text-secondary);
 }
 
 .install-space-row {

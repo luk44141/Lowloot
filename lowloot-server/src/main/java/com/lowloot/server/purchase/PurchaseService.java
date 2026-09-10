@@ -8,6 +8,7 @@ import com.lowloot.server.wallet.Transaction;
 import com.lowloot.server.wallet.TransactionRepository;
 import com.lowloot.server.wallet.Wallet;
 import com.lowloot.server.wallet.WalletRepository;
+import com.lowloot.server.wishlist.WishlistRepository;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.LinkedHashSet;
@@ -28,16 +29,19 @@ public class PurchaseService {
     private final UserGameRepository userGameRepository;
     private final WalletRepository walletRepository;
     private final TransactionRepository transactionRepository;
+    private final WishlistRepository wishlistRepository;
 
     public PurchaseService(
             GameRepository gameRepository,
             UserGameRepository userGameRepository,
             WalletRepository walletRepository,
-            TransactionRepository transactionRepository) {
+            TransactionRepository transactionRepository,
+            WishlistRepository wishlistRepository) {
         this.gameRepository = gameRepository;
         this.userGameRepository = userGameRepository;
         this.walletRepository = walletRepository;
         this.transactionRepository = transactionRepository;
+        this.wishlistRepository = wishlistRepository;
     }
 
     /**
@@ -104,6 +108,12 @@ public class PurchaseService {
         for (Long id : gameIds) {
             userGameRepository.save(new UserGame(userId, id));
         }
+
+        // Si alguno de estos juegos estaba en la wishlist del usuario, sale
+        // de ahí automáticamente al comprarlo -- ya no tiene sentido seguir
+        // "deseándolo" si ya es suyo. Es parte de la misma transacción
+        // atómica: si algo de arriba falla, esto tampoco se aplica.
+        wishlistRepository.deleteByUserIdAndGameIdIn(userId, gameIds);
 
         // --- 9. commit automatico al retornar sin excepcion ---
         return new PurchaseResponse(List.copyOf(gameIds), total, wallet.getBalance());

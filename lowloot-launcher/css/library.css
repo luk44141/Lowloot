@@ -264,75 +264,6 @@
 .lib-action-group {
   display: flex;
   gap: 8px;
-  align-items: center;
-}
-
-/* Menú de "más opciones" (3 puntitos) al lado de JUGAR: hoy solo tiene
-   Desinstalar. */
-.lib-more-menu {
-  position: relative;
-}
-
-.lib-more-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-elevated);
-  color: var(--text-secondary);
-  font-size: 16px;
-  line-height: 1;
-  cursor: default;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s var(--ease), color 0.15s var(--ease);
-}
-
-.lib-more-btn:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-}
-
-.lib-more-dropdown {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  min-width: 150px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 6px;
-  opacity: 0;
-  transform: translateY(-6px);
-  pointer-events: none;
-  transition: opacity 0.16s var(--ease), transform 0.16s var(--ease);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
-  z-index: 20;
-}
-
-.lib-more-dropdown.open {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.lib-more-item {
-  display: block;
-  width: 100%;
-  text-align: left;
-  background: transparent;
-  border: none;
-  color: #ff8a8a;
-  font-size: 12px;
-  padding: 8px 10px;
-  border-radius: 5px;
-  cursor: default;
-  transition: background 0.15s var(--ease);
-}
-
-.lib-more-item:hover {
-  background: rgba(255, 92, 92, 0.12);
 }
 
 .lib-update-dot {
@@ -428,6 +359,53 @@
 .lib-row-action {
   flex-shrink: 0;
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---------- Favorito (real, persistido) ---------- */
+
+.lib-favorite-btn {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 50%;
+  color: var(--text-muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: default;
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease), background 0.15s var(--ease), transform 0.12s var(--ease);
+}
+
+.lib-favorite-btn:hover {
+  color: #ffd873;
+  border-color: #ffd873;
+  transform: scale(1.08);
+}
+
+.lib-favorite-btn.active {
+  color: #ffd873;
+  border-color: #ffd873;
+  background: rgba(255, 216, 115, 0.12);
+}
+
+.lib-favorite-btn-card {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  background: rgba(10, 10, 10, 0.55);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.lib-card {
+  position: relative;
 }
 
 /* ---------- Modo Cuadrícula ---------- */
@@ -478,57 +456,92 @@
 
 .lib-card-action {
   padding: 12px 14px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.lib-card-action .btn-primary {
-  width: 100%;
+.lib-card-action .btn-primary,
+.lib-card-action .btn-secondary,
+.lib-card-action .lib-action-group {
+  flex: 1;
+  min-width: 0;
 }
 
-/* ---------- Modo Carátulas ---------- */
 
-.lib-games-caratulas {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 20px;
-}
 
-.lib-cover {
-  cursor: default;
-  text-align: left;
-  animation: cardIn 0.35s var(--ease) both;
-}
+/* ---------- Menú de "tres puntos" (Desinstalar) ---------- */
 
-.lib-cover-image {
+.lib-menu {
   position: relative;
-  width: 100%;
-  aspect-ratio: 3 / 4;
-  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.lib-menu-trigger {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-elevated);
   border: 1px solid var(--border-subtle);
-  margin-bottom: 8px;
-  transition: transform 0.22s var(--ease), border-color 0.22s var(--ease), box-shadow 0.22s var(--ease);
+  border-radius: 50%;
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1;
+  cursor: default;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease);
 }
 
-.lib-cover:hover .lib-cover-image {
-  transform: translateY(-5px) scale(1.03);
-  border-color: #333333;
-  box-shadow: 0 20px 38px rgba(0, 0, 0, 0.4);
+.lib-menu-trigger:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
 
-.lib-cover-badge {
+.lib-menu-dropdown {
   position: absolute;
-  bottom: 8px;
-  left: 8px;
-  background: rgba(0, 0, 0, 0.55);
-  color: var(--text-primary);
-  font-size: 10px;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 999px;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 170px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+  padding: 6px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.15s var(--ease), transform 0.15s var(--ease), visibility 0.15s;
+  z-index: 20;
 }
 
-.lib-cover-name {
+.lib-menu.open .lib-menu-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.lib-menu-item {
   display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: #ff8a8a;
   font-size: 12.5px;
-  color: var(--text-primary);
-  line-height: 1.35;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: default;
+  transition: background 0.15s var(--ease);
+}
+
+.lib-menu-item:hover {
+  background: rgba(255, 92, 92, 0.12);
+}
+
+.lib-menu-empty {
+  display: block;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--text-muted);
 }

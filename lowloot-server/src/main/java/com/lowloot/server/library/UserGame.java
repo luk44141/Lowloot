@@ -32,6 +32,11 @@ public class UserGame {
     @Column(nullable = false)
     private boolean installed = false;
 
+    // Favorito real por usuario (V3__user_games_favorite.sql), no un estado
+    // simulado en memoria del launcher.
+    @Column(nullable = false)
+    private boolean favorite = false;
+
     public UserGame() {
     }
 
@@ -62,5 +67,13 @@ public class UserGame {
 
     public void setInstalled(boolean installed) {
         this.installed = installed;
+    }
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
     }
 }

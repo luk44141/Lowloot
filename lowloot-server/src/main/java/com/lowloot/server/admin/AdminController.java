@@ -1,11 +1,11 @@
 package com.lowloot.server.admin;
 
+import com.lowloot.server.Game;
 import com.lowloot.server.auth.User;
 import com.lowloot.server.auth.UserRepository;
 import com.lowloot.server.library.LibraryEntryResponse;
 import com.lowloot.server.library.UserGame;
 import com.lowloot.server.library.UserGameRepository;
-import com.lowloot.server.Game;
 import com.lowloot.server.repository.GameRepository;
 import com.lowloot.server.wallet.Transaction;
 import com.lowloot.server.wallet.TransactionRepository;
@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -105,10 +104,14 @@ public class AdminController {
                 user.getCreatedAt());
     }
 
-    // Biblioteca de un usuario, para que el admin pueda ver qué tiene y
-    // (si hace falta) sacarle algún juego.
+    // Biblioteca real de un usuario puntual, para que el admin vea qué
+    // tiene antes de decidir si le quita algo.
     @GetMapping("/users/{userId}/library")
     public List<LibraryEntryResponse> userLibrary(@PathVariable Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
+        }
+
         List<UserGame> owned = userGameRepository.findByUserId(userId);
         if (owned.isEmpty()) return List.of();
 
@@ -128,22 +131,20 @@ public class AdminController {
                             game.getCoverImageUrl(),
                             game.getPrice(),
                             ug.isInstalled(),
+                            ug.isFavorite(),
                             ug.getPurchasedAt());
                 })
                 .filter(java.util.Objects::nonNull)
                 .toList();
     }
 
-    // Saca un juego de la biblioteca de un usuario. No devuelve el saldo
-    // (es una acción de moderación/soporte, no una devolución de plata);
-    // si en algún momento hace falta reembolsar, es un flujo aparte.
-    @Transactional
+    // Le quita un juego de la biblioteca a un usuario puntual. Es una baja
+    // administrativa real en user_games (no un ocultamiento visual): si
+    // vuelve a comprarlo más adelante, se crea una fila nueva.
     @DeleteMapping("/users/{userId}/library/{gameId}")
-    public ResponseEntity<Void> removeFromLibrary(@PathVariable Long userId, @PathVariable Long gameId) {
-        if (!userGameRepository.existsByUserIdAndGameId(userId, gameId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ese usuario no tiene ese juego en su biblioteca");
-        }
-        userGameRepository.deleteByUserIdAndGameId(userId, gameId);
-        return ResponseEntity.noContent().build();
+    public void removeFromLibrary(@PathVariable Long userId, @PathVariable Long gameId) {
+        UserGame userGame = userGameRepository.findByUserIdAndGameId(userId, gameId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ese usuario no tiene ese juego en su biblioteca"));
+        userGameRepository.delete(userGame);
     }
 }

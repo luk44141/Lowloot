@@ -153,6 +153,7 @@ async function renderLibraryGameDetail(game) {
         <button type="button" class="btn-secondary ${favorited ? 'wishlisted' : ''}" data-lib-favorite-toggle="${game.gameId}">
           <span class="wishlist-icon">${favorited ? '♥' : '♡'}</span> ${favorited ? 'En favoritos' : 'Agregar a favoritos'}
         </button>
+        ${libraryMenuButton(game)}
       </div>
 
       <div class="lib-quick-stats">
@@ -239,16 +240,3 @@ async function renderLibraryGameDetail(game) {
   `;
 }
 
-function toggleLibraryFavorite(btn) {
-  const gameId = btn.dataset.libFavoriteToggle;
-  const current = libraryFavoriteOverrides.has(gameId)
-    ? libraryFavoriteOverrides.get(gameId)
-    : libraryCache?.find((g) => String(g.gameId) === String(gameId))?.favorite;
-  const next = !current;
-
-  libraryFavoriteOverrides.set(gameId, next);
-
-  btn.classList.toggle('wishlisted', next);
-  btn.innerHTML = `<span class="wishlist-icon">${next ? '♥' : '♡'}</span> ${next ? 'En favoritos' : 'Agregar a favoritos'}`;
-  showToast(next ? 'Agregado a favoritos' : 'Quitado de favoritos');
-}

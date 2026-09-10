@@ -19,15 +19,6 @@
   transition: background 0.15s var(--ease), transform 0.12s var(--ease), box-shadow 0.2s var(--ease);
 }
 
-/* Mismo bug que ya se había corregido en los badges de notificaciones/carrito
-   (layout.css): un elemento con "display" propio necesita esta regla
-   explícita, si no [hidden] no le gana nunca y el botón queda visible
-   aunque loginBtn.hidden = true (por eso "Iniciar sesión" seguía
-   apareciendo con la sesión ya iniciada). */
-.login-btn[hidden] {
-  display: none !important;
-}
-
 .login-btn:hover {
   background: var(--accent-bright);
   box-shadow: 0 8px 20px rgba(255, 255, 255, 0.08);
@@ -44,43 +35,35 @@
 /* ---------- Modal de login ---------- */
 
 .login-modal {
-  width: 420px;
-  padding: 34px 32px 30px;
-  background: linear-gradient(180deg, var(--bg-panel), var(--bg-elevated));
-  border: 1px solid var(--border-subtle);
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+  width: 400px;
 }
 
 .login-modal-header {
   text-align: center;
-  margin-bottom: 26px;
+  margin-bottom: 22px;
 }
 
 .login-modal-mark {
-  display: inline-block;
+  display: block;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.22em;
-  color: #111111;
-  background: var(--accent-bright);
-  padding: 4px 12px;
-  border-radius: 999px;
-  margin-bottom: 18px;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  margin-bottom: 14px;
 }
 
 .login-modal .install-modal-title {
-  font-size: 21px;
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   padding-right: 0;
   text-align: center;
 }
 
 .login-modal-sub {
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--text-secondary);
   margin: 0;
-  line-height: 1.55;
+  line-height: 1.5;
 }
 
 .login-form {
@@ -134,51 +117,6 @@
   color: var(--accent-bright);
 }
 
-.login-modal .install-field {
-  margin-bottom: 20px;
-}
-
-.login-modal .install-field label {
-  font-size: 12.5px;
-  color: var(--text-secondary);
-  margin-bottom: 9px;
-}
-
-/* ---------- Modal de confirmación (checkout, etc.) ---------- */
-
-.confirm-modal {
-  width: 400px;
-  padding: 30px 28px 26px;
-}
-
-.confirm-modal .install-modal-title {
-  font-size: 18px;
-  margin: 0 0 14px;
-  padding-right: 0;
-}
-
-.confirm-modal-message {
-  font-size: 13.5px;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  margin: 0 0 26px;
-}
-
-.confirm-modal-message strong {
-  color: var(--text-primary);
-}
-
-.confirm-modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.confirm-modal-actions .btn-secondary,
-.confirm-modal-actions .btn-primary {
-  padding: 10px 20px;
-}
-
 .login-form-error {
   background: rgba(255, 92, 92, 0.12);
   border: 1px solid rgba(255, 92, 92, 0.35);
@@ -193,73 +131,51 @@
 
 .user-chip {
   position: relative;
-}
-
-/* Saldo: botón propio, separado del chip de usuario (antes vivía adentro
-   del chip, apretado contra el nombre). */
-.balance-chip {
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
+  gap: 8px;
+}
+
+/* Saldo: pastilla propia e independiente, no forma parte del botón de
+   usuario ni de su menú. */
+.user-balance-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(120, 214, 150, 0.12);
+  border: 1px solid rgba(120, 214, 150, 0.35);
   border-radius: var(--radius-sm);
-  padding: 7px 13px;
+  padding: 7px 12px;
+  color: #7ee0a0;
+  cursor: default;
+  transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.user-balance-btn:hover {
+  background: rgba(120, 214, 150, 0.2);
+}
+
+.user-balance-value {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 12.5px;
-  color: var(--accent);
-  white-space: nowrap;
-}
-
-.balance-chip[hidden] {
-  display: none !important;
-}
-
-.balance-chip-icon {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: #111111;
-  font-size: 10px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: #7ee0a0;
 }
 
 .user-chip-trigger {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   background: var(--bg-elevated);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  padding: 6px 14px 6px 6px;
+  padding: 7px 12px;
   cursor: default;
-  white-space: nowrap;
   transition: background 0.15s var(--ease);
 }
 
 .user-chip-trigger:hover {
   background: rgba(255, 255, 255, 0.1);
-}
-
-.user-chip-avatar {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #2c2c2c, #161616);
-  border: 1px solid var(--border-subtle);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-primary);
-  flex-shrink: 0;
 }
 
 .user-chip-name {

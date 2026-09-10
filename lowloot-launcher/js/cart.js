@@ -40,14 +40,6 @@ function toggleCartFromDetail(btn) {
   const id = btn.dataset.cartToggle;
   const added = !cart.has(id);
 
-  // No tiene sentido tenerlo en el carrito Y en la wishlist a la vez: si
-  // lo estás comprando, lo sacamos de "quiero esto" automáticamente.
-  if (added && wishlist.has(String(id))) {
-    wishlist.delete(String(id));
-    LowlootAPI.removeFromWishlist(id).catch(() => {});
-    if (qs('.view[data-view="wishlist"]')?.classList.contains('active')) renderWishlistView();
-  }
-
   if (added) cart.set(id, 1);
   else cart.delete(id);
 
@@ -89,14 +81,14 @@ async function renderCartView() {
 
   const rows = entries
     .map(
-      ({ game, qty }) => `
+      ({ game }) => `
     <div class="cart-row" data-game-id="${game.id}">
       <div class="result-thumb ${gameCoverClass(game)}" ${gameCoverStyle(game)} aria-hidden="true"></div>
       <div class="result-info">
         <h4 class="result-name">${game.name}</h4>
         <span class="result-genre">${game.genre}</span>
       </div>
-      <div class="result-price">${formatPrice(cartLineTotal(game, qty))}</div>
+      <div class="result-price">${formatPrice(cartLineTotal(game, 1))}</div>
       <button type="button" class="btn-secondary cart-remove-btn" data-cart-remove="${game.id}">Quitar</button>
     </div>
   `
@@ -123,23 +115,36 @@ async function purchaseGames(gameIds, { fromCart = false } = {}) {
   if (!gameIds.length) return false;
 
   const allGames = await LowlootData.getAllGames();
-  const items = gameIds
+  let items = gameIds
     .map((id) => allGames.find((g) => String(g.id) === String(id)))
     .filter(Boolean);
   if (!items.length) return false;
+
+  // No tiene sentido intentar comprar algo que ya es de la biblioteca: se
+  // avisa y se sigue solo con lo que falta, en vez de dejar que el backend
+  // rechace toda la operación (atómica: si un solo id ya es del usuario,
+  // hoy el servidor cancela la compra completa).
+  const ownedChecks = await Promise.all(items.map((g) => LibraryData.getLibraryEntry(g.id)));
+  const alreadyOwned = items.filter((_, i) => ownedChecks[i]);
+  if (alreadyOwned.length) {
+    showToast(
+      alreadyOwned.length === 1
+        ? `Ya tenés "${alreadyOwned[0].name}" en tu biblioteca`
+        : `Ya tenés en tu biblioteca: ${alreadyOwned.map((g) => g.name).join(', ')}`
+    );
+    items = items.filter((_, i) => !ownedChecks[i]);
+    if (!items.length) return false;
+  }
 
   const total = items.reduce((sum, g) => sum + cartLineTotal(g, 1), 0);
   const balance = Number(currentUser.balance) || 0;
   const names = items.map((g) => g.name).join(', ');
 
-  const confirmed = await showConfirmModal({
-    title: total > 0 ? 'Confirmar compra' : 'Agregar a tu biblioteca',
-    message:
-      total > 0
-        ? `Vas a gastar <strong>${formatPrice(total)}</strong> de tu saldo (disponible: <strong>${formatPrice(balance)}</strong>) en:<br>${escapeHtml(names)}.`
-        : `Vas a agregar a tu biblioteca (gratis):<br>${escapeHtml(names)}.`,
-    confirmLabel: total > 0 ? 'Confirmar compra' : 'Agregar',
-  });
+  const confirmed = window.confirm(
+    total > 0
+      ? `Vas a gastar ${formatPrice(total)} de tu saldo (disponible: ${formatPrice(balance)}) en: ${names}. ¿Confirmás la compra?`
+      : `Vas a agregar a tu biblioteca (gratis): ${names}. ¿Confirmás?`
+  );
   if (!confirmed) return false;
 
   try {
@@ -149,9 +154,24 @@ async function purchaseGames(gameIds, { fromCart = false } = {}) {
     if (typeof renderTopbarSession === 'function') renderTopbarSession();
     if (typeof invalidateLibraryCache === 'function') invalidateLibraryCache();
 
+    // El backend ya sacó estos juegos de la wishlist si estaban ahí (no
+    // tiene sentido seguir "deseando" algo que ya es tuyo); se refleja acá
+    // al toque, sin esperar a la próxima vez que se abra la wishlist.
+    let wishlistChanged = false;
+    response.purchasedGameIds.forEach((id) => {
+      if (wishlist.delete(String(id))) wishlistChanged = true;
+    });
+
     if (fromCart) {
       gameIds.forEach((id) => cart.delete(String(id)));
       renderCartBadge();
+    }
+
+    if (qs('.view[data-view="biblioteca"]')?.classList.contains('active') && typeof renderLibraryHome === 'function') {
+      renderLibraryHome();
+    }
+    if (wishlistChanged && qs('.view[data-view="wishlist"]')?.classList.contains('active') && typeof renderWishlistView === 'function') {
+      renderWishlistView();
     }
 
     showToast(

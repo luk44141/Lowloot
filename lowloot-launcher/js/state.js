@@ -44,15 +44,11 @@ function defaultFilters() {
 
 /* ---------- Biblioteca ---------- */
 
-let libraryViewMode = 'lista'; // 'lista' | 'cuadricula' | 'caratulas'
+let libraryViewMode = 'lista'; // 'lista' | 'cuadricula'
 let librarySort = 'nombre'; // 'nombre' | 'ultimo-jugado' | 'horas' | 'agregado' | 'actualizacion'
 let libraryFilter = 'todos'; // 'todos' | 'instalados' | 'no-instalados' | 'favoritos' | 'actualizaciones'
 let libraryQuery = '';
 let libraryFolder = null; // nombre de carpeta activa, o null si se ve la Biblioteca completa
-
-// Favoritos de Biblioteca: Map<gameId, bool>. Si un juego no está acá se usa
-// el valor por defecto que trae LibraryData (mock "de backend").
-const libraryFavoriteOverrides = new Map();
 
 // Juego cuya ficha de Biblioteca está abierta / juego para el que está
 // abierto el modal de instalación (null si no hay nada abierto).

@@ -87,7 +87,7 @@ function initDelegatedHandlers() {
       return;
     }
 
-    // ---- Biblioteca: lista/cuadrícula/carátulas, filtros, carpetas ----
+    // ---- Biblioteca: lista/cuadrícula, filtros, carpetas ----
 
     const libInstallBtn = event.target.closest('[data-lib-install]');
     if (libInstallBtn) {
@@ -95,30 +95,29 @@ function initDelegatedHandlers() {
       return;
     }
 
-    const libMoreBtn = event.target.closest('[data-lib-more]');
-    if (libMoreBtn) {
-      const dropdown = qs(`[data-lib-more-dropdown="${libMoreBtn.dataset.libMore}"]`);
-      const wasOpen = dropdown?.classList.contains('open');
-      qsa('.lib-more-dropdown.open').forEach((d) => d.classList.remove('open'));
-      if (dropdown && !wasOpen) dropdown.classList.add('open');
+    const libMenuToggleBtn = event.target.closest('[data-lib-menu-toggle]');
+    if (libMenuToggleBtn) {
+      event.stopPropagation();
+      toggleLibraryMenu(libMenuToggleBtn.dataset.libMenuToggle);
       return;
     }
 
     const libUninstallBtn = event.target.closest('[data-lib-uninstall]');
     if (libUninstallBtn) {
+      closeAllLibraryMenus(null);
       uninstallLibraryGame(libUninstallBtn.dataset.libUninstall);
       return;
     }
 
-    if (!event.target.closest('.lib-more-menu')) {
-      qsa('.lib-more-dropdown.open').forEach((d) => d.classList.remove('open'));
-    }
-
     const libFavoriteBtn = event.target.closest('[data-lib-favorite-toggle]');
     if (libFavoriteBtn) {
-      toggleLibraryFavorite(libFavoriteBtn);
+      toggleLibraryFavoriteReal(libFavoriteBtn.dataset.libFavoriteToggle);
       return;
     }
+
+    // Clic en cualquier otro lado: cierra los menús de "tres puntos" que
+    // hayan quedado abiertos.
+    if (!event.target.closest('.lib-menu')) closeAllLibraryMenus(null);
 
     const libViewBtn = event.target.closest('[data-lib-view]');
     if (libViewBtn) {

@@ -195,7 +195,7 @@ function bindHeroVideoEndedHandler(game) {
 }
 
 function cartActionButtonHtml(game) {
-  const inCart = cart.has(String(game.id));
+  const inCart = cart.has(game.id);
   return `
     <button type="button" class="btn-secondary ${inCart ? 'wishlisted' : ''}" data-cart-toggle="${game.id}">
       <span class="wishlist-icon">${inCart ? '✓' : '🛒'}</span> ${inCart ? 'En el carrito' : 'Agregar al carrito'}
@@ -288,8 +288,8 @@ async function renderGameDetail(game) {
       <button
         type="button"
         class="btn-primary"
-        data-lib-install="${game.id}">
-        INSTALAR
+        data-buy-toggle="La ejecución del juego todavía no está disponible">
+        JUGAR
       </button>
     `;
   } else if (game.isFree) {
@@ -997,7 +997,7 @@ async function toggleWishlist(btn) {
   const added = !wishlist.has(String(id));
 
   if (added && cart.has(String(id))) {
-    showToast('Ese juego ya está en tu carrito');
+    showToast('Este juego está en tu carrito');
     return;
   }
 

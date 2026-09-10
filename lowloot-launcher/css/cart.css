@@ -1,4 +1,4 @@
-/* cart.css — vista de Carrito: filas con control de cantidad y resumen de compra */
+/* cart.css — vista de Carrito: filas de juegos (1 licencia c/u) y resumen de compra */
 
 .cart-list {
   display: flex;

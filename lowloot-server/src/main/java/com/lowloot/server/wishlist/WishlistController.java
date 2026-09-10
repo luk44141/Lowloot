@@ -52,8 +52,7 @@ public class WishlistController {
                             game.getPrice(),
                             game.getDiscount(),
                             game.getReleaseDate(),
-                            item.getAddedAt(),
-                            wishlistRepository.countByGameId(game.getId()));
+                            item.getAddedAt());
                 })
                 .filter(java.util.Objects::nonNull)
                 .toList();

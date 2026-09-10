@@ -28,8 +28,40 @@ async function loadLibraryGames() {
 }
 
 function isLibraryFavorite(game) {
-  const key = String(game.gameId);
-  return libraryFavoriteOverrides.has(key) ? libraryFavoriteOverrides.get(key) : game.favorite;
+  return Boolean(game.favorite);
+}
+
+// Toggle real de favorito: persiste en PostgreSQL (user_games.favorite) y
+// actualiza la caché en memoria + vuelve a ordenar/pintar la lista al
+// toque, sin recargar toda la Biblioteca ni depender de un estado
+// simulado en el cliente.
+async function toggleLibraryFavoriteReal(gameId) {
+  const entry = libraryCache?.find((g) => String(g.gameId) === String(gameId));
+  if (!entry) return;
+
+  const next = !entry.favorite;
+  try {
+    await LowlootAPI.setLibraryFavorite(gameId, next);
+  } catch (err) {
+    showToast(err.message || 'No se pudo actualizar el favorito');
+    return;
+  }
+
+  entry.favorite = next;
+  if (typeof LibraryData !== 'undefined') LibraryData.setFavoriteCache(gameId, next);
+
+  showToast(next ? 'Agregado a favoritos' : 'Quitado de favoritos');
+
+  if (qs('.view[data-view="biblioteca"]')?.classList.contains('active')) {
+    refreshLibraryGamesList();
+  }
+  if (currentLibraryGameId != null && String(currentLibraryGameId) === String(gameId)) {
+    const favBtn = qs(`[data-lib-favorite-toggle="${gameId}"]`);
+    if (favBtn) {
+      favBtn.classList.toggle('wishlisted', next);
+      favBtn.innerHTML = `<span class="wishlist-icon">${next ? '♥' : '♡'}</span> ${next ? 'En favoritos' : 'Agregar a favoritos'}`;
+    }
+  }
 }
 
 /* ---------- Formato específico de Biblioteca ---------- */
@@ -64,48 +96,32 @@ function applyLibraryFilters(games) {
   else if (libraryFilter === 'favoritos') list = list.filter(isLibraryFavorite);
   else if (libraryFilter === 'actualizaciones') list = list.filter((g) => g.updateAvailable);
 
+  let comparator;
   switch (librarySort) {
     case 'ultimo-jugado':
-      list.sort((a, b) => new Date(b.lastPlayed || 0) - new Date(a.lastPlayed || 0));
+      comparator = (a, b) => new Date(b.lastPlayed || 0) - new Date(a.lastPlayed || 0);
       break;
     case 'horas':
-      list.sort((a, b) => b.playtimeHours - a.playtimeHours);
+      comparator = (a, b) => b.playtimeHours - a.playtimeHours;
       break;
     case 'agregado':
-      list.sort((a, b) => new Date(b.addedDate) - new Date(a.addedDate));
+      comparator = (a, b) => new Date(b.addedDate) - new Date(a.addedDate);
       break;
     case 'actualizacion':
-      list.sort((a, b) => Number(b.updateAvailable) - Number(a.updateAvailable));
+      comparator = (a, b) => Number(b.updateAvailable) - Number(a.updateAvailable);
       break;
     default:
-      list.sort((a, b) => a.name.localeCompare(b.name, 'es'));
+      comparator = (a, b) => a.name.localeCompare(b.name, 'es');
   }
+
+  // Los favoritos siempre van primero (y mantienen el mismo orden estable
+  // entre ellos, y los no-favoritos entre sí, según el criterio elegido).
+  list.sort((a, b) => Number(isLibraryFavorite(b)) - Number(isLibraryFavorite(a)) || comparator(a, b));
 
   return list;
 }
 
 /* ---------- Piezas compartidas entre lista/cuadrícula/carátulas ---------- */
-
-async function uninstallLibraryGame(gameId) {
-  qsa('.lib-more-dropdown.open').forEach((d) => d.classList.remove('open'));
-  try {
-    await LowlootAPI.uninstallGame(gameId);
-  } catch (err) {
-    showToast(err.message || 'No se pudo desinstalar el juego');
-    return;
-  }
-
-  const index = libraryCache?.findIndex((g) => String(g.gameId) === String(gameId));
-  if (index > -1) libraryCache[index].installed = false;
-
-  showToast('Juego desinstalado');
-
-  if (qs('.view[data-view="biblioteca"]')?.classList.contains('active')) refreshLibraryGamesList();
-  if (currentLibraryGameId === gameId && qs('.view[data-view="library-game"]')?.classList.contains('active')) {
-    const updatedGame = libraryCache.find((g) => String(g.gameId) === String(gameId));
-    if (updatedGame) renderLibraryGameDetail(updatedGame);
-  }
-}
 
 function libraryStatusPill(game) {
   if (game.updateAvailable) return `<span class="lib-pill lib-pill-update">ACTUALIZACIÓN DISPONIBLE</span>`;
@@ -119,23 +135,47 @@ function libraryActionButtons(game, size) {
     return `<button type="button" class="btn-primary lib-action-btn${small}" data-lib-install="${game.gameId}">INSTALAR</button>`;
   }
   const playBtn = `<button type="button" class="btn-primary lib-action-btn${small}" data-buy-toggle="La ejecución de juegos todavía no está disponible">JUGAR</button>`;
-  const moreMenu = `
-    <div class="lib-more-menu">
-      <button type="button" class="lib-more-btn" data-lib-more="${game.gameId}" aria-label="Más opciones" title="Más opciones">⋮</button>
-      <div class="lib-more-dropdown" data-lib-more-dropdown="${game.gameId}">
-        <button type="button" class="lib-more-item" data-lib-uninstall="${game.gameId}">Desinstalar</button>
+  if (game.updateAvailable && size !== 'small') {
+    return `<div class="lib-action-group"><button type="button" class="btn-secondary lib-action-btn${small}" data-buy-toggle="Las actualizaciones automáticas todavía no están disponibles">ACTUALIZAR</button>${playBtn}</div>`;
+  }
+  return playBtn;
+}
+
+// Menú de "tres puntos": por ahora solo tiene Desinstalar (simulado, no
+// borra archivos reales), y solo aparece si el juego está instalado.
+function libraryMenuButton(game) {
+  return `
+    <div class="lib-menu" data-lib-menu="${game.gameId}">
+      <button type="button" class="lib-menu-trigger" data-lib-menu-toggle="${game.gameId}" aria-label="Más opciones">⋮</button>
+      <div class="lib-menu-dropdown" id="lib-menu-dropdown-${game.gameId}">
+        ${
+          game.installed
+            ? `<button type="button" class="lib-menu-item" data-lib-uninstall="${game.gameId}">Desinstalar</button>`
+            : `<span class="lib-menu-empty">Sin más opciones</span>`
+        }
       </div>
     </div>
   `;
-  if (game.updateAvailable && size !== 'small') {
-    return `<div class="lib-action-group"><button type="button" class="btn-secondary lib-action-btn${small}" data-buy-toggle="Las actualizaciones automáticas todavía no están disponibles">ACTUALIZAR</button>${playBtn}${moreMenu}</div>`;
-  }
-  return `<div class="lib-action-group">${playBtn}${moreMenu}</div>`;
+}
+
+function closeAllLibraryMenus(exceptGameId) {
+  qsa('.lib-menu.open').forEach((menu) => {
+    if (String(menu.dataset.libMenu) !== String(exceptGameId)) menu.classList.remove('open');
+  });
+}
+
+function toggleLibraryMenu(gameId) {
+  const menu = qs(`.lib-menu[data-lib-menu="${gameId}"]`);
+  if (!menu) return;
+  const willOpen = !menu.classList.contains('open');
+  closeAllLibraryMenus(willOpen ? gameId : null);
+  menu.classList.toggle('open', willOpen);
 }
 
 /* ---------- Modo Lista ---------- */
 
 function renderLibraryRow(game) {
+  const favorited = isLibraryFavorite(game);
   return `
     <article class="lib-row" data-lib-game-id="${game.gameId}">
       <div class="lib-row-cover ${gameCoverClass(game)}" ${gameCoverStyle(game)} aria-hidden="true"></div>
@@ -152,7 +192,10 @@ function renderLibraryRow(game) {
         <span class="lib-stat-label">Última vez</span>
         <span class="lib-stat-value">${formatLastPlayed(game.lastPlayed)}</span>
       </div>
-      <div class="lib-row-action">${libraryActionButtons(game)}</div>
+      <button type="button" class="lib-favorite-btn ${favorited ? 'active' : ''}" data-lib-favorite-toggle="${game.gameId}" title="${favorited ? 'Quitar de favoritos' : 'Agregar a favoritos'}">
+        ${favorited ? '★' : '☆'}
+      </button>
+      <div class="lib-row-action">${libraryActionButtons(game)}${libraryMenuButton(game)}</div>
     </article>
   `;
 }
@@ -160,30 +203,20 @@ function renderLibraryRow(game) {
 /* ---------- Modo Cuadrícula ---------- */
 
 function renderLibraryCard(game) {
+  const favorited = isLibraryFavorite(game);
   return `
     <article class="lib-card" data-lib-game-id="${game.gameId}">
       <div class="lib-card-cover ${gameCoverClass(game)}" ${gameCoverStyle(game)} aria-hidden="true">
         ${game.updateAvailable ? '<span class="lib-update-dot" title="Actualización disponible"></span>' : ''}
       </div>
+      <button type="button" class="lib-favorite-btn lib-favorite-btn-card ${favorited ? 'active' : ''}" data-lib-favorite-toggle="${game.gameId}" title="${favorited ? 'Quitar de favoritos' : 'Agregar a favoritos'}">
+        ${favorited ? '★' : '☆'}
+      </button>
       <div class="lib-card-info">
         <h4 class="lib-card-name">${game.name}</h4>
         <span class="lib-card-sub">${formatPlaytime(game.playtimeHours)} · ${game.installed ? 'Instalado' : 'No instalado'}</span>
       </div>
-      <div class="lib-card-action">${libraryActionButtons(game, 'small')}</div>
-    </article>
-  `;
-}
-
-/* ---------- Modo Carátulas ---------- */
-
-function renderLibraryCover(game) {
-  return `
-    <article class="lib-cover" data-lib-game-id="${game.gameId}">
-      <div class="lib-cover-image ${gameCoverClass(game)}" ${gameCoverStyle(game)} aria-hidden="true">
-        ${game.updateAvailable ? '<span class="lib-update-dot" title="Actualización disponible"></span>' : ''}
-        ${!game.installed ? '<span class="lib-cover-badge">No instalado</span>' : ''}
-      </div>
-      <span class="lib-cover-name">${game.name}</span>
+      <div class="lib-card-action">${libraryActionButtons(game, 'small')}${libraryMenuButton(game)}</div>
     </article>
   `;
 }
@@ -193,7 +226,6 @@ function renderLibraryGames(list) {
     return `<p class="placeholder-text">No encontramos juegos con estos filtros.</p>`;
   }
   if (libraryViewMode === 'cuadricula') return list.map(renderLibraryCard).join('');
-  if (libraryViewMode === 'caratulas') return list.map(renderLibraryCover).join('');
   return list.map(renderLibraryRow).join('');
 }
 

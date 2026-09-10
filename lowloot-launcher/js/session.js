@@ -9,11 +9,7 @@
 
 function setCurrentUser(me) {
   currentUser = {
-    // AuthResponse (login/register) manda el campo como "userId";
-    // MeResponse (/users/me) lo manda como "id". Sin este fallback,
-    // currentUser.id quedaba undefined justo después de loguearte/crear
-    // la cuenta (solo se corregía recién al refrescar con /users/me).
-    id: me.id ?? me.userId,
+    id: me.id,
     username: me.username,
     email: me.email,
     role: me.role,
@@ -67,7 +63,7 @@ async function initSession() {
     if (typeof invalidateLibraryCache === 'function') invalidateLibraryCache();
   } catch (err) {
     LowlootAPI.clearToken();
-    currentUser = null;
+    clearUserSessionData();
   }
 
   updateSessionUI();
@@ -75,6 +71,7 @@ async function initSession() {
 
 // Se llama después de un login/registro exitoso.
 async function onAuthSuccess(authResponse, remember) {
+  clearUserSessionData();
   LowlootAPI.saveToken(authResponse.token, remember);
   setCurrentUser(authResponse);
   await refreshWishlistCache();
@@ -84,12 +81,32 @@ async function onAuthSuccess(authResponse, remember) {
 
 function logout() {
   LowlootAPI.clearToken();
-  currentUser = null;
-  wishlist.clear();
-  if (typeof invalidateLibraryCache === 'function') invalidateLibraryCache();
+  clearUserSessionData();
   updateSessionUI();
   activateView('inicio');
   showToast('Sesión cerrada');
+}
+
+// Todo lo que sea específico de la cuenta que estaba logueada: sesión,
+// wishlist, carrito, selección/filtros de Biblioteca y los "me gusta"
+// simulados de Comunidad. Se usa al cerrar sesión, y defensivamente antes
+// de cualquier login/registro nuevo, para que nunca quede pegado un dato
+// de la cuenta anterior.
+function clearUserSessionData() {
+  currentUser = null;
+  wishlist.clear();
+  cart.clear();
+  communityLikedPosts.clear();
+  communityUserComments.clear();
+
+  libraryFilter = 'todos';
+  libraryQuery = '';
+  libraryFolder = null;
+  librarySort = 'nombre';
+  currentLibraryGameId = null;
+  installModalGameId = null;
+
+  if (typeof invalidateLibraryCache === 'function') invalidateLibraryCache();
 }
 
 // Gate reutilizable para acciones que necesitan sesión (comprar, agregar a
