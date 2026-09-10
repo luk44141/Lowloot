@@ -152,6 +152,12 @@ function initDelegatedHandlers() {
       return;
     }
 
+    const libFolderDeleteBtn = event.target.closest('[data-lib-folder-delete]');
+    if (libFolderDeleteBtn) {
+      handleFolderDeleteClick(libFolderDeleteBtn.dataset.libFolderDelete, libFolderDeleteBtn);
+      return;
+    }
+
     if (event.target.closest('[data-lib-back]')) {
       handleBack('library-home');
       return;

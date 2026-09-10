@@ -37,12 +37,10 @@ function renderTopbarSession() {
   qs('#user-menu-email').textContent = currentUser.email;
 
   // Panel admin: ícono propio en la topbar (al lado de notificaciones),
-  // visible solo para ADMIN. El perfil (menú de usuario) ya no tiene este
-  // acceso: ahí solo queda "Cerrar sesión".
+  // visible solo para ADMIN. Ya no vive en la barra lateral ni en el
+  // perfil (menú de usuario): ahí solo queda "Cerrar sesión".
   const adminTrigger = document.getElementById('admin-panel-trigger');
   if (adminTrigger) adminTrigger.hidden = !isAdmin();
-  const adminNav = document.getElementById('admin-nav-list');
-  if (adminNav) adminNav.hidden = !isAdmin();
 }
 
 function initLoginButton() {

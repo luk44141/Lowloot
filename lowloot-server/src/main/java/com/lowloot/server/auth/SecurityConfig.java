@@ -41,6 +41,14 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // El preflight (OPTIONS) de CORS tiene que pasar SIEMPRE,
+                        // sin importar si hay token o no: si un PATCH/DELETE con
+                        // body cae acá sin este permiso explícito, el preflight
+                        // puede terminar evaluado por ".anyRequest().authenticated()"
+                        // y cortado con 403 vacío (nunca llega a nuestro
+                        // accessDeniedHandler, que sí manda JSON) antes de que el
+                        // launcher pueda mandar el PATCH real.
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // Catalogo de juegos y assets estaticos: publicos, no
                         // hace falta estar logueado para ver la tienda.
                         .requestMatchers(HttpMethod.GET, "/games", "/games/**").permitAll()

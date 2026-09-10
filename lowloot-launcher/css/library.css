@@ -157,9 +157,18 @@
 
 .lib-folders-track {
   display: flex;
+  align-items: flex-start;
   gap: 16px;
   overflow-x: auto;
-  padding-bottom: 6px;
+  /* Al pasar el mouse la tarjeta se eleva y agranda un poco (ver
+     .lib-folder-card:hover más abajo): "overflow-x: auto" hace que el
+     navegador también recorte el eje Y (no se puede tener un eje
+     recortado y el otro "visible" al mismo tiempo), así que sin este
+     colchón la tarjeta quedaba tapada arriba y a la izquierda justo en
+     el hover. El padding agranda el área visible y el margin negativo
+     compensa para que el layout de alrededor no se mueva. */
+  padding: 14px 4px 6px 6px;
+  margin: -14px -4px -6px -6px;
 }
 
 .lib-folder-card {
@@ -196,6 +205,9 @@
   font-weight: 500;
   color: var(--text-primary);
   padding: 10px 12px 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .lib-folder-count {
@@ -203,16 +215,12 @@
   font-size: 11px;
   color: var(--text-muted);
   padding: 0 12px 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .lib-folder-card-create {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  aspect-ratio: 168 / 128;
-  border-style: dashed;
   color: var(--text-secondary);
   background: transparent;
 }
@@ -220,6 +228,13 @@
 .lib-folder-card-create:hover {
   border-color: var(--text-secondary);
   color: var(--text-primary);
+}
+
+.lib-folder-cover-create {
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-elevated);
+  border-bottom: 1px dashed var(--border-subtle);
 }
 
 .lib-folder-create-icon {
@@ -232,16 +247,50 @@
   justify-content: center;
 }
 
-.lib-folder-card-create .lib-folder-name {
-  padding: 0;
-}
-
 .lib-folder-heading {
   font-family: var(--font-display);
   font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 20px;
+}
+
+.lib-folder-open-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.lib-folder-open-header .lib-folder-heading {
+  margin: 0;
+}
+
+.lib-folder-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 7px 12px;
+  white-space: nowrap;
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease), background 0.15s var(--ease);
+}
+
+.lib-folder-delete-btn:hover {
+  color: #ff8a8a;
+  border-color: rgba(255, 90, 90, 0.4);
+}
+
+.lib-folder-delete-btn.confirming {
+  color: #ff8a8a;
+  border-color: rgba(255, 90, 90, 0.5);
+  background: rgba(255, 90, 90, 0.1);
 }
 
 /* ---------- Contenedor de juegos + transición entre modos ---------- */

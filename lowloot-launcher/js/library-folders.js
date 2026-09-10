@@ -117,6 +117,11 @@ async function submitCreateFolder() {
   }
 
   await LibraryData.createFolder(name, [...folderModalSelectedGames]);
+  // LibraryData actualiza su propia lista interna, pero library.js guarda
+  // una copia MEZCLADA aparte (loadLibraryGames -> libraryCache) que no se
+  // entera del cambio sola: sin esto, "folder" seguía en null ahí y al
+  // entrar a la carpeta recién creada no aparecía ningún juego.
+  if (typeof invalidateLibraryCache === 'function') invalidateLibraryCache();
   closeCreateFolderModal();
   showToast(`Carpeta "${name}" creada`);
 

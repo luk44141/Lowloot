@@ -221,9 +221,9 @@ function renderLibraryCard(game) {
   `;
 }
 
-function renderLibraryGames(list) {
+function renderLibraryGames(list, isLibraryEmpty) {
   if (!list.length) {
-    return `<p class="placeholder-text">No encontramos juegos con estos filtros.</p>`;
+    return `<p class="placeholder-text">${isLibraryEmpty ? 'No hay juegos' : 'No encontramos juegos con estos filtros'}.</p>`;
   }
   if (libraryViewMode === 'cuadricula') return list.map(renderLibraryCard).join('');
   return list.map(renderLibraryRow).join('');
@@ -251,12 +251,15 @@ function renderFolderCard(folder, gamesById) {
 function renderCreateFolderCard() {
   return `
     <button type="button" class="lib-folder-card lib-folder-card-create" data-open-folder-modal>
-      <div class="lib-folder-create-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
+      <div class="lib-folder-cover lib-folder-cover-create">
+        <div class="lib-folder-create-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </div>
       </div>
       <span class="lib-folder-name">Crear carpeta</span>
+      <span class="lib-folder-count">Nueva</span>
     </button>
   `;
 }
@@ -338,13 +341,52 @@ async function renderLibraryHome() {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
             Todas las carpetas
           </button>
-          <h3 class="lib-folder-heading">${escapeHtml(libraryFolder)}</h3>`
+          <div class="lib-folder-open-header">
+            <h3 class="lib-folder-heading">${escapeHtml(libraryFolder)}</h3>
+            <button type="button" class="lib-folder-delete-btn" data-lib-folder-delete="${escapeHtml(libraryFolder)}">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              Borrar carpeta
+            </button>
+          </div>`
         : folderSection
     }
 
     <div class="lib-games lib-games-${libraryViewMode}" id="lib-games">
-      ${renderLibraryGames(filtered)}
+      ${renderLibraryGames(filtered, allGames.length === 0)}
     </div>
+  `;
+}
+
+/* ---------- Borrar carpeta (con confirmación liviana en el propio botón) ---------- */
+
+async function handleFolderDeleteClick(name, btn) {
+  if (btn.dataset.confirming !== '1') {
+    btn.dataset.confirming = '1';
+    btn.classList.add('confirming');
+    btn.innerHTML = '¿Seguro? Sí, borrar';
+    // Si el usuario se arrepiente y no vuelve a tocar el botón, que
+    // vuelva solo al estado normal después de un rato en vez de quedar
+    // pidiendo confirmación para siempre.
+    clearTimeout(btn._confirmResetTimer);
+    btn._confirmResetTimer = setTimeout(() => resetFolderDeleteButton(btn, name), 4000);
+    return;
+  }
+
+  clearTimeout(btn._confirmResetTimer);
+  await LibraryData.deleteFolder(name);
+  if (typeof invalidateLibraryCache === 'function') invalidateLibraryCache();
+  libraryFolder = null;
+  showToast(`Carpeta "${name}" borrada`);
+  renderLibraryHome();
+}
+
+function resetFolderDeleteButton(btn, name) {
+  if (!btn || !btn.isConnected) return;
+  btn.dataset.confirming = '0';
+  btn.classList.remove('confirming');
+  btn.innerHTML = `
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+    Borrar carpeta
   `;
 }
 
@@ -362,7 +404,7 @@ function refreshLibraryGamesList() {
     const allGames = await loadLibraryGames();
     const filtered = applyLibraryFilters(allGames);
     gamesEl.className = `lib-games lib-games-${libraryViewMode} lib-games-fading`;
-    gamesEl.innerHTML = renderLibraryGames(filtered);
+    gamesEl.innerHTML = renderLibraryGames(filtered, allGames.length === 0);
     setTimeout(() => gamesEl.classList.remove('lib-games-fading'), 20);
   }, 120);
 }

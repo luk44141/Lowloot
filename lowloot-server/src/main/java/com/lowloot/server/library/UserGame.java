@@ -32,7 +32,7 @@ public class UserGame {
     @Column(nullable = false)
     private boolean installed = false;
 
-    // Favorito real por usuario (V3__user_games_favorite.sql), no un estado
+    // Favorito real por usuario (V4__user_games_favorite.sql), no un estado
     // simulado en memoria del launcher.
     @Column(nullable = false)
     private boolean favorite = false;

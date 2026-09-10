@@ -95,7 +95,18 @@ const LibraryData = (() => {
     return buildPromise;
   }
 
-  // Crea (o reutiliza) una carpeta con ese nombre y le asigna los juegos
+  // Saca la carpeta: los juegos que estaban adentro quedan sueltos (no se
+  // tocan ni se borran de la biblioteca, solo pierden esa agrupación).
+  async function deleteFolder(name) {
+    await ensureLibraryBuilt();
+    const folderMap = readFolderMap();
+    const cleaned = Object.fromEntries(Object.entries(folderMap).filter(([, folderName]) => folderName !== name));
+    writeFolderMap(cleaned);
+
+    libraryEntries.forEach((entry) => {
+      if (entry.folder === name) entry.folder = null;
+    });
+  }
   // elegidos, sacándolos de cualquier otra carpeta en la que estuvieran
   // antes (un juego vive en una sola carpeta a la vez).
   async function createFolder(name, gameIds) {
@@ -159,6 +170,7 @@ const LibraryData = (() => {
     getDrives,
     setFavoriteCache,
     createFolder,
+    deleteFolder,
     invalidate,
   };
 })();

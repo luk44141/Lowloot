@@ -133,6 +133,14 @@ async function adjustUserBalance(userId) {
     if (cell) cell.textContent = formatPrice(Number(updated.balance) || 0);
     input.value = '';
     showToast(`Saldo de ${updated.username} actualizado`);
+
+    // Si el admin se ajusta el saldo a sí mismo, currentUser (y con él la
+    // topbar) quedaba con el valor viejo hasta reiniciar el launcher: acá
+    // se actualiza al toque, igual que ya se hace después de una compra.
+    if (currentUser && String(updated.id) === String(currentUser.id)) {
+      currentUser.balance = updated.balance;
+      if (typeof renderTopbarSession === 'function') renderTopbarSession();
+    }
   } catch (err) {
     showToast(err.message || 'No se pudo ajustar el saldo');
   }

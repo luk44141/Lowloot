@@ -9,6 +9,7 @@ function createWindow() {
     backgroundColor: '#0c0c0c',
     autoHideMenuBar: true,
     show: false,
+
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
@@ -17,8 +18,9 @@ function createWindow() {
 
   win.loadFile('index.html');
 
-  // Abre aprovechando prácticamente toda la pantalla disponible,
-  // pero deja que el usuario la redimensione o desmaximice libremente.
+  // Abrir DevTools automáticamente
+  win.webContents.openDevTools();
+
   win.once('ready-to-show', () => {
     win.maximize();
     win.show();

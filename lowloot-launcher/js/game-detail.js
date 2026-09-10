@@ -66,37 +66,25 @@ function heroVideoHtml(game) {
   `;
 }
 
-// Intenta reproducir el video del hero con audio a volumen bajo. Si el
-// navegador/Electron bloquea el autoplay con sonido (política estándar),
-// cae a autoplay muteado y deja el audio listo para activarse apenas el
-// usuario interactúe una vez con la app (click o tecla), en cualquier parte.
+// El preview intenta arrancar CON audio apenas se entra a la ficha (pedido
+// explícito). Si Electron/el navegador lo bloquea por política de autoplay,
+// cae a mudo — pero a diferencia de antes, el "desbloqueo" queda limitado a
+// ESTA pantalla y a una interacción CON este video puntual (sus controles
+// nativos), nunca a un listener global de "el próximo click en cualquier
+// lado de la app", que era lo que hacía sonar el audio en pantallas donde
+// el usuario ya ni siquiera estaba viendo este juego.
 function setupHeroVideoAudio() {
   const video = qs('#detail-hero-video');
   if (!video) return;
 
-  const TARGET_VOLUME = 0.15;
-  video.volume = TARGET_VOLUME;
-
-  const tryUnmutedAutoplay = () => {
-    video.muted = false;
-    video.volume = TARGET_VOLUME;
-    video.play().catch(() => {
-      video.muted = true;
-      video.play().catch(() => {});
-    });
-  };
-
-  tryUnmutedAutoplay();
-
-  const unlockAudioOnInteraction = () => {
-    if (!video.isConnected) return; // el usuario ya navegó a otra vista
-    video.muted = false;
-    video.volume = TARGET_VOLUME;
+  video.volume = 0.4;
+  video.muted = false;
+  video.play().catch(() => {
+    // Autoplay con sonido bloqueado: se ve mudo hasta que el usuario le
+    // dé play/desmute con los controles nativos del propio video.
+    video.muted = true;
     video.play().catch(() => {});
-  };
-
-  document.addEventListener('click', unlockAudioOnInteraction, { once: true });
-  document.addEventListener('keydown', unlockAudioOnInteraction, { once: true });
+  });
 }
 
 function stopGallerySlideshow() {
