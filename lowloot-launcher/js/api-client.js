@@ -239,5 +239,7 @@ const LowlootAPI = (() => {
     // admin
     adminGetUsers,
     adminAdjustBalance,
+    adminGetUserLibrary,
+    adminRemoveFromLibrary,
   };
 })();

@@ -24,7 +24,32 @@ const LibraryData = (() => {
 
   const clone = (value) => JSON.parse(JSON.stringify(value));
 
-  function toEntry(item) {
+  // Carpetas: no hay tabla para esto en el backend todavía, así que se
+  // guardan en localStorage por usuario. Son 100% a elección del usuario
+  // (nunca se auto-generan al comprar ni al instalar un juego): antes acá
+  // se armaba una carpeta por género automáticamente, lo cual generaba
+  // carpetas que nadie pidió. Un juego vive en como mucho una carpeta.
+  function foldersStorageKey() {
+    return currentUser ? `lowloot:folders:${currentUser.id}` : null;
+  }
+
+  function readFolderMap() {
+    const key = foldersStorageKey();
+    if (!key) return {};
+    try {
+      return JSON.parse(localStorage.getItem(key) || '{}');
+    } catch (err) {
+      return {};
+    }
+  }
+
+  function writeFolderMap(map) {
+    const key = foldersStorageKey();
+    if (!key) return;
+    localStorage.setItem(key, JSON.stringify(map));
+  }
+
+  function toEntry(item, folderMap) {
     return {
       gameId: item.gameId,
       installed: Boolean(item.installed),
@@ -36,7 +61,7 @@ const LibraryData = (() => {
       lastPlayed: null,
       addedDate: item.purchasedAt ? String(item.purchasedAt).slice(0, 10) : null,
       favorite: Boolean(item.favorite), // real, persistido en user_games.favorite (V3)
-      folder: item.genre || null,
+      folder: folderMap[String(item.gameId)] || null,
       dlcOwned: [], // sin fuente real todavía: user_games no distingue DLC
       achievements: [],
       devUpdates: [],
@@ -53,13 +78,37 @@ const LibraryData = (() => {
         }
         try {
           const items = await LowlootAPI.getLibrary();
-          libraryEntries = items.map(toEntry);
+          const folderMap = readFolderMap();
+          libraryEntries = items.map((item) => toEntry(item, folderMap));
+
+          // Si un juego se sacó de la biblioteca (admin, etc.) o cambió de
+          // dueño, su asignación de carpeta vieja no debería seguir
+          // ocupando espacio en localStorage para siempre.
+          const ownedIds = new Set(libraryEntries.map((e) => String(e.gameId)));
+          const cleanedMap = Object.fromEntries(Object.entries(folderMap).filter(([gameId]) => ownedIds.has(gameId)));
+          if (Object.keys(cleanedMap).length !== Object.keys(folderMap).length) writeFolderMap(cleanedMap);
         } catch (err) {
           libraryEntries = [];
         }
       })();
     }
     return buildPromise;
+  }
+
+  // Crea (o reutiliza) una carpeta con ese nombre y le asigna los juegos
+  // elegidos, sacándolos de cualquier otra carpeta en la que estuvieran
+  // antes (un juego vive en una sola carpeta a la vez).
+  async function createFolder(name, gameIds) {
+    await ensureLibraryBuilt();
+    const folderMap = readFolderMap();
+    gameIds.forEach((gameId) => {
+      folderMap[String(gameId)] = name;
+    });
+    writeFolderMap(folderMap);
+
+    libraryEntries.forEach((entry) => {
+      if (gameIds.map(String).includes(String(entry.gameId))) entry.folder = name;
+    });
   }
 
   // Se llama después de comprar / instalar / iniciar-cerrar sesión, para
@@ -109,6 +158,7 @@ const LibraryData = (() => {
     getFolders,
     getDrives,
     setFavoriteCache,
+    createFolder,
     invalidate,
   };
 })();

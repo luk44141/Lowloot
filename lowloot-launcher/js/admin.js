@@ -118,7 +118,10 @@ async function adjustUserBalance(userId) {
   const input = document.getElementById(`admin-delta-${userId}`);
   if (!input) return;
 
-  const delta = parseFloat(input.value);
+  // Admite tanto "10.50" como "10,50" (coma decimal, más natural acá):
+  // si no se normaliza, escribir con coma deja el input vacío/roto y
+  // parece que el botón "no funciona".
+  const delta = parseFloat(String(input.value).trim().replace(',', '.'));
   if (!delta || Number.isNaN(delta)) {
     showToast('Ingresá un monto distinto de cero');
     return;

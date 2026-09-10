@@ -248,14 +248,33 @@ function renderFolderCard(folder, gamesById) {
   `;
 }
 
+function renderCreateFolderCard() {
+  return `
+    <button type="button" class="lib-folder-card lib-folder-card-create" data-open-folder-modal>
+      <div class="lib-folder-create-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </div>
+      <span class="lib-folder-name">Crear carpeta</span>
+    </button>
+  `;
+}
+
 async function renderFolderCardsSection(allGames) {
+  // Sin juegos en la biblioteca todavía no tiene sentido ofrecer crear
+  // carpetas (no habría nada para elegir adentro del modal).
+  if (!allGames.length) return '';
+
   const folders = await LibraryData.getFolders();
-  if (!folders.length) return '';
   const gamesById = new Map(allGames.map((g) => [g.gameId, g]));
   return `
     <section class="lib-folders">
       <h3 class="lib-folders-title">Carpetas</h3>
-      <div class="lib-folders-track">${folders.map((f) => renderFolderCard(f, gamesById)).join('')}</div>
+      <div class="lib-folders-track">
+        ${folders.map((f) => renderFolderCard(f, gamesById)).join('')}
+        ${renderCreateFolderCard()}
+      </div>
     </section>
   `;
 }

@@ -32,6 +32,16 @@
   flex-shrink: 0;
 }
 
+/* El atributo [hidden] tiene que ganarle a "display:flex" de arriba: si no,
+   el botón de "iniciar sesión" y el chip de usuario quedan visibles los dos
+   a la vez (bug reportado: el botón de iniciar sesión sigue apareciendo con
+   la sesión ya iniciada). Mismo problema que ya se había resuelto para
+   nav-badge/notif-badge en layout.css, pero nunca se replicó acá. */
+.login-btn[hidden],
+.user-chip[hidden] {
+  display: none !important;
+}
+
 /* ---------- Modal de login ---------- */
 
 .login-modal {

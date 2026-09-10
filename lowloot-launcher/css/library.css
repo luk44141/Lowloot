@@ -205,6 +205,37 @@
   padding: 0 12px 12px;
 }
 
+.lib-folder-card-create {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  aspect-ratio: 168 / 128;
+  border-style: dashed;
+  color: var(--text-secondary);
+  background: transparent;
+}
+
+.lib-folder-card-create:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+.lib-folder-create-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lib-folder-card-create .lib-folder-name {
+  padding: 0;
+}
+
 .lib-folder-heading {
   font-family: var(--font-display);
   font-size: 18px;

@@ -104,6 +104,104 @@ async function renderCartView() {
     </div>
   `;
 }
+/* ---------- Modal de confirmación de compra (reemplaza window.confirm) ---------- */
+
+// Resolver de la promesa actualmente abierta (si hay un modal de compra
+// esperando respuesta). Se guarda acá porque el modal solo tiene un overlay
+// en el HTML y se reutiliza para cada compra.
+let purchaseConfirmResolve = null;
+
+function resolvePurchaseConfirm(result) {
+  qs('#purchase-modal-overlay')?.classList.remove('open');
+  if (purchaseConfirmResolve) {
+    const resolve = purchaseConfirmResolve;
+    purchaseConfirmResolve = null;
+    resolve(result);
+  }
+}
+
+// Arma y muestra el cartel de confirmación; devuelve una promesa que
+// resuelve true/false según lo que elija el usuario (Confirmar/Cancelar,
+// tocar afuera, Escape o la X).
+function openPurchaseConfirmModal(items, total, balance) {
+  const content = qs('#purchase-modal-content');
+  const overlay = qs('#purchase-modal-overlay');
+  if (!content || !overlay) return Promise.resolve(false);
+
+  const isFree = total <= 0;
+  const remaining = balance - total;
+  const notEnough = !isFree && remaining < 0;
+
+  const rows = items
+    .map(
+      (g) => `
+    <div class="purchase-item-row">
+      <div class="purchase-item-thumb ${gameCoverClass(g)}" ${gameCoverStyle(g)} aria-hidden="true"></div>
+      <span class="purchase-item-name">${escapeHtml(g.name)}</span>
+      <span class="purchase-item-price">${g.isFree ? 'GRATIS' : formatPrice(cartLineTotal(g, 1))}</span>
+    </div>
+  `
+    )
+    .join('');
+
+  content.innerHTML = `
+    <div class="purchase-modal-header">
+      <span class="purchase-modal-mark">LOWLOOT</span>
+      <div class="purchase-modal-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+      </div>
+      <h3 class="purchase-modal-title">${isFree ? 'Agregar a tu biblioteca' : 'Confirmar compra'}</h3>
+      <p class="purchase-modal-sub">${items.length > 1 ? `${items.length} juegos seleccionados` : '1 juego seleccionado'}</p>
+    </div>
+
+    <div class="purchase-items">${rows}</div>
+
+    <div class="purchase-summary">
+      <div class="purchase-summary-row"><span>Saldo disponible</span><span class="purchase-summary-value">${formatPrice(balance)}</span></div>
+      <div class="purchase-summary-row purchase-total"><span>${isFree ? 'Total' : 'Total a pagar'}</span><span class="purchase-summary-value">${isFree ? 'GRATIS' : formatPrice(total)}</span></div>
+    </div>
+
+    ${notEnough ? `<p class="purchase-summary-warning">Te faltaría ${formatPrice(Math.abs(remaining))} para completar esta compra.</p>` : ''}
+
+    <div class="purchase-modal-footer">
+      <button type="button" class="btn-secondary" data-purchase-cancel>CANCELAR</button>
+      <button type="button" class="btn-primary" data-purchase-confirm ${notEnough ? 'disabled' : ''}>${isFree ? 'AGREGAR' : 'CONFIRMAR COMPRA'}</button>
+    </div>
+  `;
+
+  overlay.classList.add('open');
+
+  return new Promise((resolve) => {
+    purchaseConfirmResolve = resolve;
+  });
+}
+
+function initPurchaseConfirmModal() {
+  const overlay = qs('#purchase-modal-overlay');
+  if (!overlay) return;
+
+  overlay.addEventListener('click', (event) => {
+    if (event.target === overlay) resolvePurchaseConfirm(false);
+  });
+
+  qs('#purchase-modal-content')?.addEventListener('click', (event) => {
+    if (event.target.closest('[data-purchase-confirm]')) {
+      resolvePurchaseConfirm(true);
+    } else if (event.target.closest('[data-purchase-cancel]')) {
+      resolvePurchaseConfirm(false);
+    }
+  });
+
+  document.getElementById('purchase-modal-close')?.addEventListener('click', () => resolvePurchaseConfirm(false));
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && overlay.classList.contains('open')) resolvePurchaseConfirm(false);
+  });
+}
+
 /* ---------- Compra real (atómica contra PostgreSQL vía /purchases) ---------- */
 
 // Confirma con el usuario cuánto saldo se va a gastar, hace la compra
@@ -138,13 +236,8 @@ async function purchaseGames(gameIds, { fromCart = false } = {}) {
 
   const total = items.reduce((sum, g) => sum + cartLineTotal(g, 1), 0);
   const balance = Number(currentUser.balance) || 0;
-  const names = items.map((g) => g.name).join(', ');
 
-  const confirmed = window.confirm(
-    total > 0
-      ? `Vas a gastar ${formatPrice(total)} de tu saldo (disponible: ${formatPrice(balance)}) en: ${names}. ¿Confirmás la compra?`
-      : `Vas a agregar a tu biblioteca (gratis): ${names}. ¿Confirmás?`
-  );
+  const confirmed = await openPurchaseConfirmModal(items, total, balance);
   if (!confirmed) return false;
 
   try {

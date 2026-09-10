@@ -133,6 +133,12 @@ function initDelegatedHandlers() {
       return;
     }
 
+    const openFolderModalBtn = event.target.closest('[data-open-folder-modal]');
+    if (openFolderModalBtn) {
+      openCreateFolderModal();
+      return;
+    }
+
     const libFolderCard = event.target.closest('[data-lib-folder]');
     if (libFolderCard) {
       libraryFolder = libFolderCard.dataset.libFolder;
@@ -211,7 +217,7 @@ function initDelegatedHandlers() {
     const gameCard = event.target.closest('[data-game-id]');
     if (gameCard) {
       hideSuggestions();
-      openGameDetail(gameCard.dataset.gameId);
+      openGameDetailWithOwnedNotice(gameCard.dataset.gameId);
       return;
     }
 
@@ -334,6 +340,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   initNotifications();
   initSearch();
   initLibraryControls();
+  initFolderModal();
+  initPurchaseConfirmModal();
   initAdminControls();
   initDelegatedHandlers();
   initHoverPreviews();

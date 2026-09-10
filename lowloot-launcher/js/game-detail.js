@@ -12,6 +12,24 @@ let galleryAutoTimer = null;
 // el usuario toca una miniatura a mano, para no interrumpirlo mientras mira.
 let heroAutoReturnToVideo = false;
 
+// Se usa al hacer clic en cualquier tarjeta de juego de Inicio/Tienda/
+// Wishlist (data-game-id): si el juego ya está en la biblioteca del
+// usuario, avisa con un toast ANTES de abrir la ficha (la ficha en sí
+// también muestra el badge "En tu biblioteca", pero esto lo deja claro
+// en el momento mismo del clic, no solo después de haber entrado).
+async function openGameDetailWithOwnedNotice(id) {
+  if (currentUser) {
+    try {
+      const entry = await LibraryData.getLibraryEntry(id);
+      if (entry) showToast('Ya tenés este juego en tu biblioteca');
+    } catch (err) {
+      // Si falla la consulta, simplemente no se muestra el aviso; no vale
+      // la pena bloquear la navegación por esto.
+    }
+  }
+  openGameDetail(id);
+}
+
 async function openGameDetail(id) {
   const game = await LowlootData.getGameById(id);
 
@@ -226,9 +244,9 @@ async function renderGameDetail(game) {
   // /games es catálogo público: no sabe (ni debe saber) qué juegos son de
   // cada usuario. La pertenencia real sale de /library/me (user_games),
   // no de un campo hardcodeado en game-store.js.
-  game.owned = currentUser
-    ? Boolean(await LibraryData.getLibraryEntry(game.id))
-    : false;
+  const libraryEntry = currentUser ? await LibraryData.getLibraryEntry(game.id) : null;
+  game.owned = Boolean(libraryEntry);
+  game.installed = Boolean(libraryEntry?.installed);
 
   const discounted =
     game.discount > 0
@@ -284,12 +302,24 @@ async function renderGameDetail(game) {
   let actionButton;
 
   if (game.owned) {
-    actionButton = `
+    // Mismo criterio que la Biblioteca (libraryActionButtons en library.js):
+    // si no está instalado, el botón tiene que decir INSTALAR (y abrir el
+    // modal de instalación), no JUGAR.
+    actionButton = game.installed
+      ? `
       <button
         type="button"
         class="btn-primary"
         data-buy-toggle="La ejecución del juego todavía no está disponible">
         JUGAR
+      </button>
+    `
+      : `
+      <button
+        type="button"
+        class="btn-primary"
+        data-lib-install="${game.id}">
+        INSTALAR
       </button>
     `;
   } else if (game.isFree) {

@@ -171,5 +171,13 @@ async function finishInstall(gameId) {
       const updatedGame = libraryCache.find((g) => String(g.gameId) === String(gameId));
       if (updatedGame) renderLibraryGameDetail(updatedGame);
     }
+
+    // Instalar también se puede iniciar desde la ficha de un juego en la
+    // Tienda (ya comprado): si esa ficha sigue abierta, se refresca para
+    // que el botón pase de INSTALAR a JUGAR sin que haga falta salir y
+    // volver a entrar.
+    if (qs('.view[data-view="game"]')?.classList.contains('active') && typeof openGameDetail === 'function') {
+      openGameDetail(gameId);
+    }
   }, 700);
 }

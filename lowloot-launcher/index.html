@@ -59,6 +59,15 @@
           </div>
         </div>
 
+        <div class="notifications" id="admin-panel-trigger" hidden>
+          <button type="button" class="icon-btn" aria-label="Panel admin" title="Panel admin">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2 4 5v6c0 5 3.4 8.6 8 11 4.6-2.4 8-6 8-11V5l-8-3z"></path>
+              <path d="m9 12 2 2 4-4"></path>
+            </svg>
+          </button>
+        </div>
+
         <button type="button" class="login-btn" id="login-trigger">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
@@ -90,7 +99,6 @@
               <span class="user-menu-name" id="user-menu-name"></span>
               <span class="user-menu-email" id="user-menu-email"></span>
             </div>
-            <button type="button" class="user-menu-item" id="user-menu-admin" hidden data-view-target="admin">Panel admin</button>
             <button type="button" class="user-menu-item" id="user-menu-logout">Cerrar sesión</button>
           </div>
         </div>
@@ -245,6 +253,22 @@
     </div>
   </div>
 
+  <!-- Modal de confirmación de compra -->
+  <div class="modal-overlay" id="purchase-modal-overlay">
+    <div class="modal purchase-modal" role="dialog" aria-modal="true">
+      <button type="button" class="modal-close" id="purchase-modal-close" aria-label="Cerrar">&times;</button>
+      <div id="purchase-modal-content"></div>
+    </div>
+  </div>
+
+  <!-- Modal de creación de carpeta (Biblioteca) -->
+  <div class="modal-overlay" id="folder-modal-overlay">
+    <div class="modal folder-modal" role="dialog" aria-modal="true">
+      <button type="button" class="modal-close" id="folder-modal-close" aria-label="Cerrar">&times;</button>
+      <div id="folder-modal-content"></div>
+    </div>
+  </div>
+
   <!-- Modal de inicio de sesión / registro / olvidé mi contraseña -->
   <div class="modal-overlay" id="login-modal-overlay">
     <div class="modal login-modal" role="dialog" aria-modal="true">
@@ -367,6 +391,7 @@
   <script src="js/library-community.js" defer></script>
   <script src="js/library-detail.js" defer></script>
   <script src="js/library-install.js" defer></script>
+  <script src="js/library-folders.js" defer></script>
   <script src="js/admin.js" defer></script>
   <script src="js/app.js" defer></script>
 </body>
