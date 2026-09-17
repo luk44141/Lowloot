@@ -32,9 +32,19 @@ function renderTopbarSession() {
   chip.hidden = false;
 
   qs('#user-chip-balance').textContent = formatPrice(Number(currentUser.balance) || 0);
-  qs('#user-chip-name').textContent = currentUser.username;
-  qs('#user-menu-name').textContent = currentUser.username;
+  qs('#user-chip-name').textContent = currentUser.displayName;
+  qs('#user-menu-name').textContent = currentUser.displayName;
   qs('#user-menu-email').textContent = currentUser.email;
+
+  const chipAvatar = document.getElementById('user-chip-avatar');
+  if (chipAvatar) chipAvatar.src = currentUserAvatarSrc();
+
+  // Si la vista de Perfil está abierta en este momento (por ejemplo,
+  // después de guardar cambios en Ajustes), se refresca con los datos
+  // nuevos sin que el usuario tenga que volver a entrar.
+  if (qs('.view[data-view="perfil"]')?.classList.contains('active') && typeof renderProfileView === 'function') {
+    renderProfileView();
+  }
 
   // Panel admin: ícono propio en la topbar (al lado de notificaciones),
   // visible solo para ADMIN. Ya no vive en la barra lateral ni en el
@@ -73,6 +83,13 @@ function initLoginButton() {
   chipTrigger?.addEventListener('click', (event) => {
     event.stopPropagation();
     userMenu?.classList.toggle('open');
+  });
+
+  document.getElementById('user-menu-profile')?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    userMenu?.classList.remove('open');
+    activateView('perfil');
+    if (typeof renderProfileView === 'function') renderProfileView();
   });
 
   document.getElementById('user-menu-logout')?.addEventListener('click', (event) => {

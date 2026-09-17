@@ -1,0 +1,202 @@
+/* profile.css — foto de perfil en la topbar, vista de Perfil, panel de
+   Ajustes y editor de recorte circular (canvas). Reutiliza los tokens de
+   base.css y el sistema de modal de library-install.css. */
+
+/* ---------- Avatar en la topbar (izquierda del nombre) ---------- */
+
+.user-chip-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ---------- Vista: Perfil ---------- */
+
+.profile-view {
+  max-width: 980px;
+}
+
+.profile-layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 28px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.profile-main {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+}
+
+.profile-avatar {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+}
+
+.profile-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-display-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* ---------- Panel de Ajustes (dentro de Perfil) ---------- */
+
+.profile-ajustes-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-ajustes-panel .install-field input[type='text'] {
+  width: 100%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 12.5px;
+  padding: 9px 11px;
+}
+
+.profile-ajustes-panel .install-field input[type='text']:focus {
+  outline: none;
+  border-color: var(--text-secondary);
+}
+
+.profile-ajustes-panel .install-field input[type='text']:disabled {
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.profile-ajustes-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-ajustes-avatar-preview {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+}
+
+.profile-ajustes-avatar-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.profile-ajustes-footer {
+  margin-top: 10px;
+}
+
+/* ---------- Apartado lateral de Amigos (preparado, sin lista todavía) ---------- */
+
+.profile-friends-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.profile-friends-title {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  margin: 0 0 10px;
+}
+
+/* ---------- Editor de recorte circular ---------- */
+
+.avatar-crop-modal {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar-crop-stage {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--bg-elevated);
+  cursor: grab;
+  touch-action: none;
+}
+
+.avatar-crop-stage:active {
+  cursor: grabbing;
+}
+
+#avatar-crop-canvas {
+  display: block;
+  width: 320px;
+  height: 320px;
+}
+
+.avatar-crop-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  pointer-events: none;
+}
+
+.avatar-crop-zoom-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+  margin-top: 18px;
+}
+
+.avatar-crop-zoom-row input[type='range'] {
+  flex: 1;
+  accent-color: var(--text-primary);
+}

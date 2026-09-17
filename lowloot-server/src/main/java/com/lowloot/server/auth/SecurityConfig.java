@@ -53,6 +53,10 @@ public class SecurityConfig {
                         // hace falta estar logueado para ver la tienda.
                         .requestMatchers(HttpMethod.GET, "/games", "/games/**").permitAll()
                         .requestMatchers("/assets/**").permitAll()
+                        // Foto de perfil: dato publico basico (como el nombre
+                        // visible), se sirve sin sesion para poder mostrarla
+                        // despues en listas de otros usuarios (amigos).
+                        .requestMatchers(HttpMethod.GET, "/users/*/avatar").permitAll()
                         // Registro y login son publicos por definicion.
                         .requestMatchers("/auth/**").permitAll()
                         // Panel admin: solo ADMIN. La verificacion real pasa

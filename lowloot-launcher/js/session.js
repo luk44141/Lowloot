@@ -3,18 +3,43 @@
 // funciones de topbar.js / library.js / library-data.js para refrescar la UI.
 //
 // `currentUser` vive en state.js: null si no hay sesión, o
-// { id, username, email, role, balance } si la hay. El saldo mostrado
-// siempre sale de PostgreSQL (vía /users/me o la respuesta de login), no
-// se guarda ni se inventa en el cliente.
+// { id, username, displayName, email, role, balance, avatarUrl } si la hay.
+// El saldo mostrado siempre sale de PostgreSQL (vía /users/me o la
+// respuesta de login), no se guarda ni se inventa en el cliente.
+// `username` es el identificador de cuenta (no se edita desde el perfil);
+// `displayName` es el nombre que se muestra en toda la UI.
 
 function setCurrentUser(me) {
   currentUser = {
     id: me.id,
     username: me.username,
+    displayName: me.displayName || me.username,
     email: me.email,
     role: me.role,
     balance: me.balance,
+    avatarUrl: me.avatarUrl || null,
   };
+}
+
+// Ruta de la imagen default: mismo asset que ya se agregó al frontend, sin
+// duplicarla nunca en la base de datos.
+const DEFAULT_AVATAR_SRC = 'assets/profile/default-profile.png';
+
+// Cambia cada vez que se guarda/borra una foto en esta sesión, para
+// invalidar el cache del navegador en el <img> (misma URL, contenido
+// nuevo) sin tener que tocar el backend para eso.
+let avatarCacheBust = Date.now();
+
+function bustAvatarCache() {
+  avatarCacheBust = Date.now();
+}
+
+// Fuente de imagen a usar para el usuario logueado actual: su foto
+// personalizada si tiene, o la default local si no.
+function currentUserAvatarSrc() {
+  if (!currentUser || !currentUser.avatarUrl) return DEFAULT_AVATAR_SRC;
+  const url = LowlootAPI.resolveAvatarUrl(currentUser.avatarUrl);
+  return url ? `${url}?v=${avatarCacheBust}` : DEFAULT_AVATAR_SRC;
 }
 
 function isAdmin() {
@@ -32,6 +57,22 @@ async function refreshBalance() {
   } catch (err) {
     // Si falla (por ejemplo token vencido), initSession ya se encarga de
     // limpiar la sesión la próxima vez que haga falta un endpoint protegido.
+  }
+}
+
+// Refresca nombre visible / foto desde el servidor (después de guardar
+// cambios en Ajustes) sin tocar el resto de la sesión.
+async function refreshProfile() {
+  if (!currentUser) return;
+  try {
+    const me = await LowlootAPI.getMe();
+    currentUser.displayName = me.displayName || me.username;
+    currentUser.avatarUrl = me.avatarUrl || null;
+    bustAvatarCache();
+    if (typeof renderTopbarSession === 'function') renderTopbarSession();
+  } catch (err) {
+    // Igual que refreshBalance: si falla, el próximo endpoint protegido ya
+    // se encarga de limpiar la sesión si el token venció.
   }
 }
 
@@ -105,6 +146,7 @@ function clearUserSessionData() {
   librarySort = 'nombre';
   currentLibraryGameId = null;
   installModalGameId = null;
+  profileAjustesOpen = false;
 
   if (typeof invalidateLibraryCache === 'function') invalidateLibraryCache();
 }

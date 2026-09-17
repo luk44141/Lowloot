@@ -349,6 +349,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initFolderModal();
   initPurchaseConfirmModal();
   initAdminControls();
+  initProfileView();
   initDelegatedHandlers();
   initHoverPreviews();
   await initSession();

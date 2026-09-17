@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="css/library-community.css" />
   <link rel="stylesheet" href="css/login.css" />
   <link rel="stylesheet" href="css/admin.css" />
+  <link rel="stylesheet" href="css/profile.css" />
 </head>
 <body>
   <div class="app">
@@ -88,6 +89,7 @@
           </button>
 
           <button type="button" class="user-chip-trigger" id="user-chip-trigger">
+            <img class="user-chip-avatar" id="user-chip-avatar" src="assets/profile/default-profile.png" alt="" />
             <span class="user-chip-name" id="user-chip-name"></span>
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="6 9 12 15 18 9"></polyline>
@@ -99,6 +101,7 @@
               <span class="user-menu-name" id="user-menu-name"></span>
               <span class="user-menu-email" id="user-menu-email"></span>
             </div>
+            <button type="button" class="user-menu-item" id="user-menu-profile">Perfil</button>
             <button type="button" class="user-menu-item" id="user-menu-logout">Cerrar sesión</button>
           </div>
         </div>
@@ -234,6 +237,11 @@
         <section class="view store-view" data-view="admin">
           <div id="admin-content"></div>
         </section>
+
+        <!-- Vista: Perfil -->
+        <section class="view profile-view" data-view="perfil">
+          <div id="profile-content"></div>
+        </section>
       </main>
     </div>
   </div>
@@ -259,6 +267,35 @@
     <div class="modal folder-modal" role="dialog" aria-modal="true">
       <button type="button" class="modal-close" id="folder-modal-close" aria-label="Cerrar">&times;</button>
       <div id="folder-modal-content"></div>
+    </div>
+  </div>
+
+  <!-- Input de archivo oculto para elegir la foto de perfil (lo dispara profile.js) -->
+  <input type="file" id="avatar-file-input" accept="image/png,image/jpeg,image/webp" hidden />
+
+  <!-- Modal de recorte de foto de perfil (estilo Discord: círculo + arrastre + zoom) -->
+  <div class="modal-overlay" id="avatar-crop-modal-overlay">
+    <div class="modal avatar-crop-modal" role="dialog" aria-modal="true">
+      <button type="button" class="modal-close" id="avatar-crop-modal-close" aria-label="Cerrar">&times;</button>
+      <h3 class="install-modal-title">Ajustar foto de perfil</h3>
+
+      <div class="avatar-crop-stage" id="avatar-crop-stage">
+        <canvas id="avatar-crop-canvas" width="320" height="320"></canvas>
+        <div class="avatar-crop-ring"></div>
+      </div>
+
+      <div class="avatar-crop-zoom-row">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="range" id="avatar-crop-zoom" min="1" max="4" step="0.01" value="1" />
+      </div>
+
+      <div class="install-modal-footer">
+        <button type="button" class="btn-secondary" id="avatar-crop-cancel">CANCELAR</button>
+        <button type="button" class="btn-primary" id="avatar-crop-save">GUARDAR</button>
+      </div>
     </div>
   </div>
 
@@ -386,6 +423,7 @@
   <script src="js/library-install.js" defer></script>
   <script src="js/library-folders.js" defer></script>
   <script src="js/admin.js" defer></script>
+  <script src="js/profile.js" defer></script>
   <script src="js/app.js" defer></script>
 </body>
 </html>

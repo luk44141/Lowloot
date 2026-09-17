@@ -15,9 +15,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-// Mapea 1:1 la tabla `users` que ya existia en la base `lowloot` antes de
-// este cambio (id, username, email, password_hash, created_at, role).
-// No se agrega ninguna columna nueva aca.
+// Mapea la tabla `users` que ya existia en la base `lowloot` antes de este
+// cambio (id, username, email, password_hash, created_at, role), mas
+// `display_name` agregada en V5__user_profile.sql para el perfil. La foto
+// de perfil NO vive aca (ver profile.UserAvatar): este User se carga en
+// cada request autenticado (JwtAuthFilter), asi que no conviene traer un
+// BYTEA pesado en cada consulta.
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
@@ -41,6 +44,12 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Role role = Role.USER;
+
+    // Nombre visible del perfil, independiente de `username`. NULL cuando el
+    // usuario todavia no lo configuro: en ese caso la UI y las respuestas
+    // del API usan el username como valor por defecto (getEffectiveDisplayName).
+    @Column(name = "display_name", length = 50)
+    private String displayName;
 
     public User() {
     }
@@ -87,6 +96,21 @@ public class User implements UserDetails {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    // Nombre a mostrar en la UI: el visible si esta configurado, o el
+    // username como fallback. Evita repetir este "si es null, uso username"
+    // en cada controller que arma una respuesta con el nombre del usuario.
+    public String getEffectiveDisplayName() {
+        return (displayName == null || displayName.isBlank()) ? username : displayName;
     }
 
     /* ---------- UserDetails (Spring Security se autentica contra esto) ---------- */

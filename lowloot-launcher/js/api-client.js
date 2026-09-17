@@ -151,6 +151,33 @@ const LowlootAPI = (() => {
     return request('/users/me', { auth: true });
   }
 
+  /* ---------- Perfil ---------- */
+
+  // Solo el nombre visible: el username (identificador de cuenta) no se
+  // puede tocar desde acá, ni el backend acepta ese campo en este endpoint.
+  function updateDisplayName(displayName) {
+    return request('/users/me', { method: 'PATCH', auth: true, body: { displayName } });
+  }
+
+  // imageBase64 ya viene recortada/ajustada por el editor circular
+  // (canvas.toDataURL('image/png')), lista para guardarse tal cual.
+  function updateAvatar(imageBase64) {
+    return request('/users/me/avatar', { method: 'PUT', auth: true, body: { imageBase64 } });
+  }
+
+  function deleteAvatar() {
+    return request('/users/me/avatar', { method: 'DELETE', auth: true });
+  }
+
+  // Arma la URL absoluta de la foto de un usuario. avatarUrl viene relativo
+  // desde el backend (ej. "/users/7/avatar") o null si no tiene foto
+  // personalizada, en cuyo caso el llamador debe usar la imagen default
+  // local en vez de pedir esto.
+  function resolveAvatarUrl(avatarUrl) {
+    if (!avatarUrl) return null;
+    return `${BASE_URL}${avatarUrl}`;
+  }
+
   /* ---------- Biblioteca ---------- */
 
   function getLibrary() {
@@ -225,6 +252,11 @@ const LowlootAPI = (() => {
     login,
     changePassword,
     getMe,
+    // perfil
+    updateDisplayName,
+    updateAvatar,
+    deleteAvatar,
+    resolveAvatarUrl,
     // biblioteca
     getLibrary,
     installGame,

@@ -4,6 +4,7 @@ import com.lowloot.server.auth.dto.AuthResponse;
 import com.lowloot.server.auth.dto.ChangePasswordRequest;
 import com.lowloot.server.auth.dto.LoginRequest;
 import com.lowloot.server.auth.dto.RegisterRequest;
+import com.lowloot.server.profile.UserAvatarRepository;
 import com.lowloot.server.wallet.Wallet;
 import com.lowloot.server.wallet.WalletRepository;
 import jakarta.validation.Valid;
@@ -23,16 +24,19 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final WalletRepository walletRepository;
+    private final UserAvatarRepository userAvatarRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
     public AuthController(
             UserRepository userRepository,
             WalletRepository walletRepository,
+            UserAvatarRepository userAvatarRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService) {
         this.userRepository = userRepository;
         this.walletRepository = walletRepository;
+        this.userAvatarRepository = userAvatarRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
     }
@@ -93,12 +97,15 @@ public class AuthController {
     }
 
     private AuthResponse toAuthResponse(User user, BigDecimal balance) {
+        boolean hasAvatar = userAvatarRepository.existsByUserId(user.getId());
         return new AuthResponse(
                 jwtService.generateToken(user),
                 user.getId(),
                 user.getDisplayUsername(),
+                user.getEffectiveDisplayName(),
                 user.getEmail(),
                 user.getRole().name(),
-                balance);
+                balance,
+                hasAvatar ? "/users/" + user.getId() + "/avatar" : null);
     }
 }
