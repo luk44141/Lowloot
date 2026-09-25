@@ -39,6 +39,9 @@ function renderTopbarSession() {
   const chipAvatar = document.getElementById('user-chip-avatar');
   if (chipAvatar) chipAvatar.src = currentUserAvatarSrc();
 
+  const menuAvatar = document.getElementById('user-menu-avatar');
+  if (menuAvatar) menuAvatar.src = currentUserAvatarSrc();
+
   // Si la vista de Perfil está abierta en este momento (por ejemplo,
   // después de guardar cambios en Ajustes), se refresca con los datos
   // nuevos sin que el usuario tenga que volver a entrar.

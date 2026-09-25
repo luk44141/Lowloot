@@ -1,88 +1,284 @@
-/* profile.css — foto de perfil en la topbar, vista de Perfil, panel de
-   Ajustes y editor de recorte circular (canvas). Reutiliza los tokens de
-   base.css y el sistema de modal de library-install.css. */
+/* profile.css — foto de perfil en la topbar y en el menú de usuario,
+   rediseño de la vista de Perfil como sección extensible por tarjetas,
+   panel de Ajustes colapsable, editor de recorte circular, y animaciones
+   suaves. Reutiliza los tokens de base.css y el sistema de modal de
+   library-install.css; las reglas de abajo que repiten un selector de
+   login.css (.user-menu, .user-menu-item, etc.) son ampliaciones a
+   propósito: profile.css se carga después, así que sólo agregan lo nuevo
+   (ícono, avatar, separadores) sin tocar ese archivo. */
 
 /* ---------- Avatar en la topbar (izquierda del nombre) ---------- */
+/* Antes 22px: pedido explícito de que se note más al lado del nombre. */
+
+.user-chip-trigger {
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+}
 
 .user-chip-avatar {
-  width: 22px;
-  height: 22px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
   background: var(--bg-hover);
-  border: 1px solid var(--border-subtle);
+  border: 1.5px solid var(--border-subtle);
+  transition: border-color 0.15s var(--ease), transform 0.15s var(--ease);
+}
+
+.user-chip-trigger:hover .user-chip-avatar {
+  border-color: var(--text-secondary);
+}
+
+.user-chip-name {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+/* ---------- Menú de usuario: rediseño ---------- */
+
+.user-menu {
+  min-width: 250px;
+  padding: 10px;
+  transform-origin: top right;
+  transition: opacity 0.16s var(--ease), transform 0.16s var(--ease), visibility 0.16s var(--ease);
+  transform: translateY(-4px) scale(0.97);
+}
+
+.user-menu.open {
+  transform: translateY(0) scale(1);
+}
+
+.user-menu-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px 14px;
+}
+
+.user-menu-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--bg-hover);
+  border: 1.5px solid var(--border-subtle);
+}
+
+.user-menu-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.user-menu-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-menu-email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-menu-divider {
+  height: 1px;
+  background: var(--border-soft);
+  margin: 4px 6px;
+}
+
+/* Agrupa items relacionados: agregar una sección nueva a futuro (por
+   ejemplo Biblioteca, Notificaciones) es sumar otro .user-menu-section
+   con sus propios .user-menu-item adentro, sin tocar el resto. */
+.user-menu-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-menu-item svg {
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+
+.user-menu-item:hover svg {
+  opacity: 1;
+}
+
+.user-menu-item-danger:hover {
+  background: rgba(224, 100, 100, 0.12);
+  color: #e78a8a;
 }
 
 /* ---------- Vista: Perfil ---------- */
 
 .profile-view {
-  max-width: 980px;
+  max-width: 1040px;
 }
 
-.profile-layout {
-  display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 28px;
-  align-items: start;
-}
-
-@media (max-width: 860px) {
-  .profile-layout {
-    grid-template-columns: 1fr;
-  }
-}
-
-.profile-main {
+.profile-page {
   display: flex;
   flex-direction: column;
   gap: 22px;
 }
 
-.profile-header {
+@keyframes profileFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-hero,
+.profile-card {
+  animation: profileFadeInUp 0.42s var(--ease) both;
+}
+
+/* ---------- Hero: foto grande + nombre + username ---------- */
+
+.profile-hero {
   display: flex;
   align-items: center;
-  gap: 18px;
-  background: var(--bg-panel);
+  gap: 26px;
+  background: linear-gradient(160deg, var(--bg-panel), var(--bg-elevated));
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  padding: 22px;
+  padding: 30px 32px;
+  position: relative;
+  overflow: hidden;
 }
 
-.profile-avatar {
-  width: 84px;
-  height: 84px;
+.profile-hero-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.profile-hero-avatar {
+  width: 152px;
+  height: 152px;
   border-radius: 50%;
   object-fit: cover;
-  flex-shrink: 0;
+  display: block;
   background: var(--bg-hover);
-  border: 1px solid var(--border-subtle);
+  border: 3px solid var(--border-subtle);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.35);
+  transition: transform 0.25s var(--ease);
 }
 
-.profile-header-info {
+/* Pequeño "pop" al terminar de guardar una foto nueva, para que el cambio
+   se sienta (no es un efecto permanente, se dispara una sola vez vía JS). */
+@keyframes profileAvatarPop {
+  0% {
+    transform: scale(0.9);
+  }
+  55% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.profile-hero-avatar.pop {
+  animation: profileAvatarPop 0.4s var(--ease);
+}
+
+.profile-hero-info {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
+  min-width: 0;
 }
 
-.profile-display-name {
+.profile-hero-name {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* ---------- Panel de Ajustes (dentro de Perfil) ---------- */
+.profile-hero-username {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.profile-hero-actions {
+  margin-left: auto;
+  align-self: flex-start;
+  flex-shrink: 0;
+}
+
+.profile-ajustes-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.15s var(--ease), border-color 0.15s var(--ease), transform 0.12s var(--ease);
+}
+
+.profile-ajustes-toggle:hover {
+  transform: translateY(-1px);
+}
+
+.profile-ajustes-toggle.active {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--text-secondary);
+}
+
+.profile-ajustes-toggle svg {
+  transition: transform 0.25s var(--ease);
+}
+
+.profile-ajustes-toggle.active svg {
+  transform: rotate(45deg);
+}
+
+/* ---------- Panel de Ajustes: colapsa/expande con transición suave ---------- */
+/* Técnica de grid-template-rows 0fr -> 1fr: anima a "altura automática"
+   sin tener que medir el contenido en JS. */
+
+.profile-ajustes-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.32s var(--ease);
+}
+
+.profile-ajustes-collapse.open {
+  grid-template-rows: 1fr;
+}
+
+.profile-ajustes-collapse-inner {
+  overflow: hidden;
+}
 
 .profile-ajustes-panel {
   background: var(--bg-panel);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  padding: 22px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  margin-top: 2px;
 }
 
 .profile-ajustes-panel .install-field input[type='text'] {
@@ -93,6 +289,7 @@
   color: var(--text-primary);
   font-size: 12.5px;
   padding: 9px 11px;
+  transition: border-color 0.15s var(--ease);
 }
 
 .profile-ajustes-panel .install-field input[type='text']:focus {
@@ -108,17 +305,43 @@
 .profile-ajustes-avatar-row {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
+}
+
+.profile-ajustes-avatar-preview-wrap {
+  position: relative;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  cursor: pointer;
 }
 
 .profile-ajustes-avatar-preview {
-  width: 56px;
-  height: 56px;
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
   object-fit: cover;
-  flex-shrink: 0;
+  display: block;
   background: var(--bg-hover);
   border: 1px solid var(--border-subtle);
+}
+
+.profile-ajustes-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 10, 10, 0.55);
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.15s var(--ease);
+}
+
+.profile-ajustes-avatar-preview-wrap:hover .profile-ajustes-avatar-overlay {
+  opacity: 1;
 }
 
 .profile-ajustes-avatar-actions {
@@ -131,22 +354,49 @@
   margin-top: 10px;
 }
 
-/* ---------- Apartado lateral de Amigos (preparado, sin lista todavía) ---------- */
+/* ---------- Grilla de secciones (extensible) ---------- */
+/* Hoy solo "Amigos". A futuro, cada sección nueva (Juegos, Estadísticas,
+   Logros, Actividad, Insignias, DLC...) es una tarjeta .profile-card más
+   en esta misma grilla: el layout y las animaciones ya están listos. */
 
-.profile-friends-panel {
+.profile-sections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.profile-card {
   background: var(--bg-panel);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  padding: 20px;
+  padding: 22px;
+  transition: transform 0.18s var(--ease), border-color 0.18s var(--ease), box-shadow 0.18s var(--ease);
 }
 
-.profile-friends-title {
+.profile-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--text-secondary);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+}
+
+.profile-card-title {
   font-family: var(--font-display);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.14em;
   color: var(--text-muted);
-  margin: 0 0 10px;
+  margin: 0 0 12px;
+}
+
+@media (max-width: 720px) {
+  .profile-hero {
+    flex-wrap: wrap;
+  }
+
+  .profile-hero-actions {
+    margin-left: 0;
+    align-self: stretch;
+  }
 }
 
 /* ---------- Editor de recorte circular ---------- */

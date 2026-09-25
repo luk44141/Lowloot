@@ -31,7 +31,7 @@ echo [2/3] Iniciando Spring Boot...
 
 cd /d "C:\Users\lucam\Desktop\lowloot\lowloot-server"
 
-powershell -NoProfile -Command "Start-Process -FilePath 'cmd.exe' -ArgumentList '/c','mvnw.cmd spring-boot:run' -WindowStyle Hidden"
+powershell -NoProfile -Command "Start-Process -FilePath 'cmd.exe' -ArgumentList '/k','mvnw.cmd spring-boot:run'"
 
 echo Spring Boot iniciado.
 echo.

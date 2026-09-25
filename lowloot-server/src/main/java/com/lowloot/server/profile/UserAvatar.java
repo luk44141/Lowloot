@@ -3,9 +3,10 @@ package com.lowloot.server.profile;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 // Mapea `user_avatars` (V5__user_profile.sql), separada de `users` a
 // proposito: solo se consulta cuando hace falta mostrar/editar la foto, no
@@ -20,7 +21,15 @@ public class UserAvatar {
     @Column(name = "user_id")
     private Long userId;
 
-    @Lob
+    // OJO: a proposito SIN @Lob. Con @Lob, Hibernate mapea byte[] contra
+    // PostgreSQL como un Large Object (columna tipo `oid`, via
+    // lo_creat/lo_write), que no es compatible con nuestra columna
+    // `image_data BYTEA` de V5__user_profile.sql: el INSERT/UPDATE falla en
+    // tiempo de ejecucion con algo como "column image_data is of type
+    // bytea but expression is of type oid" (se reprodujo justamente asi
+    // contra un Postgres real). @JdbcTypeCode(SqlTypes.VARBINARY) fuerza el
+    // mapeo correcto byte[] <-> bytea sin ambiguedad.
+    @JdbcTypeCode(SqlTypes.VARBINARY)
     @Column(name = "image_data", nullable = false)
     private byte[] imageData;
 

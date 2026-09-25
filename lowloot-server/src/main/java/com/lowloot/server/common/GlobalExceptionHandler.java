@@ -2,6 +2,8 @@ package com.lowloot.server.common;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -20,6 +22,8 @@ import org.springframework.web.server.ResponseStatusException;
 // stacktrace o el texto genérico de Spring.
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // Los controllers y servicios (AuthController, PurchaseService, etc.)
     // ya tiran ResponseStatusException con su propio status y mensaje de
@@ -55,10 +59,13 @@ public class GlobalExceptionHandler {
     }
 
     // Cualquier otra excepción no prevista: nunca se expone el mensaje real
-    // (podría contener detalles internos) ni un stacktrace, solo un 500
-    // genérico y amigable.
+    // al cliente (podría contener detalles internos) ni un stacktrace, pero
+    // SÍ se loguea completo del lado del servidor (antes esto se tragaba en
+    // silencio: un 500 llegaba al launcher como "Hubo un problema..." sin
+    // dejar ningún rastro en la consola para poder diagnosticarlo).
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleUnexpected(Exception ex) {
+        log.error("Error no manejado procesando un request", ex);
         return body(HttpStatus.INTERNAL_SERVER_ERROR, "Hubo un problema en el servidor, intentá de nuevo en un momento");
     }
 

@@ -98,11 +98,39 @@
 
           <div class="user-menu" id="user-menu">
             <div class="user-menu-header">
-              <span class="user-menu-name" id="user-menu-name"></span>
-              <span class="user-menu-email" id="user-menu-email"></span>
+              <img class="user-menu-avatar" id="user-menu-avatar" src="assets/profile/default-profile.png" alt="" />
+              <div class="user-menu-header-text">
+                <span class="user-menu-name" id="user-menu-name"></span>
+                <span class="user-menu-email" id="user-menu-email"></span>
+              </div>
             </div>
-            <button type="button" class="user-menu-item" id="user-menu-profile">Perfil</button>
-            <button type="button" class="user-menu-item" id="user-menu-logout">Cerrar sesión</button>
+
+            <div class="user-menu-divider"></div>
+
+            <!-- Sección de navegación: agregar un item nuevo a futuro (Biblioteca,
+                 Notificaciones, etc.) es sumar otro .user-menu-item acá adentro. -->
+            <div class="user-menu-section">
+              <button type="button" class="user-menu-item" id="user-menu-profile">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Perfil</span>
+              </button>
+            </div>
+
+            <div class="user-menu-divider"></div>
+
+            <div class="user-menu-section">
+              <button type="button" class="user-menu-item user-menu-item-danger" id="user-menu-logout">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Cerrar sesión</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
