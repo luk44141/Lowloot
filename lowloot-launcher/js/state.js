@@ -18,11 +18,32 @@ const cart = new Map();
 let newsList = [];
 let newsIndex = 0;
 
-// Notificaciones: todavía no existe un endpoint real (/notifications), así
-// que arranca vacío en vez de mostrar datos simulados. topbar.js ya maneja
-// el estado vacío ("No tenés notificaciones todavía."), y cuando exista el
-// backend esto se reemplaza por un fetch sin tocar el resto de topbar.js.
-const notifications = [];
+// Notificaciones: ahora sí hay backend real (/notifications, ver
+// notification/* en el servidor — no existía nada antes de Amigos, era
+// un array vacío fijo). session.js las carga al iniciar sesión y
+// app.js las refresca periódicamente junto con el contador de Amigos;
+// topbar.js solo lee de acá para pintar la campanita.
+let notifications = [];
+
+/* ---------- Amigos ---------- */
+// Todo esto viene de /friends/** (lowloot-server + PostgreSQL). Se carga
+// la primera vez que se abre la pestaña Amigos y se refresca después de
+// cada acción (enviar, aceptar, rechazar, eliminar) para que el contador
+// y las listas nunca queden desactualizados frente a lo persistido.
+let myFriendCode = '';
+let friendsList = [];
+let receivedFriendRequests = [];
+let sentFriendRequests = [];
+let pendingFriendRequestCount = 0;
+let friendsActiveTab = 'amigos'; // 'amigos' | 'recibidas' | 'enviadas' | 'buscar'
+let friendsSearchQuery = '';
+let friendsSearchResults = [];
+let friendsSearchLoading = false;
+
+// Perfil público de un amigo (o resultado de búsqueda) abierto en el
+// modal; null si no hay ninguno abierto. Ver friends.js.
+let friendProfileModalUserId = null;
+let friendProfileModalData = null;
 
 let currentDetailReviews = [];
 let currentResultsBaseList = [];

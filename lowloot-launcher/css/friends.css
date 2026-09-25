@@ -1,0 +1,320 @@
+/* friends.css — pestaña Amigos: código propio, buscador, pestañas
+   (Amigos/Recibidas/Enviadas), filas de amigo/solicitud/resultado, y el
+   modal de perfil público. Reutiliza las variables de base.css y las
+   clases .btn-primary/.btn-secondary/.icon-btn/.placeholder-text ya
+   existentes en components.css/layout.css. */
+
+.friends-page {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  max-width: 720px;
+}
+
+.friends-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.friend-code-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+}
+
+.friend-code-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.friend-code-value-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.friend-code-value {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--text-primary);
+}
+
+/* ---------- Buscador ---------- */
+
+.friends-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: var(--text-muted);
+}
+
+.friends-search-bar input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: var(--font-body);
+}
+
+.friends-search-bar input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ---------- Pestañas ---------- */
+
+.friends-tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.friends-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 10px 4px;
+  margin-bottom: -1px;
+  cursor: default;
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.friends-tab + .friends-tab {
+  margin-left: 14px;
+}
+
+.friends-tab:hover {
+  color: var(--text-primary);
+}
+
+.friends-tab.active {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent-bright);
+}
+
+.friends-tab-count {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.friends-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--accent-bright);
+  color: #111111;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.friends-tab-content {
+  min-height: 80px;
+}
+
+/* ---------- Filas (amigo / solicitud / resultado de búsqueda) ---------- */
+
+.friends-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.friend-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 8px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s var(--ease);
+}
+
+.friend-row:hover {
+  background: var(--bg-hover);
+}
+
+.friend-row-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: default;
+  padding: 0;
+}
+
+.friend-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+}
+
+.friend-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  background: var(--bg-elevated);
+}
+
+.friend-status-dot {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--bg-panel);
+  background: var(--text-muted);
+}
+
+.friend-status-dot.online {
+  background: #3ecf6e;
+}
+
+.friend-row-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.friend-row-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.friend-row-sub {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.friend-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.friend-row-tag {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.friend-row-remove {
+  color: var(--text-muted);
+}
+
+.friend-row-remove:hover {
+  color: #e5484d;
+  background: rgba(229, 72, 77, 0.12);
+}
+
+.friends-btn-sm {
+  padding: 6px 12px;
+  font-size: 11px;
+}
+
+.confirm-armed {
+  color: #e5484d !important;
+  border-color: #e5484d !important;
+}
+
+/* ---------- Perfil público (modal) ---------- */
+
+.friend-profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 8px 12px 4px;
+}
+
+.friend-profile-avatar-wrap {
+  width: 84px;
+  height: 84px;
+  margin-bottom: 10px;
+}
+
+.friend-profile-avatar {
+  width: 84px;
+  height: 84px;
+}
+
+.friend-profile-avatar-wrap .friend-status-dot {
+  width: 16px;
+  height: 16px;
+  border-width: 3px;
+}
+
+.friend-profile-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.friend-profile-username {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.friend-profile-status {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 2px 0 14px;
+}
+
+.friend-profile-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* ---------- Tarjeta "Amigos" del perfil propio (profile.js) ---------- */
+
+.profile-friends-count {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0 0 12px;
+}

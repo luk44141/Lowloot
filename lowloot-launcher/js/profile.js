@@ -8,13 +8,17 @@
 // una sección nueva a futuro (Juegos, Biblioteca, Horas jugadas, Logros,
 // Actividad reciente, Favoritos, Estadísticas, Insignias, DLC, info
 // adicional, etc.) es sumar un objeto más acá: el layout, el hover y la
-// animación de entrada ya están preparados para eso. A propósito no hay
-// ninguna sección con datos falsos: solo "Amigos", preparada pero vacía.
+// animación de entrada ya están preparados para eso. "Amigos" ahora
+// muestra el conteo real (friendsList, cargado por friends.js) y lleva a
+// la pestaña Amigos para el resto de la funcionalidad.
 const PROFILE_SECTIONS = [
   {
     id: 'friends',
     title: 'AMIGOS',
-    render: () => `<p class="placeholder-text">Esta sección todavía no está disponible.</p>`,
+    render: () => `
+      <p class="profile-friends-count">${friendsList.length} ${friendsList.length === 1 ? 'amigo' : 'amigos'}</p>
+      <button type="button" class="btn-secondary friends-btn-sm" data-profile-go-friends>Ver Amigos</button>
+    `,
   },
 ];
 
@@ -69,6 +73,23 @@ function renderProfileView() {
       </div>
     </div>
   `;
+
+  refreshProfileFriendsCount();
+}
+
+// El conteo de "Amigos" en el perfil se pide aparte y en segundo plano
+// (no bloquea el resto del perfil) porque friendsList puede estar
+// desactualizado si el usuario todavía no abrió la pestaña Amigos en esta
+// sesión.
+async function refreshProfileFriendsCount() {
+  if (!currentUser) return;
+  try {
+    friendsList = await LowlootAPI.getFriends();
+  } catch (err) {
+    return;
+  }
+  const countEl = qs('.profile-friends-count');
+  if (countEl) countEl.textContent = `${friendsList.length} ${friendsList.length === 1 ? 'amigo' : 'amigos'}`;
 }
 
 function renderAjustesPanel() {
@@ -189,6 +210,12 @@ function playAvatarChangeAnimation() {
 
 function initProfileControls() {
   document.body.addEventListener('click', (event) => {
+    if (event.target.closest('[data-profile-go-friends]')) {
+      activateView('amigos');
+      if (typeof renderFriendsView === 'function') renderFriendsView();
+      return;
+    }
+
     if (event.target.closest('#profile-ajustes-toggle')) {
       toggleAjustesPanel();
       return;

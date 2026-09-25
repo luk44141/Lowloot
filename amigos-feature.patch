@@ -1,0 +1,2754 @@
+diff --git a/lowloot-launcher/css/friends.css b/lowloot-launcher/css/friends.css
+new file mode 100644
+index 0000000..fef18b2
+--- /dev/null
++++ b/lowloot-launcher/css/friends.css
+@@ -0,0 +1,320 @@
++/* friends.css — pestaña Amigos: código propio, buscador, pestañas
++   (Amigos/Recibidas/Enviadas), filas de amigo/solicitud/resultado, y el
++   modal de perfil público. Reutiliza las variables de base.css y las
++   clases .btn-primary/.btn-secondary/.icon-btn/.placeholder-text ya
++   existentes en components.css/layout.css. */
++
++.friends-page {
++  display: flex;
++  flex-direction: column;
++  gap: 22px;
++  max-width: 720px;
++}
++
++.friends-header {
++  display: flex;
++  align-items: center;
++  justify-content: space-between;
++  flex-wrap: wrap;
++  gap: 16px;
++}
++
++.friend-code-box {
++  display: flex;
++  flex-direction: column;
++  gap: 6px;
++  background: var(--bg-panel);
++  border: 1px solid var(--border-subtle);
++  border-radius: var(--radius-md);
++  padding: 12px 16px;
++}
++
++.friend-code-label {
++  font-size: 11px;
++  color: var(--text-secondary);
++  text-transform: uppercase;
++  letter-spacing: 0.06em;
++}
++
++.friend-code-value-row {
++  display: flex;
++  align-items: center;
++  gap: 12px;
++}
++
++.friend-code-value {
++  font-family: var(--font-display);
++  font-size: 16px;
++  font-weight: 600;
++  letter-spacing: 0.12em;
++  color: var(--text-primary);
++}
++
++/* ---------- Buscador ---------- */
++
++.friends-search-bar {
++  display: flex;
++  align-items: center;
++  gap: 10px;
++  background: var(--bg-panel);
++  border: 1px solid var(--border-subtle);
++  border-radius: var(--radius-sm);
++  padding: 10px 14px;
++  color: var(--text-muted);
++}
++
++.friends-search-bar input {
++  flex: 1;
++  background: transparent;
++  border: none;
++  outline: none;
++  color: var(--text-primary);
++  font-size: 13px;
++  font-family: var(--font-body);
++}
++
++.friends-search-bar input::placeholder {
++  color: var(--text-muted);
++}
++
++/* ---------- Pestañas ---------- */
++
++.friends-tabs {
++  display: flex;
++  gap: 6px;
++  border-bottom: 1px solid var(--border-subtle);
++}
++
++.friends-tab {
++  display: inline-flex;
++  align-items: center;
++  gap: 6px;
++  background: transparent;
++  border: none;
++  border-bottom: 2px solid transparent;
++  color: var(--text-secondary);
++  font-size: 12px;
++  font-weight: 600;
++  letter-spacing: 0.04em;
++  padding: 10px 4px;
++  margin-bottom: -1px;
++  cursor: default;
++  transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
++}
++
++.friends-tab + .friends-tab {
++  margin-left: 14px;
++}
++
++.friends-tab:hover {
++  color: var(--text-primary);
++}
++
++.friends-tab.active {
++  color: var(--text-primary);
++  border-bottom-color: var(--accent-bright);
++}
++
++.friends-tab-count {
++  color: var(--text-muted);
++  font-weight: 500;
++}
++
++.friends-tab-badge {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  min-width: 16px;
++  height: 16px;
++  padding: 0 4px;
++  border-radius: 999px;
++  background: var(--accent-bright);
++  color: #111111;
++  font-size: 10px;
++  font-weight: 700;
++}
++
++.friends-tab-content {
++  min-height: 80px;
++}
++
++/* ---------- Filas (amigo / solicitud / resultado de búsqueda) ---------- */
++
++.friends-list {
++  display: flex;
++  flex-direction: column;
++  gap: 4px;
++}
++
++.friend-row {
++  display: flex;
++  align-items: center;
++  justify-content: space-between;
++  gap: 12px;
++  padding: 10px 8px;
++  border-radius: var(--radius-sm);
++  transition: background 0.15s var(--ease);
++}
++
++.friend-row:hover {
++  background: var(--bg-hover);
++}
++
++.friend-row-main {
++  display: flex;
++  align-items: center;
++  gap: 12px;
++  flex: 1;
++  min-width: 0;
++  background: transparent;
++  border: none;
++  color: inherit;
++  font: inherit;
++  text-align: left;
++  cursor: default;
++  padding: 0;
++}
++
++.friend-avatar-wrap {
++  position: relative;
++  flex-shrink: 0;
++  width: 38px;
++  height: 38px;
++}
++
++.friend-avatar {
++  width: 38px;
++  height: 38px;
++  border-radius: 50%;
++  object-fit: cover;
++  display: block;
++  background: var(--bg-elevated);
++}
++
++.friend-status-dot {
++  position: absolute;
++  right: -1px;
++  bottom: -1px;
++  width: 10px;
++  height: 10px;
++  border-radius: 50%;
++  border: 2px solid var(--bg-panel);
++  background: var(--text-muted);
++}
++
++.friend-status-dot.online {
++  background: #3ecf6e;
++}
++
++.friend-row-info {
++  display: flex;
++  flex-direction: column;
++  gap: 2px;
++  min-width: 0;
++}
++
++.friend-row-name {
++  font-size: 13px;
++  font-weight: 500;
++  color: var(--text-primary);
++  white-space: nowrap;
++  overflow: hidden;
++  text-overflow: ellipsis;
++}
++
++.friend-row-sub {
++  font-size: 11.5px;
++  color: var(--text-muted);
++}
++
++.friend-row-actions {
++  display: flex;
++  align-items: center;
++  gap: 8px;
++  flex-shrink: 0;
++}
++
++.friend-row-tag {
++  font-size: 11px;
++  color: var(--text-muted);
++  white-space: nowrap;
++}
++
++.friend-row-remove {
++  color: var(--text-muted);
++}
++
++.friend-row-remove:hover {
++  color: #e5484d;
++  background: rgba(229, 72, 77, 0.12);
++}
++
++.friends-btn-sm {
++  padding: 6px 12px;
++  font-size: 11px;
++}
++
++.confirm-armed {
++  color: #e5484d !important;
++  border-color: #e5484d !important;
++}
++
++/* ---------- Perfil público (modal) ---------- */
++
++.friend-profile-card {
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  text-align: center;
++  gap: 6px;
++  padding: 8px 12px 4px;
++}
++
++.friend-profile-avatar-wrap {
++  width: 84px;
++  height: 84px;
++  margin-bottom: 10px;
++}
++
++.friend-profile-avatar {
++  width: 84px;
++  height: 84px;
++}
++
++.friend-profile-avatar-wrap .friend-status-dot {
++  width: 16px;
++  height: 16px;
++  border-width: 3px;
++}
++
++.friend-profile-name {
++  font-family: var(--font-display);
++  font-size: 18px;
++  color: var(--text-primary);
++  margin: 0;
++}
++
++.friend-profile-username {
++  font-size: 12.5px;
++  color: var(--text-secondary);
++  margin: 0;
++}
++
++.friend-profile-status {
++  font-size: 12px;
++  color: var(--text-muted);
++  margin: 2px 0 14px;
++}
++
++.friend-profile-actions {
++  display: flex;
++  gap: 10px;
++}
++
++/* ---------- Tarjeta "Amigos" del perfil propio (profile.js) ---------- */
++
++.profile-friends-count {
++  font-size: 13px;
++  color: var(--text-secondary);
++  margin: 0 0 12px;
++}
+diff --git a/lowloot-launcher/css/layout.css b/lowloot-launcher/css/layout.css
+index 4739a99..93c2a1b 100644
+--- a/lowloot-launcher/css/layout.css
++++ b/lowloot-launcher/css/layout.css
+@@ -445,6 +445,14 @@
+   border-radius: var(--radius-sm);
+   cursor: default;
+   transition: background 0.15s var(--ease);
++  /* Ahora es un <button> real (antes era un <div>) para que sea accesible
++     y clickeable: se resetea el estilo nativo de botón del navegador. */
++  width: 100%;
++  border: none;
++  background: transparent;
++  font: inherit;
++  text-align: left;
++  color: inherit;
+ }
+ 
+ .notif-item:hover {
+diff --git a/lowloot-launcher/index.html b/lowloot-launcher/index.html
+index 26f0b15..8490ffc 100644
+--- a/lowloot-launcher/index.html
++++ b/lowloot-launcher/index.html
+@@ -24,6 +24,7 @@
+   <link rel="stylesheet" href="css/login.css" />
+   <link rel="stylesheet" href="css/admin.css" />
+   <link rel="stylesheet" href="css/profile.css" />
++  <link rel="stylesheet" href="css/friends.css" />
+ </head>
+ <body>
+   <div class="app">
+@@ -164,6 +165,7 @@
+           <li class="nav-item" data-view="amigos">
+             <span class="nav-indicator"></span>
+             <span class="nav-label">AMIGOS</span>
++            <span class="nav-badge" id="friends-nav-badge" hidden></span>
+           </li>
+           <li class="nav-item" data-view="mods">
+             <span class="nav-indicator"></span>
+@@ -240,12 +242,12 @@
+           <div id="library-game-content"></div>
+         </section>
+ 
+-        <!-- Vistas placeholder -->
+-        <section class="view placeholder-view" data-view="amigos">
+-          <h2 class="section-title">AMIGOS</h2>
+-          <p class="placeholder-text">Esta sección todavía no está disponible.</p>
++        <!-- Vista: Amigos -->
++        <section class="view store-view" data-view="amigos">
++          <div id="friends-content"></div>
+         </section>
+ 
++        <!-- Vistas placeholder -->
+         <section class="view placeholder-view" data-view="mods">
+           <h2 class="section-title">MODS</h2>
+           <p class="placeholder-text">Esta sección todavía no está disponible.</p>
+@@ -426,6 +428,14 @@
+   </div>
+ 
+ 
++  <!-- Modal de perfil público de un amigo / resultado de búsqueda -->
++  <div class="modal-overlay" id="friend-profile-modal-overlay">
++    <div class="modal friend-profile-modal" role="dialog" aria-modal="true">
++      <button type="button" class="modal-close" id="friend-profile-modal-close" aria-label="Cerrar">&times;</button>
++      <div id="friend-profile-modal-content"></div>
++    </div>
++  </div>
++
+   <!-- Toast -->
+   <div class="toast" id="toast"></div>
+ 
+@@ -452,6 +462,7 @@
+   <script src="js/library-folders.js" defer></script>
+   <script src="js/admin.js" defer></script>
+   <script src="js/profile.js" defer></script>
++  <script src="js/friends.js" defer></script>
+   <script src="js/app.js" defer></script>
+ </body>
+ </html>
+\ No newline at end of file
+diff --git a/lowloot-launcher/js/api-client.js b/lowloot-launcher/js/api-client.js
+index 269b7b1..0cc8fdb 100644
+--- a/lowloot-launcher/js/api-client.js
++++ b/lowloot-launcher/js/api-client.js
+@@ -216,6 +216,74 @@ const LowlootAPI = (() => {
+     return request('/purchases', { method: 'POST', auth: true, body: { gameIds } });
+   }
+ 
++  /* ---------- Amigos ---------- */
++
++  function getMyFriendCode() {
++    return request('/friends/me/code', { auth: true });
++  }
++
++  function searchFriends(query) {
++    return request(`/friends/search?q=${encodeURIComponent(query)}`, { auth: true });
++  }
++
++  function sendFriendRequest(userId) {
++    return request('/friends/requests', { method: 'POST', auth: true, body: { userId } });
++  }
++
++  function getReceivedFriendRequests() {
++    return request('/friends/requests/received', { auth: true });
++  }
++
++  function getSentFriendRequests() {
++    return request('/friends/requests/sent', { auth: true });
++  }
++
++  function getPendingFriendRequestCount() {
++    return request('/friends/requests/pending-count', { auth: true });
++  }
++
++  function acceptFriendRequest(requestId) {
++    return request(`/friends/requests/${requestId}/accept`, { method: 'POST', auth: true });
++  }
++
++  function rejectFriendRequest(requestId) {
++    return request(`/friends/requests/${requestId}/reject`, { method: 'POST', auth: true });
++  }
++
++  function cancelFriendRequest(requestId) {
++    return request(`/friends/requests/${requestId}`, { method: 'DELETE', auth: true });
++  }
++
++  function getFriends() {
++    return request('/friends', { auth: true });
++  }
++
++  function getFriendProfile(userId) {
++    return request(`/friends/${userId}`, { auth: true });
++  }
++
++  function removeFriend(userId) {
++    return request(`/friends/${userId}`, { method: 'DELETE', auth: true });
++  }
++
++  /* ---------- Notificaciones ---------- */
++
++  function getNotifications() {
++    return request('/notifications', { auth: true });
++  }
++
++  function getUnreadNotifCount() {
++    return request('/notifications/unread-count', { auth: true });
++  }
++
++  function markNotificationRead(notifId) {
++    return request(`/notifications/${notifId}/read`, { method: 'POST', auth: true });
++  }
++
++  function markAllNotificationsRead() {
++    return request('/notifications/read-all', { method: 'POST', auth: true });
++  }
++
+   /* ---------- Admin ---------- */
+ 
+   function adminGetUsers() {
+@@ -268,6 +336,24 @@ const LowlootAPI = (() => {
+     removeFromWishlist,
+     // compra
+     purchase,
++    // amigos
++    getMyFriendCode,
++    searchFriends,
++    sendFriendRequest,
++    getReceivedFriendRequests,
++    getSentFriendRequests,
++    getPendingFriendRequestCount,
++    acceptFriendRequest,
++    rejectFriendRequest,
++    cancelFriendRequest,
++    getFriends,
++    getFriendProfile,
++    removeFriend,
++    // notificaciones
++    getNotifications,
++    getUnreadNotifCount,
++    markNotificationRead,
++    markAllNotificationsRead,
+     // admin
+     adminGetUsers,
+     adminAdjustBalance,
+diff --git a/lowloot-launcher/js/app.js b/lowloot-launcher/js/app.js
+index 72d2d31..437089b 100644
+--- a/lowloot-launcher/js/app.js
++++ b/lowloot-launcher/js/app.js
+@@ -350,9 +350,29 @@ document.addEventListener('DOMContentLoaded', async () => {
+   initPurchaseConfirmModal();
+   initAdminControls();
+   initProfileView();
++  initFriendsControls();
+   initDelegatedHandlers();
+   initHoverPreviews();
+   await initSession();
+   renderCartBadge();
+   await renderHome();
+-});
+\ No newline at end of file
++  initFriendsPolling();
++});
++
++// Contador de solicitudes pendientes + notificaciones: se refrescan solo
++// cada cierto tiempo (sin WebSockets, tal como se pidió) para que el
++// badge de "Amigos" y la campanita no dependan únicamente de que el
++// usuario haga clic en algo. También es lo que hace que "última
++// actividad" de los amigos online se vea razonablemente al día mientras
++// el launcher queda abierto.
++function initFriendsPolling() {
++  const POLL_MS = 45000;
++  setInterval(() => {
++    if (!currentUser) return;
++    if (typeof refreshFriendsBadge === 'function') refreshFriendsBadge();
++    if (typeof refreshNotifications === 'function') refreshNotifications();
++    if (qs('.view[data-view="amigos"]')?.classList.contains('active') && typeof renderFriendsView === 'function') {
++      renderFriendsView();
++    }
++  }, POLL_MS);
++}
+\ No newline at end of file
+diff --git a/lowloot-launcher/js/friends.js b/lowloot-launcher/js/friends.js
+new file mode 100644
+index 0000000..cc82e8c
+--- /dev/null
++++ b/lowloot-launcher/js/friends.js
+@@ -0,0 +1,506 @@
++// friends.js — pestaña Amigos completa: código propio, búsqueda por nombre
++// visible o código, solicitudes (recibidas/enviadas/aceptar/rechazar/
++// cancelar), lista de amigos con estado Online/Offline y el modal de
++// perfil público. Todo contra el backend real (/friends/**, /notifications
++// para el aviso -- ver notification/* en el servidor).
++//
++// Depende de api-client.js, state.js, helpers.js, session.js
++// (DEFAULT_AVATAR_SRC) y topbar.js (refreshNotifications, para refrescar la
++// campanita después de aceptar/rechazar).
++
++/* ---------- Helpers de datos ---------- */
++
++function friendAvatarSrc(entity) {
++  if (entity && entity.avatarUrl) {
++    const url = LowlootAPI.resolveAvatarUrl(entity.avatarUrl);
++    if (url) return url;
++  }
++  return typeof DEFAULT_AVATAR_SRC !== 'undefined' ? DEFAULT_AVATAR_SRC : 'assets/profile/default-profile.png';
++}
++
++function lastSeenLabel(lastActiveAt) {
++  if (!lastActiveAt) return 'Desconectado';
++  return `Desconectado · Últ. vez ${formatRelativeTime(lastActiveAt)}`;
++}
++
++/* ---------- Badge de la barra lateral (contador persistido) ---------- */
++
++async function refreshFriendsBadge() {
++  if (!currentUser) {
++    pendingFriendRequestCount = 0;
++    renderFriendsNavBadge();
++    return;
++  }
++  try {
++    const res = await LowlootAPI.getPendingFriendRequestCount();
++    pendingFriendRequestCount = res.count;
++  } catch (err) {
++    // Si falla, se deja el último valor conocido; el próximo refresh (o
++    // abrir la pestaña Amigos) lo corrige.
++  }
++  renderFriendsNavBadge();
++}
++
++function renderFriendsNavBadge() {
++  const badge = document.getElementById('friends-nav-badge');
++  if (!badge) return;
++  if (pendingFriendRequestCount > 0) {
++    badge.textContent = pendingFriendRequestCount > 9 ? '9+' : String(pendingFriendRequestCount);
++    badge.hidden = false;
++  } else {
++    badge.hidden = true;
++  }
++}
++
++/* ---------- Carga de datos según la pestaña/búsqueda activa ---------- */
++
++async function refreshActiveFriendsTabData() {
++  try {
++    if (friendsSearchQuery.trim()) {
++      friendsSearchLoading = true;
++      friendsSearchResults = await LowlootAPI.searchFriends(friendsSearchQuery.trim());
++    } else if (friendsActiveTab === 'recibidas') {
++      receivedFriendRequests = await LowlootAPI.getReceivedFriendRequests();
++      pendingFriendRequestCount = receivedFriendRequests.length;
++      renderFriendsNavBadge();
++    } else if (friendsActiveTab === 'enviadas') {
++      sentFriendRequests = await LowlootAPI.getSentFriendRequests();
++    } else {
++      friendsList = await LowlootAPI.getFriends();
++    }
++  } catch (err) {
++    showToast(err.message || 'No se pudo cargar Amigos');
++  } finally {
++    friendsSearchLoading = false;
++  }
++}
++
++/* ---------- Render ---------- */
++
++async function renderFriendsView() {
++  const container = qs('#friends-content');
++  if (!container) return;
++
++  if (!currentUser) {
++    container.innerHTML = `
++      <div class="friends-page">
++        <h2 class="section-title">AMIGOS</h2>
++        <p class="placeholder-text">Iniciá sesión para ver tu código de amigo, buscar usuarios y administrar tus solicitudes.</p>
++        <button type="button" class="btn-primary" data-friends-login>INICIAR SESIÓN</button>
++      </div>
++    `;
++    return;
++  }
++
++  if (!myFriendCode) {
++    try {
++      const res = await LowlootAPI.getMyFriendCode();
++      myFriendCode = res.friendCode;
++    } catch (err) {
++      showToast(err.message || 'No se pudo obtener tu código de amigo');
++    }
++  }
++
++  await refreshActiveFriendsTabData();
++  container.innerHTML = friendsPageHtml();
++}
++
++// Refresco liviano tras una acción (aceptar, rechazar, eliminar, etc.):
++// vuelve a pedir los datos de la pestaña activa y reemplaza solo el
++// contenido + los contadores de las pestañas, sin tocar el buscador (para
++// no perder el foco mientras el usuario está escribiendo).
++async function renderFriendsTabsAndContent() {
++  const tabsBox = qs('#friends-tabs');
++  const contentBox = qs('#friends-tab-content');
++  if (!contentBox) return;
++  if (tabsBox) tabsBox.innerHTML = friendsTabsHtml();
++  contentBox.innerHTML = friendsTabContentHtml();
++}
++
++function friendsPageHtml() {
++  return `
++    <div class="friends-page">
++      <div class="friends-header">
++        <h2 class="section-title">AMIGOS</h2>
++        <div class="friend-code-box">
++          <span class="friend-code-label">Tu código de amigo</span>
++          <div class="friend-code-value-row">
++            <span class="friend-code-value" id="friends-my-code">${escapeHtml(myFriendCode || '—')}</span>
++            <button type="button" class="btn-secondary friends-btn-sm" data-friend-code-copy>Copiar</button>
++          </div>
++        </div>
++      </div>
++
++      <div class="friends-search-bar">
++        <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
++          <circle cx="11" cy="11" r="7"></circle>
++          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
++        </svg>
++        <input type="text" id="friends-search-input" placeholder="Buscar por nombre visible o código de amigo..." autocomplete="off" value="${escapeHtml(friendsSearchQuery)}" />
++      </div>
++
++      <div class="friends-tabs" id="friends-tabs">
++        ${friendsTabsHtml()}
++      </div>
++
++      <div class="friends-tab-content" id="friends-tab-content">
++        ${friendsTabContentHtml()}
++      </div>
++    </div>
++  `;
++}
++
++function friendsTabsHtml() {
++  const searching = Boolean(friendsSearchQuery.trim());
++  const tab = (name) => `friends-tab${friendsActiveTab === name && !searching ? ' active' : ''}`;
++  return `
++    <button type="button" class="${tab('amigos')}" data-friends-tab="amigos">
++      Amigos <span class="friends-tab-count">${friendsList.length}</span>
++    </button>
++    <button type="button" class="${tab('recibidas')}" data-friends-tab="recibidas">
++      Recibidas ${pendingFriendRequestCount > 0 ? `<span class="friends-tab-badge">${pendingFriendRequestCount > 9 ? '9+' : pendingFriendRequestCount}</span>` : ''}
++    </button>
++    <button type="button" class="${tab('enviadas')}" data-friends-tab="enviadas">
++      Enviadas
++    </button>
++  `;
++}
++
++function friendsTabContentHtml() {
++  if (friendsSearchQuery.trim()) return friendsSearchResultsHtml();
++  if (friendsActiveTab === 'recibidas') return friendsReceivedHtml();
++  if (friendsActiveTab === 'enviadas') return friendsSentHtml();
++  return friendsListHtml();
++}
++
++function friendsListHtml() {
++  if (!friendsList.length) {
++    return `<p class="placeholder-text">Todavía no tenés amigos agregados. Buscá a alguien arriba por su nombre visible o su código para empezar.</p>`;
++  }
++  return `<div class="friends-list">${friendsList.map(friendRowHtml).join('')}</div>`;
++}
++
++function friendsReceivedHtml() {
++  if (!receivedFriendRequests.length) {
++    return `<p class="placeholder-text">No tenés solicitudes de amistad pendientes.</p>`;
++  }
++  return `<div class="friends-list">${receivedFriendRequests.map(receivedRequestRowHtml).join('')}</div>`;
++}
++
++function friendsSentHtml() {
++  if (!sentFriendRequests.length) {
++    return `<p class="placeholder-text">No enviaste ninguna solicitud de amistad todavía.</p>`;
++  }
++  return `<div class="friends-list">${sentFriendRequests.map(sentRequestRowHtml).join('')}</div>`;
++}
++
++function friendsSearchResultsHtml() {
++  const query = friendsSearchQuery.trim();
++  if (!friendsSearchResults.length) {
++    return `<p class="placeholder-text">No se encontraron usuarios para "${escapeHtml(query)}".</p>`;
++  }
++  return `<div class="friends-list">${friendsSearchResults.map(searchResultRowHtml).join('')}</div>`;
++}
++
++function friendRowHtml(f) {
++  return `
++    <div class="friend-row">
++      <button type="button" class="friend-row-main" data-friend-open-profile="${f.id}">
++        <span class="friend-avatar-wrap">
++          <img class="friend-avatar" src="${friendAvatarSrc(f)}" alt="" />
++          <span class="friend-status-dot ${f.online ? 'online' : 'offline'}"></span>
++        </span>
++        <span class="friend-row-info">
++          <span class="friend-row-name">${escapeHtml(f.displayName)}</span>
++          <span class="friend-row-sub">${f.online ? 'En línea' : lastSeenLabel(f.lastActiveAt)}</span>
++        </span>
++      </button>
++      <button type="button" class="icon-btn friend-row-remove" data-friend-remove="${f.id}" title="Eliminar amigo" aria-label="Eliminar amigo">✕</button>
++    </div>
++  `;
++}
++
++function receivedRequestRowHtml(r) {
++  return `
++    <div class="friend-row">
++      <button type="button" class="friend-row-main" data-friend-open-profile="${r.userId}">
++        <span class="friend-avatar-wrap"><img class="friend-avatar" src="${friendAvatarSrc(r)}" alt="" /></span>
++        <span class="friend-row-info">
++          <span class="friend-row-name">${escapeHtml(r.displayName)}</span>
++          <span class="friend-row-sub">${formatRelativeTime(r.createdAt)}</span>
++        </span>
++      </button>
++      <div class="friend-row-actions">
++        <button type="button" class="btn-primary friends-btn-sm" data-friend-request-accept="${r.id}">Aceptar</button>
++        <button type="button" class="btn-secondary friends-btn-sm" data-friend-request-reject="${r.id}">Rechazar</button>
++      </div>
++    </div>
++  `;
++}
++
++function sentRequestRowHtml(r) {
++  return `
++    <div class="friend-row">
++      <button type="button" class="friend-row-main" data-friend-open-profile="${r.userId}">
++        <span class="friend-avatar-wrap"><img class="friend-avatar" src="${friendAvatarSrc(r)}" alt="" /></span>
++        <span class="friend-row-info">
++          <span class="friend-row-name">${escapeHtml(r.displayName)}</span>
++          <span class="friend-row-sub">Enviada ${formatRelativeTime(r.createdAt)}</span>
++        </span>
++      </button>
++      <div class="friend-row-actions">
++        <button type="button" class="btn-secondary friends-btn-sm" data-friend-request-cancel="${r.id}">Cancelar</button>
++      </div>
++    </div>
++  `;
++}
++
++function searchResultRowHtml(u) {
++  let actionHtml;
++  if (u.status === 'FRIENDS') {
++    actionHtml = `<span class="friend-row-tag">Ya son amigos</span>`;
++  } else if (u.status === 'REQUEST_SENT') {
++    actionHtml = `<span class="friend-row-tag">Solicitud enviada</span>`;
++  } else if (u.status === 'REQUEST_RECEIVED') {
++    actionHtml = `<span class="friend-row-tag">Te envió una solicitud</span>`;
++  } else {
++    actionHtml = `<button type="button" class="btn-primary friends-btn-sm" data-friend-send-request="${u.id}">Agregar</button>`;
++  }
++
++  return `
++    <div class="friend-row">
++      <button type="button" class="friend-row-main" data-friend-open-profile="${u.id}">
++        <span class="friend-avatar-wrap">
++          <img class="friend-avatar" src="${friendAvatarSrc(u)}" alt="" />
++          <span class="friend-status-dot ${u.online ? 'online' : 'offline'}"></span>
++        </span>
++        <span class="friend-row-info">
++          <span class="friend-row-name">${escapeHtml(u.displayName)}</span>
++          <span class="friend-row-sub">Código: ${escapeHtml(u.friendCode)}</span>
++        </span>
++      </button>
++      <div class="friend-row-actions">${actionHtml}</div>
++    </div>
++  `;
++}
++
++/* ---------- Modal de perfil público ---------- */
++
++async function openFriendProfileModal(userId) {
++  friendProfileModalUserId = userId;
++  const overlay = qs('#friend-profile-modal-overlay');
++  const content = qs('#friend-profile-modal-content');
++  if (!overlay || !content) return;
++
++  content.innerHTML = `<p class="placeholder-text">Cargando perfil...</p>`;
++  overlay.classList.add('open');
++
++  try {
++    const profile = await LowlootAPI.getFriendProfile(userId);
++    friendProfileModalData = profile;
++    content.innerHTML = friendProfileModalHtml(profile);
++  } catch (err) {
++    content.innerHTML = `<p class="placeholder-text">${escapeHtml(err.message || 'No se pudo cargar este perfil')}</p>`;
++  }
++}
++
++function closeFriendProfileModal() {
++  qs('#friend-profile-modal-overlay')?.classList.remove('open');
++  friendProfileModalUserId = null;
++  friendProfileModalData = null;
++}
++
++function friendProfileModalHtml(profile) {
++  const actionHtml = profile.isFriend
++    ? `<button type="button" class="btn-secondary" data-friend-remove-confirm="${profile.id}">Eliminar amigo</button>`
++    : `<button type="button" class="btn-primary" data-friend-send-request="${profile.id}">Enviar solicitud</button>`;
++
++  return `
++    <div class="friend-profile-card">
++      <span class="friend-avatar-wrap friend-profile-avatar-wrap">
++        <img class="friend-avatar friend-profile-avatar" src="${friendAvatarSrc(profile)}" alt="" />
++        <span class="friend-status-dot ${profile.online ? 'online' : 'offline'}"></span>
++      </span>
++      <h3 class="friend-profile-name">${escapeHtml(profile.displayName)}</h3>
++      <p class="friend-profile-username">@${escapeHtml(profile.username)}</p>
++      <p class="friend-profile-status">${profile.online ? 'En línea' : lastSeenLabel(profile.lastActiveAt)}</p>
++      <div class="friend-profile-actions">${actionHtml}</div>
++    </div>
++  `;
++}
++
++/* ---------- Botón "armado" de dos pasos para eliminar (el proyecto evita
++   window.confirm, ver cart.js) ---------- */
++
++function armConfirmButton(btn, armedLabel) {
++  if (btn.dataset.armed === '1') return true; // ya estaba armado: se ejecuta la acción real
++  btn.dataset.armed = '1';
++  btn.dataset.originalLabel = btn.textContent;
++  btn.textContent = armedLabel;
++  btn.classList.add('confirm-armed');
++  btn._armTimeout = setTimeout(() => {
++    if (btn.isConnected) {
++      btn.dataset.armed = '0';
++      btn.textContent = btn.dataset.originalLabel;
++      btn.classList.remove('confirm-armed');
++    }
++  }, 3000);
++  return false;
++}
++
++/* ---------- Eventos ---------- */
++
++function initFriendsControls() {
++  let searchDebounce = null;
++
++  document.body.addEventListener('input', (event) => {
++    if (event.target.id !== 'friends-search-input') return;
++    friendsSearchQuery = event.target.value;
++    clearTimeout(searchDebounce);
++    searchDebounce = setTimeout(async () => {
++      await refreshActiveFriendsTabData();
++      renderFriendsTabsAndContent();
++    }, 300);
++  });
++
++  document.body.addEventListener('click', async (event) => {
++    if (event.target.closest('[data-friends-login]')) {
++      openLoginModal('login');
++      return;
++    }
++
++    if (event.target.closest('[data-friend-code-copy]')) {
++      if (!myFriendCode) return;
++      try {
++        await navigator.clipboard.writeText(myFriendCode);
++        showToast('Código copiado al portapapeles');
++      } catch (err) {
++        showToast('No se pudo copiar el código');
++      }
++      return;
++    }
++
++    const tabBtn = event.target.closest('[data-friends-tab]');
++    if (tabBtn) {
++      friendsActiveTab = tabBtn.dataset.friendsTab;
++      friendsSearchQuery = '';
++      await refreshActiveFriendsTabData();
++      const container = qs('#friends-content');
++      if (container) container.innerHTML = friendsPageHtml();
++      return;
++    }
++
++    const openProfileBtn = event.target.closest('[data-friend-open-profile]');
++    if (openProfileBtn) {
++      openFriendProfileModal(openProfileBtn.dataset.friendOpenProfile);
++      return;
++    }
++
++    if (event.target.closest('#friend-profile-modal-close') || event.target.id === 'friend-profile-modal-overlay') {
++      closeFriendProfileModal();
++      return;
++    }
++
++    const sendReqBtn = event.target.closest('[data-friend-send-request]');
++    if (sendReqBtn) {
++      const userId = sendReqBtn.dataset.friendSendRequest;
++      sendReqBtn.disabled = true;
++      try {
++        await LowlootAPI.sendFriendRequest(Number(userId));
++        showToast('Solicitud de amistad enviada');
++        closeFriendProfileModal();
++        await refreshActiveFriendsTabData();
++        renderFriendsTabsAndContent();
++      } catch (err) {
++        showToast(err.message || 'No se pudo enviar la solicitud');
++        sendReqBtn.disabled = false;
++      }
++      return;
++    }
++
++    const acceptBtn = event.target.closest('[data-friend-request-accept]');
++    if (acceptBtn) {
++      const id = acceptBtn.dataset.friendRequestAccept;
++      acceptBtn.disabled = true;
++      try {
++        await LowlootAPI.acceptFriendRequest(id);
++        showToast('¡Ahora son amigos!');
++        await refreshActiveFriendsTabData();
++        renderFriendsTabsAndContent();
++        refreshNotifications();
++      } catch (err) {
++        showToast(err.message || 'No se pudo aceptar la solicitud');
++        acceptBtn.disabled = false;
++      }
++      return;
++    }
++
++    const rejectBtn = event.target.closest('[data-friend-request-reject]');
++    if (rejectBtn) {
++      const id = rejectBtn.dataset.friendRequestReject;
++      rejectBtn.disabled = true;
++      try {
++        await LowlootAPI.rejectFriendRequest(id);
++        showToast('Solicitud rechazada');
++        await refreshActiveFriendsTabData();
++        renderFriendsTabsAndContent();
++        refreshNotifications();
++      } catch (err) {
++        showToast(err.message || 'No se pudo rechazar la solicitud');
++        rejectBtn.disabled = false;
++      }
++      return;
++    }
++
++    const cancelBtn = event.target.closest('[data-friend-request-cancel]');
++    if (cancelBtn) {
++      const id = cancelBtn.dataset.friendRequestCancel;
++      cancelBtn.disabled = true;
++      try {
++        await LowlootAPI.cancelFriendRequest(id);
++        showToast('Solicitud cancelada');
++        await refreshActiveFriendsTabData();
++        renderFriendsTabsAndContent();
++      } catch (err) {
++        showToast(err.message || 'No se pudo cancelar la solicitud');
++        cancelBtn.disabled = false;
++      }
++      return;
++    }
++
++    const removeBtn = event.target.closest('[data-friend-remove]');
++    if (removeBtn) {
++      if (!armConfirmButton(removeBtn, '¿Seguro?')) return;
++      const id = removeBtn.dataset.friendRemove;
++      try {
++        await LowlootAPI.removeFriend(id);
++        showToast('Amigo eliminado');
++        await refreshActiveFriendsTabData();
++        renderFriendsTabsAndContent();
++      } catch (err) {
++        showToast(err.message || 'No se pudo eliminar al amigo');
++      }
++      return;
++    }
++
++    const modalRemoveBtn = event.target.closest('[data-friend-remove-confirm]');
++    if (modalRemoveBtn) {
++      if (!armConfirmButton(modalRemoveBtn, '¿Seguro?')) return;
++      const id = modalRemoveBtn.dataset.friendRemoveConfirm;
++      try {
++        await LowlootAPI.removeFriend(id);
++        showToast('Amigo eliminado');
++        closeFriendProfileModal();
++        await refreshActiveFriendsTabData();
++        renderFriendsTabsAndContent();
++      } catch (err) {
++        showToast(err.message || 'No se pudo eliminar al amigo');
++      }
++      return;
++    }
++  });
++
++  document.addEventListener('keydown', (event) => {
++    if (event.key === 'Escape') closeFriendProfileModal();
++  });
++}
+diff --git a/lowloot-launcher/js/helpers.js b/lowloot-launcher/js/helpers.js
+index cfe7d7c..787030e 100644
+--- a/lowloot-launcher/js/helpers.js
++++ b/lowloot-launcher/js/helpers.js
+@@ -18,6 +18,27 @@ function formatDate(iso) {
+   return d.toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
+ }
+ 
++// Tiempo relativo para datos reales del backend (notificaciones,
++// solicitudes de amistad): a diferencia de NOW de arriba (fecha fija de
++// la maqueta del catálogo), acá se usa la hora real del dispositivo,
++// porque `createdAt`/`lastActiveAt` vienen con la hora real del servidor.
++function formatRelativeTime(isoLocalDateTime) {
++  if (!isoLocalDateTime) return '';
++  const then = new Date(isoLocalDateTime);
++  if (Number.isNaN(then.getTime())) return '';
++  const diffMs = Date.now() - then.getTime();
++  const diffSec = Math.max(0, Math.floor(diffMs / 1000));
++
++  if (diffSec < 60) return 'Justo ahora';
++  const diffMin = Math.floor(diffSec / 60);
++  if (diffMin < 60) return `Hace ${diffMin} min`;
++  const diffHours = Math.floor(diffMin / 60);
++  if (diffHours < 24) return `Hace ${diffHours} h`;
++  const diffDays = Math.floor(diffHours / 24);
++  if (diffDays < 7) return `Hace ${diffDays} d`;
++  return then.toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' });
++}
++
+ function escapeHtml(str) {
+   const div = document.createElement('div');
+   div.textContent = str;
+diff --git a/lowloot-launcher/js/navigation.js b/lowloot-launcher/js/navigation.js
+index 51a8ac7..21cbbac 100644
+--- a/lowloot-launcher/js/navigation.js
++++ b/lowloot-launcher/js/navigation.js
+@@ -44,6 +44,7 @@ function initSidebarNavigation() {
+       if (item.dataset.view === 'biblioteca') renderLibraryHome();
+       if (item.dataset.view === 'carrito') renderCartView();
+       if (item.dataset.view === 'admin') renderAdminView();
++      if (item.dataset.view === 'amigos') renderFriendsView();
+     });
+   });
+ }
+diff --git a/lowloot-launcher/js/profile.js b/lowloot-launcher/js/profile.js
+index e2ab4ac..3713512 100644
+--- a/lowloot-launcher/js/profile.js
++++ b/lowloot-launcher/js/profile.js
+@@ -8,13 +8,17 @@
+ // una sección nueva a futuro (Juegos, Biblioteca, Horas jugadas, Logros,
+ // Actividad reciente, Favoritos, Estadísticas, Insignias, DLC, info
+ // adicional, etc.) es sumar un objeto más acá: el layout, el hover y la
+-// animación de entrada ya están preparados para eso. A propósito no hay
+-// ninguna sección con datos falsos: solo "Amigos", preparada pero vacía.
++// animación de entrada ya están preparados para eso. "Amigos" ahora
++// muestra el conteo real (friendsList, cargado por friends.js) y lleva a
++// la pestaña Amigos para el resto de la funcionalidad.
+ const PROFILE_SECTIONS = [
+   {
+     id: 'friends',
+     title: 'AMIGOS',
+-    render: () => `<p class="placeholder-text">Esta sección todavía no está disponible.</p>`,
++    render: () => `
++      <p class="profile-friends-count">${friendsList.length} ${friendsList.length === 1 ? 'amigo' : 'amigos'}</p>
++      <button type="button" class="btn-secondary friends-btn-sm" data-profile-go-friends>Ver Amigos</button>
++    `,
+   },
+ ];
+ 
+@@ -69,6 +73,23 @@ function renderProfileView() {
+       </div>
+     </div>
+   `;
++
++  refreshProfileFriendsCount();
++}
++
++// El conteo de "Amigos" en el perfil se pide aparte y en segundo plano
++// (no bloquea el resto del perfil) porque friendsList puede estar
++// desactualizado si el usuario todavía no abrió la pestaña Amigos en esta
++// sesión.
++async function refreshProfileFriendsCount() {
++  if (!currentUser) return;
++  try {
++    friendsList = await LowlootAPI.getFriends();
++  } catch (err) {
++    return;
++  }
++  const countEl = qs('.profile-friends-count');
++  if (countEl) countEl.textContent = `${friendsList.length} ${friendsList.length === 1 ? 'amigo' : 'amigos'}`;
+ }
+ 
+ function renderAjustesPanel() {
+@@ -189,6 +210,12 @@ function playAvatarChangeAnimation() {
+ 
+ function initProfileControls() {
+   document.body.addEventListener('click', (event) => {
++    if (event.target.closest('[data-profile-go-friends]')) {
++      activateView('amigos');
++      if (typeof renderFriendsView === 'function') renderFriendsView();
++      return;
++    }
++
+     if (event.target.closest('#profile-ajustes-toggle')) {
+       toggleAjustesPanel();
+       return;
+diff --git a/lowloot-launcher/js/session.js b/lowloot-launcher/js/session.js
+index ae674b4..bf150a1 100644
+--- a/lowloot-launcher/js/session.js
++++ b/lowloot-launcher/js/session.js
+@@ -148,6 +148,21 @@ function clearUserSessionData() {
+   installModalGameId = null;
+   profileAjustesOpen = false;
+ 
++  // Amigos / notificaciones: todo esto es propio de la cuenta que estaba
++  // logueada, se limpia acá para no arrastrar datos de un usuario al
++  // siguiente que inicie sesión en el mismo launcher.
++  myFriendCode = '';
++  friendsList = [];
++  receivedFriendRequests = [];
++  sentFriendRequests = [];
++  pendingFriendRequestCount = 0;
++  friendsActiveTab = 'amigos';
++  friendsSearchQuery = '';
++  friendsSearchResults = [];
++  friendProfileModalUserId = null;
++  friendProfileModalData = null;
++  notifications = [];
++
+   if (typeof invalidateLibraryCache === 'function') invalidateLibraryCache();
+ }
+ 
+@@ -164,6 +179,14 @@ function updateSessionUI() {
+   if (typeof renderTopbarSession === 'function') renderTopbarSession();
+   if (typeof renderCartBadge === 'function') renderCartBadge();
+ 
++  // Contador de Amigos (persistido en el backend, ver requisito 5) y
++  // campanita de notificaciones: se piden de nuevo cada vez que cambia la
++  // sesión (login, logout, o simplemente arrancar el launcher con un
++  // token guardado) para que sigan siendo ciertos y no dependan solo del
++  // estado que haya quedado en memoria del cliente.
++  if (typeof refreshFriendsBadge === 'function') refreshFriendsBadge();
++  if (typeof refreshNotifications === 'function') refreshNotifications();
++
+   // Si la Biblioteca o la Wishlist están abiertas justo cuando cambia la
+   // sesión (login/logout), se refrescan en el momento.
+   if (qs('.view[data-view="biblioteca"]')?.classList.contains('active') && typeof renderLibraryHome === 'function') {
+@@ -172,4 +195,7 @@ function updateSessionUI() {
+   if (qs('.view[data-view="wishlist"]')?.classList.contains('active') && typeof renderWishlistView === 'function') {
+     renderWishlistView();
+   }
++  if (qs('.view[data-view="amigos"]')?.classList.contains('active') && typeof renderFriendsView === 'function') {
++    renderFriendsView();
++  }
+ }
+diff --git a/lowloot-launcher/js/state.js b/lowloot-launcher/js/state.js
+index a09cce5..e17702a 100644
+--- a/lowloot-launcher/js/state.js
++++ b/lowloot-launcher/js/state.js
+@@ -18,11 +18,32 @@ const cart = new Map();
+ let newsList = [];
+ let newsIndex = 0;
+ 
+-// Notificaciones: todavía no existe un endpoint real (/notifications), así
+-// que arranca vacío en vez de mostrar datos simulados. topbar.js ya maneja
+-// el estado vacío ("No tenés notificaciones todavía."), y cuando exista el
+-// backend esto se reemplaza por un fetch sin tocar el resto de topbar.js.
+-const notifications = [];
++// Notificaciones: ahora sí hay backend real (/notifications, ver
++// notification/* en el servidor — no existía nada antes de Amigos, era
++// un array vacío fijo). session.js las carga al iniciar sesión y
++// app.js las refresca periódicamente junto con el contador de Amigos;
++// topbar.js solo lee de acá para pintar la campanita.
++let notifications = [];
++
++/* ---------- Amigos ---------- */
++// Todo esto viene de /friends/** (lowloot-server + PostgreSQL). Se carga
++// la primera vez que se abre la pestaña Amigos y se refresca después de
++// cada acción (enviar, aceptar, rechazar, eliminar) para que el contador
++// y las listas nunca queden desactualizados frente a lo persistido.
++let myFriendCode = '';
++let friendsList = [];
++let receivedFriendRequests = [];
++let sentFriendRequests = [];
++let pendingFriendRequestCount = 0;
++let friendsActiveTab = 'amigos'; // 'amigos' | 'recibidas' | 'enviadas' | 'buscar'
++let friendsSearchQuery = '';
++let friendsSearchResults = [];
++let friendsSearchLoading = false;
++
++// Perfil público de un amigo (o resultado de búsqueda) abierto en el
++// modal; null si no hay ninguno abierto. Ver friends.js.
++let friendProfileModalUserId = null;
++let friendProfileModalData = null;
+ 
+ let currentDetailReviews = [];
+ let currentResultsBaseList = [];
+diff --git a/lowloot-launcher/js/topbar.js b/lowloot-launcher/js/topbar.js
+index 28c8e2e..e025d4d 100644
+--- a/lowloot-launcher/js/topbar.js
++++ b/lowloot-launcher/js/topbar.js
+@@ -121,6 +121,24 @@ function initLoginButton() {
+ }
+ 
+ /* ---------- Notificaciones ---------- */
++// Backend real (/notifications, ver notification/* en el servidor): esto
++// reemplaza el array vacío fijo que había antes. friends.js reutiliza este
++// mismo sistema para avisar solicitudes de amistad (no crea el suyo).
++
++async function refreshNotifications() {
++  if (!currentUser) {
++    renderNotifBadge();
++    renderNotifList();
++    return;
++  }
++  try {
++    notifications = await LowlootAPI.getNotifications();
++  } catch (err) {
++    console.error('No se pudieron cargar las notificaciones', err);
++  }
++  renderNotifBadge();
++  renderNotifList();
++}
+ 
+ function unreadNotifCount() {
+   return notifications.filter((n) => !n.read).length;
+@@ -128,6 +146,7 @@ function unreadNotifCount() {
+ 
+ function renderNotifBadge() {
+   const badge = document.getElementById('notif-badge');
++  if (!badge) return;
+   const count = unreadNotifCount();
+   if (count > 0) {
+     badge.textContent = count > 9 ? '9+' : String(count);
+@@ -139,6 +158,7 @@ function renderNotifBadge() {
+ 
+ function renderNotifList() {
+   const list = document.getElementById('notif-list');
++  if (!list) return;
+   if (!notifications.length) {
+     list.innerHTML = `<p class="placeholder-text">No tenés notificaciones todavía.</p>`;
+     return;
+@@ -146,13 +166,13 @@ function renderNotifList() {
+   list.innerHTML = notifications
+     .map(
+       (n) => `
+-    <div class="notif-item ${n.read ? '' : 'unread'}" data-notif-id="${n.id}">
++    <button type="button" class="notif-item ${n.read ? '' : 'unread'}" data-notif-id="${n.id}" data-notif-type="${n.type}">
+       <span class="notif-dot"></span>
+       <div class="notif-item-text">
+-        <span class="notif-item-title">${n.title}</span>
+-        <span class="notif-item-time">${n.time}</span>
++        <span class="notif-item-title">${escapeHtml(n.title)}</span>
++        <span class="notif-item-time">${formatRelativeTime(n.createdAt)}</span>
+       </div>
+-    </div>
++    </button>
+   `
+     )
+     .join('');
+@@ -167,24 +187,47 @@ function initNotifications() {
+ 
+   trigger.addEventListener('click', (event) => {
+     event.stopPropagation();
++    const willOpen = !menu.classList.contains('open');
+     menu.classList.toggle('open');
++    if (willOpen) refreshNotifications();
+   });
+ 
+-  document.getElementById('notif-mark-read').addEventListener('click', (event) => {
++  document.getElementById('notif-mark-read').addEventListener('click', async (event) => {
+     event.stopPropagation();
+-    notifications.forEach((n) => (n.read = true));
+-    renderNotifBadge();
+-    renderNotifList();
++    try {
++      await LowlootAPI.markAllNotificationsRead();
++      notifications.forEach((n) => (n.read = true));
++      renderNotifBadge();
++      renderNotifList();
++    } catch (err) {
++      showToast(err.message || 'No se pudieron marcar como leídas');
++    }
+   });
+ 
+-  menu.addEventListener('click', (event) => {
++  menu.addEventListener('click', async (event) => {
+     const item = event.target.closest('.notif-item');
+     if (!item) return;
+     event.stopPropagation();
+-    const notif = notifications.find((n) => n.id === item.dataset.notifId);
+-    if (notif) notif.read = true;
+-    renderNotifBadge();
+-    renderNotifList();
++
++    const notifId = item.dataset.notifId;
++    const notif = notifications.find((n) => String(n.id) === String(notifId));
++    if (notif && !notif.read) {
++      notif.read = true;
++      renderNotifBadge();
++      renderNotifList();
++      LowlootAPI.markNotificationRead(notifId).catch(() => {
++        // Si falla, se corrige solo en el próximo refresh; no bloqueamos la UI por esto.
++      });
++    }
++
++    // Las notificaciones de Amigos llevan directo a la pestaña correspondiente.
++    const type = item.dataset.notifType;
++    if ((type === 'FRIEND_REQUEST' || type === 'FRIEND_ACCEPTED') && typeof renderFriendsView === 'function') {
++      menu.classList.remove('open');
++      friendsActiveTab = type === 'FRIEND_REQUEST' ? 'recibidas' : 'amigos';
++      activateView('amigos');
++      renderFriendsView();
++    }
+   });
+ }
+ 
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/auth/AuthController.java b/lowloot-server/src/main/java/com/lowloot/server/auth/AuthController.java
+index f5f2cc2..e8b4072 100644
+--- a/lowloot-server/src/main/java/com/lowloot/server/auth/AuthController.java
++++ b/lowloot-server/src/main/java/com/lowloot/server/auth/AuthController.java
+@@ -4,11 +4,13 @@ import com.lowloot.server.auth.dto.AuthResponse;
+ import com.lowloot.server.auth.dto.ChangePasswordRequest;
+ import com.lowloot.server.auth.dto.LoginRequest;
+ import com.lowloot.server.auth.dto.RegisterRequest;
++import com.lowloot.server.friends.FriendCodeGenerator;
+ import com.lowloot.server.profile.UserAvatarRepository;
+ import com.lowloot.server.wallet.Wallet;
+ import com.lowloot.server.wallet.WalletRepository;
+ import jakarta.validation.Valid;
+ import java.math.BigDecimal;
++import java.time.LocalDateTime;
+ import org.springframework.http.HttpStatus;
+ import org.springframework.http.ResponseEntity;
+ import org.springframework.security.crypto.password.PasswordEncoder;
+@@ -58,6 +60,8 @@ public class AuthController {
+         user.setEmail(request.email());
+         user.setPasswordHash(passwordEncoder.encode(request.password()));
+         user.setRole(Role.USER);
++        user.setFriendCode(generateUniqueFriendCode());
++        user.setLastActiveAt(LocalDateTime.now());
+         user = userRepository.save(user);
+ 
+         Wallet wallet = new Wallet(user.getId(), BigDecimal.ZERO);
+@@ -96,6 +100,21 @@ public class AuthController {
+         return ResponseEntity.noContent().build();
+     }
+ 
++    // Reintenta un puñado de veces por si el código al azar chocara contra
++    // uno ya existente (extremadamente improbable, pero la columna es
++    // UNIQUE así que hay que estar preparados). Si agota los intentos, deja
++    // que el último choque explote como error real en vez de seguir para
++    // siempre.
++    private String generateUniqueFriendCode() {
++        String code = FriendCodeGenerator.generate();
++        int attempts = 0;
++        while (userRepository.existsByFriendCode(code) && attempts < 10) {
++            code = FriendCodeGenerator.generate();
++            attempts++;
++        }
++        return code;
++    }
++
+     private AuthResponse toAuthResponse(User user, BigDecimal balance) {
+         boolean hasAvatar = userAvatarRepository.existsByUserId(user.getId());
+         return new AuthResponse(
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/auth/JwtAuthFilter.java b/lowloot-server/src/main/java/com/lowloot/server/auth/JwtAuthFilter.java
+index b66d5ed..a19c92b 100644
+--- a/lowloot-server/src/main/java/com/lowloot/server/auth/JwtAuthFilter.java
++++ b/lowloot-server/src/main/java/com/lowloot/server/auth/JwtAuthFilter.java
+@@ -5,6 +5,8 @@ import jakarta.servlet.ServletException;
+ import jakarta.servlet.http.HttpServletRequest;
+ import jakarta.servlet.http.HttpServletResponse;
+ import java.io.IOException;
++import java.time.Duration;
++import java.time.LocalDateTime;
+ import org.springframework.lang.NonNull;
+ import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+ import org.springframework.security.core.context.SecurityContextHolder;
+@@ -15,6 +17,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
+ @Component
+ public class JwtAuthFilter extends OncePerRequestFilter {
+ 
++    // Margen minimo entre escrituras de "ultima actividad" por usuario:
++    // evita un UPDATE en cada request autenticado (el launcher pega varios
++    // por segundo mientras se navega) sin perder precision real para el
++    // umbral de Online/Offline de Amigos (varios minutos, ver FriendService).
++    private static final Duration LAST_ACTIVE_UPDATE_MARGIN = Duration.ofSeconds(60);
++
+     private final JwtService jwtService;
+     private final UserRepository userRepository;
+ 
+@@ -48,6 +56,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
+                                 new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                         SecurityContextHolder.getContext().setAuthentication(authToken);
++                        touchLastActive(user);
+                     });
+                 }
+             }
+@@ -59,4 +68,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
+ 
+         filterChain.doFilter(request, response);
+     }
++
++    // Base del estado Online/Offline de Amigos (ver FriendService): sin
++    // WebSockets ni presencia en tiempo real, solo "ultima vez que hizo un
++    // request autenticado", con el margen de arriba para no escribir en
++    // cada request.
++    private void touchLastActive(User user) {
++        LocalDateTime now = LocalDateTime.now();
++        LocalDateTime last = user.getLastActiveAt();
++        if (last != null && Duration.between(last, now).compareTo(LAST_ACTIVE_UPDATE_MARGIN) < 0) {
++            return;
++        }
++        user.setLastActiveAt(now);
++        userRepository.save(user);
++    }
+ }
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/auth/User.java b/lowloot-server/src/main/java/com/lowloot/server/auth/User.java
+index b3dc2ea..f0a69a9 100644
+--- a/lowloot-server/src/main/java/com/lowloot/server/auth/User.java
++++ b/lowloot-server/src/main/java/com/lowloot/server/auth/User.java
+@@ -51,6 +51,21 @@ public class User implements UserDetails {
+     @Column(name = "display_name", length = 50)
+     private String displayName;
+ 
++    // Codigo de amigo unico y permanente (V6__friends.sql). Se genera al
++    // registrarse (ver AuthController + FriendCodeGenerator) y nunca
++    // cambia; es lo que un usuario le comparte a otro para agregarlo sin
++    // exponer su email.
++    @Column(name = "friend_code", nullable = false, unique = true, length = 12)
++    private String friendCode;
++
++    // Ultima vez que este usuario hizo un request autenticado (la
++    // actualiza JwtAuthFilter, con un margen minimo entre escrituras). Es
++    // la base del estado Online/Offline de Amigos: no hay WebSockets ni
++    // presencia en tiempo real, solo "hace menos de N minutos que estuvo
++    // activo".
++    @Column(name = "last_active_at", nullable = false)
++    private LocalDateTime lastActiveAt;
++
+     public User() {
+     }
+ 
+@@ -106,6 +121,22 @@ public class User implements UserDetails {
+         this.displayName = displayName;
+     }
+ 
++    public String getFriendCode() {
++        return friendCode;
++    }
++
++    public void setFriendCode(String friendCode) {
++        this.friendCode = friendCode;
++    }
++
++    public LocalDateTime getLastActiveAt() {
++        return lastActiveAt;
++    }
++
++    public void setLastActiveAt(LocalDateTime lastActiveAt) {
++        this.lastActiveAt = lastActiveAt;
++    }
++
+     // Nombre a mostrar en la UI: el visible si esta configurado, o el
+     // username como fallback. Evita repetir este "si es null, uso username"
+     // en cada controller que arma una respuesta con el nombre del usuario.
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/auth/UserRepository.java b/lowloot-server/src/main/java/com/lowloot/server/auth/UserRepository.java
+index 8b8998f..6b0d7ee 100644
+--- a/lowloot-server/src/main/java/com/lowloot/server/auth/UserRepository.java
++++ b/lowloot-server/src/main/java/com/lowloot/server/auth/UserRepository.java
+@@ -1,7 +1,10 @@
+ package com.lowloot.server.auth;
+ 
++import java.util.List;
+ import java.util.Optional;
+ import org.springframework.data.jpa.repository.JpaRepository;
++import org.springframework.data.jpa.repository.Query;
++import org.springframework.data.repository.query.Param;
+ 
+ public interface UserRepository extends JpaRepository<User, Long> {
+ 
+@@ -10,4 +13,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
+     boolean existsByEmail(String email);
+ 
+     boolean existsByUsername(String username);
++
++    boolean existsByFriendCode(String friendCode);
++
++    Optional<User> findByFriendCodeIgnoreCase(String friendCode);
++
++    // Busqueda de Amigos por nombre visible (o username como respaldo,
++    // para usuarios que nunca configuraron un nombre visible propio).
++    // Excluye al que busca para no encontrarse a si mismo en los resultados.
++    @Query("select u from User u where u.id <> :excludeId "
++            + "and lower(coalesce(u.displayName, u.username)) like lower(concat('%', :query, '%')) "
++            + "order by coalesce(u.displayName, u.username)")
++    List<User> searchByDisplayName(@Param("query") String query, @Param("excludeId") Long excludeId);
+ }
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/friends/FriendCodeGenerator.java b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendCodeGenerator.java
+new file mode 100644
+index 0000000..ed113f0
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendCodeGenerator.java
+@@ -0,0 +1,26 @@
++package com.lowloot.server.friends;
++
++import java.security.SecureRandom;
++
++// Genera codigos de amigo legibles: 8 caracteres en mayuscula, sin
++// caracteres ambiguos (0/O, 1/I/L) para que sea facil compartirlos de
++// palabra o escritos a mano. La unicidad real la garantiza la columna
++// `users.friend_code` (UNIQUE, V6__friends.sql); quien llama a esto
++// reintenta si por casualidad ya existe (ver AuthController).
++public final class FriendCodeGenerator {
++
++    private static final String ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
++    private static final int LENGTH = 8;
++    private static final SecureRandom RANDOM = new SecureRandom();
++
++    private FriendCodeGenerator() {
++    }
++
++    public static String generate() {
++        StringBuilder sb = new StringBuilder(LENGTH);
++        for (int i = 0; i < LENGTH; i++) {
++            sb.append(ALPHABET.charAt(RANDOM.nextInt(ALPHABET.length())));
++        }
++        return sb.toString();
++    }
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/friends/FriendCodeResponse.java b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendCodeResponse.java
+new file mode 100644
+index 0000000..6e04778
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendCodeResponse.java
+@@ -0,0 +1,4 @@
++package com.lowloot.server.friends;
++
++public record FriendCodeResponse(String friendCode) {
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/friends/FriendController.java b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendController.java
+new file mode 100644
+index 0000000..b370f82
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendController.java
+@@ -0,0 +1,102 @@
++package com.lowloot.server.friends;
++
++import com.lowloot.server.auth.User;
++import jakarta.validation.Valid;
++import java.util.List;
++import org.springframework.http.ResponseEntity;
++import org.springframework.security.core.annotation.AuthenticationPrincipal;
++import org.springframework.web.bind.annotation.DeleteMapping;
++import org.springframework.web.bind.annotation.GetMapping;
++import org.springframework.web.bind.annotation.PathVariable;
++import org.springframework.web.bind.annotation.PostMapping;
++import org.springframework.web.bind.annotation.RequestBody;
++import org.springframework.web.bind.annotation.RequestMapping;
++import org.springframework.web.bind.annotation.RequestParam;
++import org.springframework.web.bind.annotation.RestController;
++
++@RestController
++@RequestMapping("/friends")
++public class FriendController {
++
++    private final FriendService friendService;
++
++    public FriendController(FriendService friendService) {
++        this.friendService = friendService;
++    }
++
++    @GetMapping("/me/code")
++    public FriendCodeResponse myCode(@AuthenticationPrincipal User user) {
++        return new FriendCodeResponse(user.getFriendCode());
++    }
++
++    @GetMapping("/search")
++    public List<FriendSearchResult> search(@AuthenticationPrincipal User user, @RequestParam("q") String query) {
++        return friendService.search(user, query);
++    }
++
++    /* ---------- Solicitudes ---------- */
++
++    @PostMapping("/requests")
++    public FriendRequestResponse sendRequest(
++            @AuthenticationPrincipal User user,
++            @Valid @RequestBody SendFriendRequestRequest request) {
++        return friendService.sendRequest(user, request.userId());
++    }
++
++    @GetMapping("/requests/received")
++    public List<FriendRequestResponse> received(@AuthenticationPrincipal User user) {
++        return friendService.listReceived(user);
++    }
++
++    @GetMapping("/requests/sent")
++    public List<FriendRequestResponse> sent(@AuthenticationPrincipal User user) {
++        return friendService.listSent(user);
++    }
++
++    // Fuente del contador de solicitudes pendientes (requisito 5): se
++    // consulta al arrancar el launcher y después de cada acción, así que
++    // sobrevive a cerrar y volver a abrir sin depender solo del frontend.
++    @GetMapping("/requests/pending-count")
++    public PendingCountResponse pendingCount(@AuthenticationPrincipal User user) {
++        return new PendingCountResponse(friendService.pendingReceivedCount(user.getId()));
++    }
++
++    @PostMapping("/requests/{id}/accept")
++    public ResponseEntity<Void> accept(@AuthenticationPrincipal User user, @PathVariable Long id) {
++        friendService.acceptRequest(user, id);
++        return ResponseEntity.noContent().build();
++    }
++
++    @PostMapping("/requests/{id}/reject")
++    public ResponseEntity<Void> reject(@AuthenticationPrincipal User user, @PathVariable Long id) {
++        friendService.rejectRequest(user, id);
++        return ResponseEntity.noContent().build();
++    }
++
++    @DeleteMapping("/requests/{id}")
++    public ResponseEntity<Void> cancel(@AuthenticationPrincipal User user, @PathVariable Long id) {
++        friendService.cancelRequest(user, id);
++        return ResponseEntity.noContent().build();
++    }
++
++    /* ---------- Amigos ---------- */
++
++    @GetMapping
++    public List<FriendResponse> myFriends(@AuthenticationPrincipal User user) {
++        return friendService.listFriends(user);
++    }
++
++    // Va después de /requests/** y /search a propósito (orden de los
++    // métodos no afecta el ruteo de Spring, pero mantiene juntas las rutas
++    // fijas antes que esta con path variable, para que sea fácil de leer).
++    @GetMapping("/{userId}")
++    public FriendProfileResponse profile(@AuthenticationPrincipal User user, @PathVariable Long userId) {
++        return friendService.publicProfile(user, userId);
++    }
++
++    @DeleteMapping("/{userId}")
++    public ResponseEntity<Void> remove(@AuthenticationPrincipal User user, @PathVariable Long userId) {
++        friendService.removeFriend(user, userId);
++        return ResponseEntity.noContent().build();
++    }
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/friends/FriendProfileResponse.java b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendProfileResponse.java
+new file mode 100644
+index 0000000..4a98393
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendProfileResponse.java
+@@ -0,0 +1,16 @@
++package com.lowloot.server.friends;
++
++import java.time.LocalDateTime;
++
++// Perfil publico de otro usuario (abierto desde la lista de Amigos o
++// desde un resultado de búsqueda). `isFriend` le permite al frontend
++// mostrar "Eliminar amigo" en vez de "Agregar" cuando corresponde.
++public record FriendProfileResponse(
++        Long id,
++        String username,
++        String displayName,
++        String avatarUrl,
++        boolean isFriend,
++        boolean online,
++        LocalDateTime lastActiveAt) {
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/friends/FriendRequest.java b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendRequest.java
+new file mode 100644
+index 0000000..d69b2dd
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendRequest.java
+@@ -0,0 +1,55 @@
++package com.lowloot.server.friends;
++
++import jakarta.persistence.Column;
++import jakarta.persistence.Entity;
++import jakarta.persistence.GeneratedValue;
++import jakarta.persistence.GenerationType;
++import jakarta.persistence.Id;
++import jakarta.persistence.Table;
++import java.time.LocalDateTime;
++
++// Mapea `friend_requests` (V6__friends.sql): una solicitud de amistad
++// pendiente entre dos usuarios. Al aceptarla se borra esta fila y se crea
++// una en `friendships`; al rechazarla o cancelarla se borra sin más (ver
++// FriendService).
++@Entity
++@Table(name = "friend_requests")
++public class FriendRequest {
++
++    @Id
++    @GeneratedValue(strategy = GenerationType.IDENTITY)
++    private Long id;
++
++    @Column(name = "sender_id", nullable = false)
++    private Long senderId;
++
++    @Column(name = "receiver_id", nullable = false)
++    private Long receiverId;
++
++    @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
++    private LocalDateTime createdAt;
++
++    public FriendRequest() {
++    }
++
++    public FriendRequest(Long senderId, Long receiverId) {
++        this.senderId = senderId;
++        this.receiverId = receiverId;
++    }
++
++    public Long getId() {
++        return id;
++    }
++
++    public Long getSenderId() {
++        return senderId;
++    }
++
++    public Long getReceiverId() {
++        return receiverId;
++    }
++
++    public LocalDateTime getCreatedAt() {
++        return createdAt;
++    }
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/friends/FriendRequestRepository.java b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendRequestRepository.java
+new file mode 100644
+index 0000000..a06863a
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendRequestRepository.java
+@@ -0,0 +1,22 @@
++package com.lowloot.server.friends;
++
++import java.util.List;
++import java.util.Optional;
++import org.springframework.data.jpa.repository.JpaRepository;
++
++public interface FriendRequestRepository extends JpaRepository<FriendRequest, Long> {
++
++    Optional<FriendRequest> findBySenderIdAndReceiverId(Long senderId, Long receiverId);
++
++    boolean existsBySenderIdAndReceiverId(Long senderId, Long receiverId);
++
++    List<FriendRequest> findByReceiverIdOrderByCreatedAtDesc(Long receiverId);
++
++    List<FriendRequest> findBySenderIdOrderByCreatedAtDesc(Long senderId);
++
++    // Fuente de verdad del contador de la pestaña Amigos (requisito 5): se
++    // deriva directamente de las solicitudes pendientes reales, no de si
++    // el usuario marco notificaciones como leidas, así que aceptar o
++    // rechazar es lo único que lo mueve.
++    long countByReceiverId(Long receiverId);
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/friends/FriendRequestResponse.java b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendRequestResponse.java
+new file mode 100644
+index 0000000..7adc47d
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendRequestResponse.java
+@@ -0,0 +1,15 @@
++package com.lowloot.server.friends;
++
++import java.time.LocalDateTime;
++
++// Sirve tanto para "recibidas" como para "enviadas": userId/username/etc.
++// son siempre los del OTRO usuario (quien envió, si es una recibida; a
++// quien se le envió, si es una enviada), nunca los del usuario logueado.
++public record FriendRequestResponse(
++        Long id,
++        Long userId,
++        String username,
++        String displayName,
++        String avatarUrl,
++        LocalDateTime createdAt) {
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/friends/FriendResponse.java b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendResponse.java
+new file mode 100644
+index 0000000..ce5244a
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendResponse.java
+@@ -0,0 +1,12 @@
++package com.lowloot.server.friends;
++
++import java.time.LocalDateTime;
++
++public record FriendResponse(
++        Long id,
++        String username,
++        String displayName,
++        String avatarUrl,
++        boolean online,
++        LocalDateTime lastActiveAt) {
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/friends/FriendSearchResult.java b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendSearchResult.java
+new file mode 100644
+index 0000000..f4f3458
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendSearchResult.java
+@@ -0,0 +1,15 @@
++package com.lowloot.server.friends;
++
++// `status` le dice al frontend qué botón mostrar sin que tenga que cruzar
++// listas por su cuenta: NONE (puede enviar solicitud), REQUEST_SENT (ya le
++// mandó una, esperando), REQUEST_RECEIVED (ese usuario ya le mandó una a
++// él), FRIENDS (ya son amigos).
++public record FriendSearchResult(
++        Long id,
++        String username,
++        String displayName,
++        String friendCode,
++        String avatarUrl,
++        boolean online,
++        String status) {
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/friends/FriendService.java b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendService.java
+new file mode 100644
+index 0000000..f8ed650
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendService.java
+@@ -0,0 +1,333 @@
++package com.lowloot.server.friends;
++
++import com.lowloot.server.auth.User;
++import com.lowloot.server.auth.UserRepository;
++import com.lowloot.server.notification.NotificationService;
++import com.lowloot.server.profile.UserAvatarRepository;
++import java.time.Duration;
++import java.time.LocalDateTime;
++import java.util.Comparator;
++import java.util.LinkedHashMap;
++import java.util.List;
++import java.util.Map;
++import java.util.Objects;
++import java.util.function.Function;
++import java.util.stream.Collectors;
++import org.springframework.dao.DataIntegrityViolationException;
++import org.springframework.http.HttpStatus;
++import org.springframework.stereotype.Service;
++import org.springframework.transaction.annotation.Transactional;
++import org.springframework.web.server.ResponseStatusException;
++
++@Service
++public class FriendService {
++
++    // Umbral para considerar a alguien "En línea": si tuvo actividad
++    // autenticada (ver JwtAuthFilter) dentro de este margen. No hay
++    // presencia en tiempo real (sin WebSockets), es una aproximación
++    // simple y suficiente, tal como se pidió.
++    private static final Duration ONLINE_THRESHOLD = Duration.ofMinutes(5);
++    private static final int SEARCH_LIMIT = 20;
++
++    private static final String TYPE_FRIEND_REQUEST = "FRIEND_REQUEST";
++    private static final String TYPE_FRIEND_ACCEPTED = "FRIEND_ACCEPTED";
++
++    private final UserRepository userRepository;
++    private final FriendRequestRepository friendRequestRepository;
++    private final FriendshipRepository friendshipRepository;
++    private final UserAvatarRepository userAvatarRepository;
++    private final NotificationService notificationService;
++
++    public FriendService(
++            UserRepository userRepository,
++            FriendRequestRepository friendRequestRepository,
++            FriendshipRepository friendshipRepository,
++            UserAvatarRepository userAvatarRepository,
++            NotificationService notificationService) {
++        this.userRepository = userRepository;
++        this.friendRequestRepository = friendRequestRepository;
++        this.friendshipRepository = friendshipRepository;
++        this.userAvatarRepository = userAvatarRepository;
++        this.notificationService = notificationService;
++    }
++
++    /* ---------- Búsqueda ---------- */
++
++    // Por nombre visible (parcial, insensible a mayúsculas) o por código
++    // de amigo (exacto). El código va primero: si alguien pega un código
++    // completo, esperamos que sea justo a esa persona a la que busca.
++    public List<FriendSearchResult> search(User currentUser, String rawQuery) {
++        String query = rawQuery == null ? "" : rawQuery.trim();
++        if (query.isEmpty()) return List.of();
++
++        LinkedHashMap<Long, User> results = new LinkedHashMap<>();
++
++        userRepository.findByFriendCodeIgnoreCase(query).ifPresent(u -> {
++            if (!u.getId().equals(currentUser.getId())) results.put(u.getId(), u);
++        });
++
++        userRepository.searchByDisplayName(query, currentUser.getId())
++                .forEach(u -> results.putIfAbsent(u.getId(), u));
++
++        return results.values().stream()
++                .limit(SEARCH_LIMIT)
++                .map(u -> toSearchResult(currentUser, u))
++                .toList();
++    }
++
++    /* ---------- Solicitudes ---------- */
++
++    @Transactional
++    public FriendRequestResponse sendRequest(User sender, Long receiverId) {
++        if (receiverId == null) {
++            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Falta indicar a quién enviarle la solicitud");
++        }
++        if (receiverId.equals(sender.getId())) {
++            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No podés enviarte una solicitud de amistad a vos mismo");
++        }
++
++        User receiver = userRepository.findById(receiverId)
++                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
++
++        if (isFriendPair(sender.getId(), receiverId)) {
++            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya son amigos");
++        }
++        if (friendRequestRepository.existsBySenderIdAndReceiverId(sender.getId(), receiverId)) {
++            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya le enviaste una solicitud a este usuario");
++        }
++        if (friendRequestRepository.existsBySenderIdAndReceiverId(receiverId, sender.getId())) {
++            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este usuario ya te envió una solicitud: respondela desde \"Recibidas\"");
++        }
++
++        FriendRequest request = new FriendRequest(sender.getId(), receiverId);
++        try {
++            request = friendRequestRepository.save(request);
++        } catch (DataIntegrityViolationException ex) {
++            // Carrera entre dos requests simultáneos creando la misma
++            // solicitud: la unique constraint (sender_id, receiver_id) la
++            // frena en la base: se lo informamos como conflicto en vez de
++            // un 500 genérico.
++            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe una solicitud entre estos usuarios");
++        }
++
++        notificationService.create(
++                receiver.getId(),
++                TYPE_FRIEND_REQUEST,
++                sender,
++                request.getId(),
++                sender.getEffectiveDisplayName() + " te envió una solicitud de amistad",
++                null);
++
++        return toRequestResponse(request, sender, receiver, true);
++    }
++
++    public List<FriendRequestResponse> listReceived(User currentUser) {
++        List<FriendRequest> requests = friendRequestRepository.findByReceiverIdOrderByCreatedAtDesc(currentUser.getId());
++        if (requests.isEmpty()) return List.of();
++
++        Map<Long, User> sendersById = usersById(requests.stream().map(FriendRequest::getSenderId).toList());
++
++        return requests.stream()
++                .map(r -> {
++                    User sender = sendersById.get(r.getSenderId());
++                    if (sender == null) return null; // cuenta borrada entre medio: no se muestra
++                    return toRequestResponse(r, sender, currentUser, false);
++                })
++                .filter(Objects::nonNull)
++                .toList();
++    }
++
++    public List<FriendRequestResponse> listSent(User currentUser) {
++        List<FriendRequest> requests = friendRequestRepository.findBySenderIdOrderByCreatedAtDesc(currentUser.getId());
++        if (requests.isEmpty()) return List.of();
++
++        Map<Long, User> receiversById = usersById(requests.stream().map(FriendRequest::getReceiverId).toList());
++
++        return requests.stream()
++                .map(r -> {
++                    User receiver = receiversById.get(r.getReceiverId());
++                    if (receiver == null) return null;
++                    return toRequestResponse(r, currentUser, receiver, true);
++                })
++                .filter(Objects::nonNull)
++                .toList();
++    }
++
++    public long pendingReceivedCount(Long userId) {
++        return friendRequestRepository.countByReceiverId(userId);
++    }
++
++    @Transactional
++    public void acceptRequest(User currentUser, Long requestId) {
++        FriendRequest request = ownedReceivedRequest(currentUser, requestId);
++
++        long low = Math.min(request.getSenderId(), request.getReceiverId());
++        long high = Math.max(request.getSenderId(), request.getReceiverId());
++
++        if (!friendshipRepository.existsByUserIdLowAndUserIdHigh(low, high)) {
++            try {
++                friendshipRepository.save(new Friendship(low, high));
++            } catch (DataIntegrityViolationException ex) {
++                // Ya se había creado (dos aceptaciones/casos borde en
++                // simultáneo): no es un error real, la amistad ya existe.
++            }
++        }
++
++        notificationService.deleteByReference(TYPE_FRIEND_REQUEST, request.getId());
++        friendRequestRepository.delete(request);
++
++        userRepository.findById(request.getSenderId()).ifPresent(sender ->
++                notificationService.create(
++                        sender.getId(),
++                        TYPE_FRIEND_ACCEPTED,
++                        currentUser,
++                        currentUser.getId(),
++                        currentUser.getEffectiveDisplayName() + " aceptó tu solicitud de amistad",
++                        null));
++    }
++
++    @Transactional
++    public void rejectRequest(User currentUser, Long requestId) {
++        FriendRequest request = ownedReceivedRequest(currentUser, requestId);
++        notificationService.deleteByReference(TYPE_FRIEND_REQUEST, request.getId());
++        friendRequestRepository.delete(request);
++    }
++
++    // El que envió la solicitud puede arrepentirse antes de que el otro
++    // responda; no estaba pedido explícitamente pero se desprende de
++    // "ver solicitudes enviadas" (si no, quedarían ahí para siempre).
++    @Transactional
++    public void cancelRequest(User currentUser, Long requestId) {
++        FriendRequest request = friendRequestRepository.findById(requestId)
++                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitud no encontrada"));
++        if (!request.getSenderId().equals(currentUser.getId())) {
++            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Esta solicitud no te pertenece");
++        }
++        notificationService.deleteByReference(TYPE_FRIEND_REQUEST, request.getId());
++        friendRequestRepository.delete(request);
++    }
++
++    private FriendRequest ownedReceivedRequest(User currentUser, Long requestId) {
++        FriendRequest request = friendRequestRepository.findById(requestId)
++                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitud no encontrada"));
++        if (!request.getReceiverId().equals(currentUser.getId())) {
++            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Esta solicitud no te pertenece");
++        }
++        return request;
++    }
++
++    /* ---------- Amigos ---------- */
++
++    public List<FriendResponse> listFriends(User currentUser) {
++        List<Friendship> friendships = friendshipRepository.findAllForUser(currentUser.getId());
++        if (friendships.isEmpty()) return List.of();
++
++        List<Long> friendIds = friendships.stream()
++                .map(f -> f.getUserIdLow().equals(currentUser.getId()) ? f.getUserIdHigh() : f.getUserIdLow())
++                .toList();
++
++        Map<Long, User> usersById = usersById(friendIds);
++
++        return friendIds.stream()
++                .map(usersById::get)
++                .filter(Objects::nonNull)
++                .sorted(Comparator.comparing(User::getEffectiveDisplayName, String.CASE_INSENSITIVE_ORDER))
++                .map(this::toFriendResponse)
++                .toList();
++    }
++
++    public FriendProfileResponse publicProfile(User currentUser, Long userId) {
++        User target = userRepository.findById(userId)
++                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
++
++        boolean hasAvatar = userAvatarRepository.existsByUserId(target.getId());
++        return new FriendProfileResponse(
++                target.getId(),
++                target.getDisplayUsername(),
++                target.getEffectiveDisplayName(),
++                hasAvatar ? "/users/" + target.getId() + "/avatar" : null,
++                isFriendPair(currentUser.getId(), target.getId()),
++                isOnline(target),
++                target.getLastActiveAt());
++    }
++
++    @Transactional
++    public void removeFriend(User currentUser, Long friendUserId) {
++        if (friendUserId.equals(currentUser.getId())) {
++            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Operación inválida");
++        }
++        long low = Math.min(currentUser.getId(), friendUserId);
++        long high = Math.max(currentUser.getId(), friendUserId);
++
++        Friendship friendship = friendshipRepository.findByUserIdLowAndUserIdHigh(low, high)
++                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No son amigos"));
++
++        friendshipRepository.delete(friendship);
++    }
++
++    /* ---------- Helpers ---------- */
++
++    private boolean isFriendPair(Long a, Long b) {
++        long low = Math.min(a, b);
++        long high = Math.max(a, b);
++        return friendshipRepository.existsByUserIdLowAndUserIdHigh(low, high);
++    }
++
++    private boolean isOnline(User user) {
++        LocalDateTime last = user.getLastActiveAt();
++        return last != null && Duration.between(last, LocalDateTime.now()).compareTo(ONLINE_THRESHOLD) <= 0;
++    }
++
++    private Map<Long, User> usersById(List<Long> ids) {
++        if (ids.isEmpty()) return Map.of();
++        return userRepository.findAllById(ids).stream()
++                .collect(Collectors.toMap(User::getId, Function.identity()));
++    }
++
++    private String avatarUrl(User user) {
++        return userAvatarRepository.existsByUserId(user.getId()) ? "/users/" + user.getId() + "/avatar" : null;
++    }
++
++    private FriendSearchResult toSearchResult(User currentUser, User target) {
++        String status;
++        if (isFriendPair(currentUser.getId(), target.getId())) {
++            status = "FRIENDS";
++        } else if (friendRequestRepository.existsBySenderIdAndReceiverId(currentUser.getId(), target.getId())) {
++            status = "REQUEST_SENT";
++        } else if (friendRequestRepository.existsBySenderIdAndReceiverId(target.getId(), currentUser.getId())) {
++            status = "REQUEST_RECEIVED";
++        } else {
++            status = "NONE";
++        }
++
++        return new FriendSearchResult(
++                target.getId(),
++                target.getDisplayUsername(),
++                target.getEffectiveDisplayName(),
++                target.getFriendCode(),
++                avatarUrl(target),
++                isOnline(target),
++                status);
++    }
++
++    private FriendResponse toFriendResponse(User friend) {
++        return new FriendResponse(
++                friend.getId(),
++                friend.getDisplayUsername(),
++                friend.getEffectiveDisplayName(),
++                avatarUrl(friend),
++                isOnline(friend),
++                friend.getLastActiveAt());
++    }
++
++    private FriendRequestResponse toRequestResponse(FriendRequest request, User sender, User receiver, boolean outgoing) {
++        User other = outgoing ? receiver : sender;
++        return new FriendRequestResponse(
++                request.getId(),
++                other.getId(),
++                other.getDisplayUsername(),
++                other.getEffectiveDisplayName(),
++                avatarUrl(other),
++                request.getCreatedAt());
++    }
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/friends/Friendship.java b/lowloot-server/src/main/java/com/lowloot/server/friends/Friendship.java
+new file mode 100644
+index 0000000..52691bf
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/friends/Friendship.java
+@@ -0,0 +1,58 @@
++package com.lowloot.server.friends;
++
++import jakarta.persistence.Column;
++import jakarta.persistence.Entity;
++import jakarta.persistence.GeneratedValue;
++import jakarta.persistence.GenerationType;
++import jakarta.persistence.Id;
++import jakarta.persistence.Table;
++import java.time.LocalDateTime;
++
++// Mapea `friendships` (V6__friends.sql): UNA SOLA fila logica por par de
++// usuarios amigos (userIdLow siempre el menor id, ver constraint
++// chk_friendships_order). No hay una fila por direccion -- evita
++// duplicados y hace que borrar la amistad sea borrar una sola fila.
++@Entity
++@Table(name = "friendships")
++public class Friendship {
++
++    @Id
++    @GeneratedValue(strategy = GenerationType.IDENTITY)
++    private Long id;
++
++    @Column(name = "user_id_low", nullable = false)
++    private Long userIdLow;
++
++    @Column(name = "user_id_high", nullable = false)
++    private Long userIdHigh;
++
++    @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
++    private LocalDateTime createdAt;
++
++    public Friendship() {
++    }
++
++    // A proposito no valida el orden aca: FriendService siempre arma los
++    // ids con Math.min/Math.max antes de instanciar, y la base tiene el
++    // mismo chequeo como red de seguridad (chk_friendships_order).
++    public Friendship(Long userIdLow, Long userIdHigh) {
++        this.userIdLow = userIdLow;
++        this.userIdHigh = userIdHigh;
++    }
++
++    public Long getId() {
++        return id;
++    }
++
++    public Long getUserIdLow() {
++        return userIdLow;
++    }
++
++    public Long getUserIdHigh() {
++        return userIdHigh;
++    }
++
++    public LocalDateTime getCreatedAt() {
++        return createdAt;
++    }
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/friends/FriendshipRepository.java b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendshipRepository.java
+new file mode 100644
+index 0000000..ee81c71
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/friends/FriendshipRepository.java
+@@ -0,0 +1,17 @@
++package com.lowloot.server.friends;
++
++import java.util.List;
++import java.util.Optional;
++import org.springframework.data.jpa.repository.JpaRepository;
++import org.springframework.data.jpa.repository.Query;
++import org.springframework.data.repository.query.Param;
++
++public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
++
++    Optional<Friendship> findByUserIdLowAndUserIdHigh(Long userIdLow, Long userIdHigh);
++
++    boolean existsByUserIdLowAndUserIdHigh(Long userIdLow, Long userIdHigh);
++
++    @Query("select f from Friendship f where f.userIdLow = :userId or f.userIdHigh = :userId")
++    List<Friendship> findAllForUser(@Param("userId") Long userId);
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/friends/PendingCountResponse.java b/lowloot-server/src/main/java/com/lowloot/server/friends/PendingCountResponse.java
+new file mode 100644
+index 0000000..6dfefd9
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/friends/PendingCountResponse.java
+@@ -0,0 +1,4 @@
++package com.lowloot.server.friends;
++
++public record PendingCountResponse(long count) {
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/friends/SendFriendRequestRequest.java b/lowloot-server/src/main/java/com/lowloot/server/friends/SendFriendRequestRequest.java
+new file mode 100644
+index 0000000..36430cc
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/friends/SendFriendRequestRequest.java
+@@ -0,0 +1,6 @@
++package com.lowloot.server.friends;
++
++import jakarta.validation.constraints.NotNull;
++
++public record SendFriendRequestRequest(@NotNull Long userId) {
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/notification/Notification.java b/lowloot-server/src/main/java/com/lowloot/server/notification/Notification.java
+new file mode 100644
+index 0000000..c650733
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/notification/Notification.java
+@@ -0,0 +1,123 @@
++package com.lowloot.server.notification;
++
++import jakarta.persistence.Column;
++import jakarta.persistence.Entity;
++import jakarta.persistence.GeneratedValue;
++import jakarta.persistence.GenerationType;
++import jakarta.persistence.Id;
++import jakarta.persistence.Table;
++import java.time.LocalDateTime;
++
++// Mapea `notifications` (V6__friends.sql). Primera vez que existe una
++// tabla real para esto en Lowloot (antes solo había un array vacío en el
++// frontend, ver state.js) -- se diseña genérica (type/actorUserId/
++// referenceId) a propósito para que otras funcionalidades a futuro la
++// reutilicen en vez de crear su propio sistema, tal como se pidió para
++// Amigos.
++@Entity
++@Table(name = "notifications")
++public class Notification {
++
++    @Id
++    @GeneratedValue(strategy = GenerationType.IDENTITY)
++    private Long id;
++
++    @Column(name = "user_id", nullable = false)
++    private Long userId;
++
++    // Tipo de evento: "FRIEND_REQUEST", "FRIEND_ACCEPTED", etc. Un tipo
++    // nuevo a futuro no requiere ninguna migración ni tabla nueva.
++    @Column(nullable = false, length = 40)
++    private String type;
++
++    // Quién generó la notificación (quien envió la solicitud, quien
++    // aceptó, etc). Nullable porque no todo tipo de notificación futuro
++    // tiene necesariamente un actor humano.
++    @Column(name = "actor_user_id")
++    private Long actorUserId;
++
++    // Id del recurso relacionado (ej. el id de la FriendRequest), para
++    // poder encontrar y borrar/actualizar la notificación correspondiente
++    // cuando ese recurso cambia de estado (ver NotificationService).
++    @Column(name = "reference_id")
++    private Long referenceId;
++
++    @Column(nullable = false, length = 200)
++    private String title;
++
++    @Column(length = 500)
++    private String body;
++
++    @Column(nullable = false)
++    private boolean read = false;
++
++    @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
++    private LocalDateTime createdAt;
++
++    public Notification() {
++    }
++
++    public Long getId() {
++        return id;
++    }
++
++    public Long getUserId() {
++        return userId;
++    }
++
++    public void setUserId(Long userId) {
++        this.userId = userId;
++    }
++
++    public String getType() {
++        return type;
++    }
++
++    public void setType(String type) {
++        this.type = type;
++    }
++
++    public Long getActorUserId() {
++        return actorUserId;
++    }
++
++    public void setActorUserId(Long actorUserId) {
++        this.actorUserId = actorUserId;
++    }
++
++    public Long getReferenceId() {
++        return referenceId;
++    }
++
++    public void setReferenceId(Long referenceId) {
++        this.referenceId = referenceId;
++    }
++
++    public String getTitle() {
++        return title;
++    }
++
++    public void setTitle(String title) {
++        this.title = title;
++    }
++
++    public String getBody() {
++        return body;
++    }
++
++    public void setBody(String body) {
++        this.body = body;
++    }
++
++    public boolean isRead() {
++        return read;
++    }
++
++    public void setRead(boolean read) {
++        this.read = read;
++    }
++
++    public LocalDateTime getCreatedAt() {
++        return createdAt;
++    }
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/notification/NotificationController.java b/lowloot-server/src/main/java/com/lowloot/server/notification/NotificationController.java
+new file mode 100644
+index 0000000..d5d7c07
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/notification/NotificationController.java
+@@ -0,0 +1,44 @@
++package com.lowloot.server.notification;
++
++import com.lowloot.server.auth.User;
++import java.util.List;
++import org.springframework.http.ResponseEntity;
++import org.springframework.security.core.annotation.AuthenticationPrincipal;
++import org.springframework.web.bind.annotation.GetMapping;
++import org.springframework.web.bind.annotation.PathVariable;
++import org.springframework.web.bind.annotation.PostMapping;
++import org.springframework.web.bind.annotation.RequestMapping;
++import org.springframework.web.bind.annotation.RestController;
++
++@RestController
++@RequestMapping("/notifications")
++public class NotificationController {
++
++    private final NotificationService notificationService;
++
++    public NotificationController(NotificationService notificationService) {
++        this.notificationService = notificationService;
++    }
++
++    @GetMapping
++    public List<NotificationResponse> list(@AuthenticationPrincipal User user) {
++        return notificationService.listForUser(user.getId());
++    }
++
++    @GetMapping("/unread-count")
++    public UnreadCountResponse unreadCount(@AuthenticationPrincipal User user) {
++        return new UnreadCountResponse(notificationService.unreadCount(user.getId()));
++    }
++
++    @PostMapping("/{id}/read")
++    public ResponseEntity<Void> markRead(@AuthenticationPrincipal User user, @PathVariable Long id) {
++        notificationService.markRead(user.getId(), id);
++        return ResponseEntity.noContent().build();
++    }
++
++    @PostMapping("/read-all")
++    public ResponseEntity<Void> markAllRead(@AuthenticationPrincipal User user) {
++        notificationService.markAllRead(user.getId());
++        return ResponseEntity.noContent().build();
++    }
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/notification/NotificationRepository.java b/lowloot-server/src/main/java/com/lowloot/server/notification/NotificationRepository.java
+new file mode 100644
+index 0000000..da92685
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/notification/NotificationRepository.java
+@@ -0,0 +1,27 @@
++package com.lowloot.server.notification;
++
++import java.util.List;
++import java.util.Optional;
++import org.springframework.data.jpa.repository.JpaRepository;
++import org.springframework.data.jpa.repository.Modifying;
++import org.springframework.data.jpa.repository.Query;
++import org.springframework.data.repository.query.Param;
++
++public interface NotificationRepository extends JpaRepository<Notification, Long> {
++
++    List<Notification> findByUserIdOrderByCreatedAtDesc(Long userId);
++
++    long countByUserIdAndReadFalse(Long userId);
++
++    Optional<Notification> findByIdAndUserId(Long id, Long userId);
++
++    // Usado al aceptar/rechazar/cancelar una solicitud de amistad: la
++    // notificación de esa solicitud puntual deja de tener sentido (ya no
++    // hay nada que aceptar/rechazar), así que se borra en vez de quedar
++    // como leída para siempre.
++    void deleteByTypeAndReferenceId(String type, Long referenceId);
++
++    @Modifying
++    @Query("update Notification n set n.read = true where n.userId = :userId and n.read = false")
++    int markAllReadForUser(@Param("userId") Long userId);
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/notification/NotificationResponse.java b/lowloot-server/src/main/java/com/lowloot/server/notification/NotificationResponse.java
+new file mode 100644
+index 0000000..2f19c06
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/notification/NotificationResponse.java
+@@ -0,0 +1,14 @@
++package com.lowloot.server.notification;
++
++import java.time.LocalDateTime;
++
++public record NotificationResponse(
++        Long id,
++        String type,
++        Long actorUserId,
++        Long referenceId,
++        String title,
++        String body,
++        boolean read,
++        LocalDateTime createdAt) {
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/notification/NotificationService.java b/lowloot-server/src/main/java/com/lowloot/server/notification/NotificationService.java
+new file mode 100644
+index 0000000..e27863f
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/notification/NotificationService.java
+@@ -0,0 +1,79 @@
++package com.lowloot.server.notification;
++
++import com.lowloot.server.auth.User;
++import java.util.List;
++import org.springframework.stereotype.Service;
++import org.springframework.transaction.annotation.Transactional;
++import org.springframework.web.server.ResponseStatusException;
++
++// Único sistema de notificaciones de Lowloot (ver nota en
++// Notification.java: no existía ninguno antes). FriendService lo consume
++// para avisar solicitudes de amistad recibidas y aceptadas, pero está
++// escrito para que cualquier otra funcionalidad futura llame a
++// `create(...)` con su propio `type` sin tener que tocar esta clase.
++@Service
++public class NotificationService {
++
++    private final NotificationRepository notificationRepository;
++
++    public NotificationService(NotificationRepository notificationRepository) {
++        this.notificationRepository = notificationRepository;
++    }
++
++    public Notification create(Long recipientUserId, String type, User actor, Long referenceId, String title, String body) {
++        Notification notification = new Notification();
++        notification.setUserId(recipientUserId);
++        notification.setType(type);
++        notification.setActorUserId(actor != null ? actor.getId() : null);
++        notification.setReferenceId(referenceId);
++        notification.setTitle(title);
++        notification.setBody(body);
++        return notificationRepository.save(notification);
++    }
++
++    // Se usa cuando el recurso al que apuntaba la notificación (ej. una
++    // solicitud de amistad) dejó de existir o cambió de estado: aceptar,
++    // rechazar o cancelar una solicitud borra su notificación en vez de
++    // dejarla dando vueltas sin nada que hacer.
++    @Transactional
++    public void deleteByReference(String type, Long referenceId) {
++        notificationRepository.deleteByTypeAndReferenceId(type, referenceId);
++    }
++
++    public List<NotificationResponse> listForUser(Long userId) {
++        return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
++                .map(NotificationService::toResponse)
++                .toList();
++    }
++
++    public long unreadCount(Long userId) {
++        return notificationRepository.countByUserIdAndReadFalse(userId);
++    }
++
++    @Transactional
++    public void markRead(Long userId, Long notificationId) {
++        Notification notification = notificationRepository.findByIdAndUserId(notificationId, userId)
++                .orElseThrow(() -> new ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "Notificación no encontrada"));
++        if (!notification.isRead()) {
++            notification.setRead(true);
++            notificationRepository.save(notification);
++        }
++    }
++
++    @Transactional
++    public void markAllRead(Long userId) {
++        notificationRepository.markAllReadForUser(userId);
++    }
++
++    private static NotificationResponse toResponse(Notification n) {
++        return new NotificationResponse(
++                n.getId(),
++                n.getType(),
++                n.getActorUserId(),
++                n.getReferenceId(),
++                n.getTitle(),
++                n.getBody(),
++                n.isRead(),
++                n.getCreatedAt());
++    }
++}
+diff --git a/lowloot-server/src/main/java/com/lowloot/server/notification/UnreadCountResponse.java b/lowloot-server/src/main/java/com/lowloot/server/notification/UnreadCountResponse.java
+new file mode 100644
+index 0000000..d617f32
+--- /dev/null
++++ b/lowloot-server/src/main/java/com/lowloot/server/notification/UnreadCountResponse.java
+@@ -0,0 +1,4 @@
++package com.lowloot.server.notification;
++
++public record UnreadCountResponse(long count) {
++}
+diff --git a/lowloot-server/src/main/resources/db/migration/V6__friends.sql b/lowloot-server/src/main/resources/db/migration/V6__friends.sql
+new file mode 100644
+index 0000000..6916c1f
+--- /dev/null
++++ b/lowloot-server/src/main/resources/db/migration/V6__friends.sql
+@@ -0,0 +1,93 @@
++-- Sistema de Amigos: codigo de amigo unico y permanente, solicitudes,
++-- amistades y ultima conexion (para Online/Offline sin WebSockets).
++--
++-- IMPORTANTE: al revisar el repo, `notifications` no existia todavia como
++-- tabla ni como sistema real -- el frontend solo tenia un array vacio en
++-- memoria (`notifications` en state.js) con un comentario explicito de que
++-- "todavia no existe un endpoint real". Esta migracion crea esa tabla por
++-- primera vez, generica (no especifica de Amigos), para que cualquier otra
++-- funcionalidad futura la reutilice en vez de armar la suya.
++
++-- Codigo de amigo: se agrega nullable primero para poder rellenar los
++-- usuarios ya existentes antes de exigir NOT NULL + UNIQUE.
++ALTER TABLE public.users
++    ADD COLUMN IF NOT EXISTS friend_code VARCHAR(12);
++
++-- Backfill para usuarios existentes: codigo derivado de su id + un valor
++-- aleatorio, con probabilidad de colision despreciable para el volumen de
++-- usuarios de este proyecto. Los usuarios nuevos generan el suyo en el
++-- backend (AuthController + FriendCodeGenerator), con reintento si llegara
++-- a chocar contra uno existente.
++UPDATE public.users
++SET friend_code = UPPER(SUBSTRING(MD5(id::text || clock_timestamp()::text || random()::text), 1, 8))
++WHERE friend_code IS NULL;
++
++ALTER TABLE public.users
++    ALTER COLUMN friend_code SET NOT NULL;
++
++ALTER TABLE public.users
++    ADD CONSTRAINT uq_users_friend_code UNIQUE (friend_code);
++
++-- Ultima actividad: se usa para inferir Online/Offline (umbral en el
++-- backend) sin necesidad de WebSockets. JwtAuthFilter la actualiza en cada
++-- request autenticado (con un margen minimo entre escrituras).
++ALTER TABLE public.users
++    ADD COLUMN IF NOT EXISTS last_active_at TIMESTAMP WITHOUT TIME ZONE;
++
++UPDATE public.users
++SET last_active_at = created_at
++WHERE last_active_at IS NULL;
++
++ALTER TABLE public.users
++    ALTER COLUMN last_active_at SET NOT NULL,
++    ALTER COLUMN last_active_at SET DEFAULT CURRENT_TIMESTAMP;
++
++-- Solicitudes de amistad pendientes. Al aceptar, se borra la fila de aca y
++-- se crea la amistad en `friendships` (una sola relacion logica entre dos
++-- usuarios). Al rechazar o cancelar, se borra sin crear nada.
++CREATE TABLE IF NOT EXISTS public.friend_requests (
++    id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
++    sender_id BIGINT NOT NULL REFERENCES public.users (id) ON DELETE CASCADE,
++    receiver_id BIGINT NOT NULL REFERENCES public.users (id) ON DELETE CASCADE,
++    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
++    CONSTRAINT uq_friend_requests_pair UNIQUE (sender_id, receiver_id),
++    CONSTRAINT chk_friend_requests_no_self CHECK (sender_id <> receiver_id)
++);
++
++CREATE INDEX IF NOT EXISTS idx_friend_requests_receiver ON public.friend_requests (receiver_id);
++CREATE INDEX IF NOT EXISTS idx_friend_requests_sender ON public.friend_requests (sender_id);
++
++-- Amistades confirmadas: una sola fila logica por par de usuarios
++-- (user_id_low siempre el menor de los dos ids). Asi la relacion es una
++-- sola tanto para consultarla como para borrarla, sin duplicar filas por
++-- direccion (A->B / B->A).
++CREATE TABLE IF NOT EXISTS public.friendships (
++    id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
++    user_id_low BIGINT NOT NULL REFERENCES public.users (id) ON DELETE CASCADE,
++    user_id_high BIGINT NOT NULL REFERENCES public.users (id) ON DELETE CASCADE,
++    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
++    CONSTRAINT uq_friendships_pair UNIQUE (user_id_low, user_id_high),
++    CONSTRAINT chk_friendships_order CHECK (user_id_low < user_id_high)
++);
++
++CREATE INDEX IF NOT EXISTS idx_friendships_low ON public.friendships (user_id_low);
++CREATE INDEX IF NOT EXISTS idx_friendships_high ON public.friendships (user_id_high);
++
++-- Notificaciones (primera vez que existe una tabla real para esto, ver
++-- nota arriba). Generica a proposito (type + actor_user_id + reference_id)
++-- para no atarla solo a Amigos: FRIEND_REQUEST y FRIEND_ACCEPTED son sus
++-- primeros dos tipos.
++CREATE TABLE IF NOT EXISTS public.notifications (
++    id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
++    user_id BIGINT NOT NULL REFERENCES public.users (id) ON DELETE CASCADE,
++    type VARCHAR(40) NOT NULL,
++    actor_user_id BIGINT REFERENCES public.users (id) ON DELETE SET NULL,
++    reference_id BIGINT,
++    title VARCHAR(200) NOT NULL,
++    body VARCHAR(500),
++    read boolean NOT NULL DEFAULT false,
++    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
++);
++
++CREATE INDEX IF NOT EXISTS idx_notifications_user ON public.notifications (user_id, created_at DESC);
++CREATE INDEX IF NOT EXISTS idx_notifications_user_type_ref ON public.notifications (user_id, type, reference_id);

@@ -216,6 +216,74 @@ const LowlootAPI = (() => {
     return request('/purchases', { method: 'POST', auth: true, body: { gameIds } });
   }
 
+  /* ---------- Amigos ---------- */
+
+  function getMyFriendCode() {
+    return request('/friends/me/code', { auth: true });
+  }
+
+  function searchFriends(query) {
+    return request(`/friends/search?q=${encodeURIComponent(query)}`, { auth: true });
+  }
+
+  function sendFriendRequest(userId) {
+    return request('/friends/requests', { method: 'POST', auth: true, body: { userId } });
+  }
+
+  function getReceivedFriendRequests() {
+    return request('/friends/requests/received', { auth: true });
+  }
+
+  function getSentFriendRequests() {
+    return request('/friends/requests/sent', { auth: true });
+  }
+
+  function getPendingFriendRequestCount() {
+    return request('/friends/requests/pending-count', { auth: true });
+  }
+
+  function acceptFriendRequest(requestId) {
+    return request(`/friends/requests/${requestId}/accept`, { method: 'POST', auth: true });
+  }
+
+  function rejectFriendRequest(requestId) {
+    return request(`/friends/requests/${requestId}/reject`, { method: 'POST', auth: true });
+  }
+
+  function cancelFriendRequest(requestId) {
+    return request(`/friends/requests/${requestId}`, { method: 'DELETE', auth: true });
+  }
+
+  function getFriends() {
+    return request('/friends', { auth: true });
+  }
+
+  function getFriendProfile(userId) {
+    return request(`/friends/${userId}`, { auth: true });
+  }
+
+  function removeFriend(userId) {
+    return request(`/friends/${userId}`, { method: 'DELETE', auth: true });
+  }
+
+  /* ---------- Notificaciones ---------- */
+
+  function getNotifications() {
+    return request('/notifications', { auth: true });
+  }
+
+  function getUnreadNotifCount() {
+    return request('/notifications/unread-count', { auth: true });
+  }
+
+  function markNotificationRead(notifId) {
+    return request(`/notifications/${notifId}/read`, { method: 'POST', auth: true });
+  }
+
+  function markAllNotificationsRead() {
+    return request('/notifications/read-all', { method: 'POST', auth: true });
+  }
+
   /* ---------- Admin ---------- */
 
   function adminGetUsers() {
@@ -268,6 +336,24 @@ const LowlootAPI = (() => {
     removeFromWishlist,
     // compra
     purchase,
+    // amigos
+    getMyFriendCode,
+    searchFriends,
+    sendFriendRequest,
+    getReceivedFriendRequests,
+    getSentFriendRequests,
+    getPendingFriendRequestCount,
+    acceptFriendRequest,
+    rejectFriendRequest,
+    cancelFriendRequest,
+    getFriends,
+    getFriendProfile,
+    removeFriend,
+    // notificaciones
+    getNotifications,
+    getUnreadNotifCount,
+    markNotificationRead,
+    markAllNotificationsRead,
     // admin
     adminGetUsers,
     adminAdjustBalance,

@@ -51,6 +51,21 @@ public class User implements UserDetails {
     @Column(name = "display_name", length = 50)
     private String displayName;
 
+    // Codigo de amigo unico y permanente (V6__friends.sql). Se genera al
+    // registrarse (ver AuthController + FriendCodeGenerator) y nunca
+    // cambia; es lo que un usuario le comparte a otro para agregarlo sin
+    // exponer su email.
+    @Column(name = "friend_code", nullable = false, unique = true, length = 12)
+    private String friendCode;
+
+    // Ultima vez que este usuario hizo un request autenticado (la
+    // actualiza JwtAuthFilter, con un margen minimo entre escrituras). Es
+    // la base del estado Online/Offline de Amigos: no hay WebSockets ni
+    // presencia en tiempo real, solo "hace menos de N minutos que estuvo
+    // activo".
+    @Column(name = "last_active_at", nullable = false)
+    private LocalDateTime lastActiveAt;
+
     public User() {
     }
 
@@ -104,6 +119,22 @@ public class User implements UserDetails {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public String getFriendCode() {
+        return friendCode;
+    }
+
+    public void setFriendCode(String friendCode) {
+        this.friendCode = friendCode;
+    }
+
+    public LocalDateTime getLastActiveAt() {
+        return lastActiveAt;
+    }
+
+    public void setLastActiveAt(LocalDateTime lastActiveAt) {
+        this.lastActiveAt = lastActiveAt;
     }
 
     // Nombre a mostrar en la UI: el visible si esta configurado, o el

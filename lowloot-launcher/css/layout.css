@@ -445,6 +445,14 @@
   border-radius: var(--radius-sm);
   cursor: default;
   transition: background 0.15s var(--ease);
+  /* Ahora es un <button> real (antes era un <div>) para que sea accesible
+     y clickeable: se resetea el estilo nativo de botón del navegador. */
+  width: 100%;
+  border: none;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  color: inherit;
 }
 
 .notif-item:hover {

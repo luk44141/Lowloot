@@ -4,11 +4,13 @@ import com.lowloot.server.auth.dto.AuthResponse;
 import com.lowloot.server.auth.dto.ChangePasswordRequest;
 import com.lowloot.server.auth.dto.LoginRequest;
 import com.lowloot.server.auth.dto.RegisterRequest;
+import com.lowloot.server.friends.FriendCodeGenerator;
 import com.lowloot.server.profile.UserAvatarRepository;
 import com.lowloot.server.wallet.Wallet;
 import com.lowloot.server.wallet.WalletRepository;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -58,6 +60,8 @@ public class AuthController {
         user.setEmail(request.email());
         user.setPasswordHash(passwordEncoder.encode(request.password()));
         user.setRole(Role.USER);
+        user.setFriendCode(generateUniqueFriendCode());
+        user.setLastActiveAt(LocalDateTime.now());
         user = userRepository.save(user);
 
         Wallet wallet = new Wallet(user.getId(), BigDecimal.ZERO);
@@ -94,6 +98,21 @@ public class AuthController {
         userRepository.save(user);
 
         return ResponseEntity.noContent().build();
+    }
+
+    // Reintenta un puñado de veces por si el código al azar chocara contra
+    // uno ya existente (extremadamente improbable, pero la columna es
+    // UNIQUE así que hay que estar preparados). Si agota los intentos, deja
+    // que el último choque explote como error real en vez de seguir para
+    // siempre.
+    private String generateUniqueFriendCode() {
+        String code = FriendCodeGenerator.generate();
+        int attempts = 0;
+        while (userRepository.existsByFriendCode(code) && attempts < 10) {
+            code = FriendCodeGenerator.generate();
+            attempts++;
+        }
+        return code;
     }
 
     private AuthResponse toAuthResponse(User user, BigDecimal balance) {

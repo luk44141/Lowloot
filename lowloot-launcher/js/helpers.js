@@ -18,6 +18,27 @@ function formatDate(iso) {
   return d.toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
+// Tiempo relativo para datos reales del backend (notificaciones,
+// solicitudes de amistad): a diferencia de NOW de arriba (fecha fija de
+// la maqueta del catálogo), acá se usa la hora real del dispositivo,
+// porque `createdAt`/`lastActiveAt` vienen con la hora real del servidor.
+function formatRelativeTime(isoLocalDateTime) {
+  if (!isoLocalDateTime) return '';
+  const then = new Date(isoLocalDateTime);
+  if (Number.isNaN(then.getTime())) return '';
+  const diffMs = Date.now() - then.getTime();
+  const diffSec = Math.max(0, Math.floor(diffMs / 1000));
+
+  if (diffSec < 60) return 'Justo ahora';
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `Hace ${diffMin} min`;
+  const diffHours = Math.floor(diffMin / 60);
+  if (diffHours < 24) return `Hace ${diffHours} h`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 7) return `Hace ${diffDays} d`;
+  return then.toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;

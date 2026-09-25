@@ -148,6 +148,21 @@ function clearUserSessionData() {
   installModalGameId = null;
   profileAjustesOpen = false;
 
+  // Amigos / notificaciones: todo esto es propio de la cuenta que estaba
+  // logueada, se limpia acá para no arrastrar datos de un usuario al
+  // siguiente que inicie sesión en el mismo launcher.
+  myFriendCode = '';
+  friendsList = [];
+  receivedFriendRequests = [];
+  sentFriendRequests = [];
+  pendingFriendRequestCount = 0;
+  friendsActiveTab = 'amigos';
+  friendsSearchQuery = '';
+  friendsSearchResults = [];
+  friendProfileModalUserId = null;
+  friendProfileModalData = null;
+  notifications = [];
+
   if (typeof invalidateLibraryCache === 'function') invalidateLibraryCache();
 }
 
@@ -164,6 +179,14 @@ function updateSessionUI() {
   if (typeof renderTopbarSession === 'function') renderTopbarSession();
   if (typeof renderCartBadge === 'function') renderCartBadge();
 
+  // Contador de Amigos (persistido en el backend, ver requisito 5) y
+  // campanita de notificaciones: se piden de nuevo cada vez que cambia la
+  // sesión (login, logout, o simplemente arrancar el launcher con un
+  // token guardado) para que sigan siendo ciertos y no dependan solo del
+  // estado que haya quedado en memoria del cliente.
+  if (typeof refreshFriendsBadge === 'function') refreshFriendsBadge();
+  if (typeof refreshNotifications === 'function') refreshNotifications();
+
   // Si la Biblioteca o la Wishlist están abiertas justo cuando cambia la
   // sesión (login/logout), se refrescan en el momento.
   if (qs('.view[data-view="biblioteca"]')?.classList.contains('active') && typeof renderLibraryHome === 'function') {
@@ -171,5 +194,8 @@ function updateSessionUI() {
   }
   if (qs('.view[data-view="wishlist"]')?.classList.contains('active') && typeof renderWishlistView === 'function') {
     renderWishlistView();
+  }
+  if (qs('.view[data-view="amigos"]')?.classList.contains('active') && typeof renderFriendsView === 'function') {
+    renderFriendsView();
   }
 }

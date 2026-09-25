@@ -121,6 +121,24 @@ function initLoginButton() {
 }
 
 /* ---------- Notificaciones ---------- */
+// Backend real (/notifications, ver notification/* en el servidor): esto
+// reemplaza el array vacío fijo que había antes. friends.js reutiliza este
+// mismo sistema para avisar solicitudes de amistad (no crea el suyo).
+
+async function refreshNotifications() {
+  if (!currentUser) {
+    renderNotifBadge();
+    renderNotifList();
+    return;
+  }
+  try {
+    notifications = await LowlootAPI.getNotifications();
+  } catch (err) {
+    console.error('No se pudieron cargar las notificaciones', err);
+  }
+  renderNotifBadge();
+  renderNotifList();
+}
 
 function unreadNotifCount() {
   return notifications.filter((n) => !n.read).length;
@@ -128,6 +146,7 @@ function unreadNotifCount() {
 
 function renderNotifBadge() {
   const badge = document.getElementById('notif-badge');
+  if (!badge) return;
   const count = unreadNotifCount();
   if (count > 0) {
     badge.textContent = count > 9 ? '9+' : String(count);
@@ -139,6 +158,7 @@ function renderNotifBadge() {
 
 function renderNotifList() {
   const list = document.getElementById('notif-list');
+  if (!list) return;
   if (!notifications.length) {
     list.innerHTML = `<p class="placeholder-text">No tenés notificaciones todavía.</p>`;
     return;
@@ -146,13 +166,13 @@ function renderNotifList() {
   list.innerHTML = notifications
     .map(
       (n) => `
-    <div class="notif-item ${n.read ? '' : 'unread'}" data-notif-id="${n.id}">
+    <button type="button" class="notif-item ${n.read ? '' : 'unread'}" data-notif-id="${n.id}" data-notif-type="${n.type}">
       <span class="notif-dot"></span>
       <div class="notif-item-text">
-        <span class="notif-item-title">${n.title}</span>
-        <span class="notif-item-time">${n.time}</span>
+        <span class="notif-item-title">${escapeHtml(n.title)}</span>
+        <span class="notif-item-time">${formatRelativeTime(n.createdAt)}</span>
       </div>
-    </div>
+    </button>
   `
     )
     .join('');
@@ -167,24 +187,47 @@ function initNotifications() {
 
   trigger.addEventListener('click', (event) => {
     event.stopPropagation();
+    const willOpen = !menu.classList.contains('open');
     menu.classList.toggle('open');
+    if (willOpen) refreshNotifications();
   });
 
-  document.getElementById('notif-mark-read').addEventListener('click', (event) => {
+  document.getElementById('notif-mark-read').addEventListener('click', async (event) => {
     event.stopPropagation();
-    notifications.forEach((n) => (n.read = true));
-    renderNotifBadge();
-    renderNotifList();
+    try {
+      await LowlootAPI.markAllNotificationsRead();
+      notifications.forEach((n) => (n.read = true));
+      renderNotifBadge();
+      renderNotifList();
+    } catch (err) {
+      showToast(err.message || 'No se pudieron marcar como leídas');
+    }
   });
 
-  menu.addEventListener('click', (event) => {
+  menu.addEventListener('click', async (event) => {
     const item = event.target.closest('.notif-item');
     if (!item) return;
     event.stopPropagation();
-    const notif = notifications.find((n) => n.id === item.dataset.notifId);
-    if (notif) notif.read = true;
-    renderNotifBadge();
-    renderNotifList();
+
+    const notifId = item.dataset.notifId;
+    const notif = notifications.find((n) => String(n.id) === String(notifId));
+    if (notif && !notif.read) {
+      notif.read = true;
+      renderNotifBadge();
+      renderNotifList();
+      LowlootAPI.markNotificationRead(notifId).catch(() => {
+        // Si falla, se corrige solo en el próximo refresh; no bloqueamos la UI por esto.
+      });
+    }
+
+    // Las notificaciones de Amigos llevan directo a la pestaña correspondiente.
+    const type = item.dataset.notifType;
+    if ((type === 'FRIEND_REQUEST' || type === 'FRIEND_ACCEPTED') && typeof renderFriendsView === 'function') {
+      menu.classList.remove('open');
+      friendsActiveTab = type === 'FRIEND_REQUEST' ? 'recibidas' : 'amigos';
+      activateView('amigos');
+      renderFriendsView();
+    }
   });
 }
 

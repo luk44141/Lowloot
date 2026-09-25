@@ -350,9 +350,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   initPurchaseConfirmModal();
   initAdminControls();
   initProfileView();
+  initFriendsControls();
   initDelegatedHandlers();
   initHoverPreviews();
   await initSession();
   renderCartBadge();
   await renderHome();
+  initFriendsPolling();
 });
+
+// Contador de solicitudes pendientes + notificaciones: se refrescan solo
+// cada cierto tiempo (sin WebSockets, tal como se pidió) para que el
+// badge de "Amigos" y la campanita no dependan únicamente de que el
+// usuario haga clic en algo. También es lo que hace que "última
+// actividad" de los amigos online se vea razonablemente al día mientras
+// el launcher queda abierto.
+function initFriendsPolling() {
+  const POLL_MS = 45000;
+  setInterval(() => {
+    if (!currentUser) return;
+    if (typeof refreshFriendsBadge === 'function') refreshFriendsBadge();
+    if (typeof refreshNotifications === 'function') refreshNotifications();
+    if (qs('.view[data-view="amigos"]')?.classList.contains('active') && typeof renderFriendsView === 'function') {
+      renderFriendsView();
+    }
+  }, POLL_MS);
+}

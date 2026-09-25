@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="css/login.css" />
   <link rel="stylesheet" href="css/admin.css" />
   <link rel="stylesheet" href="css/profile.css" />
+  <link rel="stylesheet" href="css/friends.css" />
 </head>
 <body>
   <div class="app">
@@ -164,6 +165,7 @@
           <li class="nav-item" data-view="amigos">
             <span class="nav-indicator"></span>
             <span class="nav-label">AMIGOS</span>
+            <span class="nav-badge" id="friends-nav-badge" hidden></span>
           </li>
           <li class="nav-item" data-view="mods">
             <span class="nav-indicator"></span>
@@ -240,12 +242,12 @@
           <div id="library-game-content"></div>
         </section>
 
-        <!-- Vistas placeholder -->
-        <section class="view placeholder-view" data-view="amigos">
-          <h2 class="section-title">AMIGOS</h2>
-          <p class="placeholder-text">Esta sección todavía no está disponible.</p>
+        <!-- Vista: Amigos -->
+        <section class="view store-view" data-view="amigos">
+          <div id="friends-content"></div>
         </section>
 
+        <!-- Vistas placeholder -->
         <section class="view placeholder-view" data-view="mods">
           <h2 class="section-title">MODS</h2>
           <p class="placeholder-text">Esta sección todavía no está disponible.</p>
@@ -426,6 +428,14 @@
   </div>
 
 
+  <!-- Modal de perfil público de un amigo / resultado de búsqueda -->
+  <div class="modal-overlay" id="friend-profile-modal-overlay">
+    <div class="modal friend-profile-modal" role="dialog" aria-modal="true">
+      <button type="button" class="modal-close" id="friend-profile-modal-close" aria-label="Cerrar">&times;</button>
+      <div id="friend-profile-modal-content"></div>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
@@ -452,6 +462,7 @@
   <script src="js/library-folders.js" defer></script>
   <script src="js/admin.js" defer></script>
   <script src="js/profile.js" defer></script>
+  <script src="js/friends.js" defer></script>
   <script src="js/app.js" defer></script>
 </body>
 </html>
