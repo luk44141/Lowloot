@@ -2,6 +2,14 @@
 setlocal
 
 :: ============================================
+:: Rutas y configuracion (portable, basado en la
+:: ubicacion del propio .bat)
+:: ============================================
+
+set "PROJECT_ROOT=%~dp0"
+set "PG_SERVICE_NAME=postgresql-x64-18"
+
+:: ============================================
 :: Comprobar permisos de administrador
 :: ============================================
 
@@ -22,14 +30,14 @@ echo.
 
 echo [1/3] Iniciando PostgreSQL...
 
-net start postgresql-x64-18
+net start %PG_SERVICE_NAME%
 
 echo PostgreSQL listo.
 echo.
 
 echo [2/3] Iniciando Spring Boot...
 
-cd /d "C:\Users\lucam\Desktop\lowloot\lowloot-server"
+cd /d "%PROJECT_ROOT%lowloot-server"
 
 powershell -NoProfile -Command "Start-Process -FilePath 'cmd.exe' -ArgumentList '/k','mvnw.cmd spring-boot:run'"
 
@@ -49,16 +57,16 @@ if errorlevel 1 (
 
 echo Spring Boot esta listo.
 
-powershell -NoProfile -Command "$p = Get-NetTCPConnection -LocalPort 8080 -State Listen | Select-Object -First 1 -ExpandProperty OwningProcess; Set-Content 'C:\Users\lucam\Desktop\lowloot\backend.pid' $p"
+powershell -NoProfile -Command "$p = Get-NetTCPConnection -LocalPort 8080 -State Listen | Select-Object -First 1 -ExpandProperty OwningProcess; Set-Content '%PROJECT_ROOT%backend.pid' $p"
 
 echo PID del backend guardado:
-type "C:\Users\lucam\Desktop\lowloot\backend.pid"
+type "%PROJECT_ROOT%backend.pid"
 echo.
 
 echo [3/3] Iniciando Electron...
 echo.
 
-cd /d "C:\Users\lucam\Desktop\lowloot\lowloot-launcher"
+cd /d "%PROJECT_ROOT%lowloot-launcher"
 
 call npm start
 
@@ -70,7 +78,7 @@ echo.
 
 echo Deteniendo Spring Boot...
 
-cd /d "C:\Users\lucam\Desktop\lowloot"
+cd /d "%PROJECT_ROOT%"
 
 if exist backend.pid (
     echo PID encontrado:
@@ -93,7 +101,7 @@ echo.
 
 echo Deteniendo PostgreSQL...
 
-net stop postgresql-x64-18
+net stop %PG_SERVICE_NAME%
 
 echo.
 echo PostgreSQL detenido.
